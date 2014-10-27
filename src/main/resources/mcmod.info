@@ -1,0 +1,13 @@
+[
+    {
+        "modid": "thaifixes",
+        "name": "ThaiFixes",
+        "description": "ช่วยให้การแสดงผลของภาษาไทยออกมาอย่างถูกต้อง",
+        "version": "1.7.10-2.1",
+        "mcversion": "1.7.10",
+        "url": "http://thaifixes.lion328.com/",
+        "authorList": ["lion328"],
+        "credits": "PCXD, secretdataz",
+        "dependencies": ["Forge1.7.10-10.13.2.1230"]
+    }
+]
