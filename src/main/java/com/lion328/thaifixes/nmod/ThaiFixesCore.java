@@ -35,8 +35,8 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 @Mod(name = ThaiFixesCore.NAME, modid = ThaiFixesCore.MODID, version = ThaiFixesCore.VERSION)
 public class ThaiFixesCore {
 
-	public static final String MODID = "thaifixes", NAME = "ThaiFixes", VERSION = "1.7.10-2.1", MCVERSION = "1.7.10";
-	public static final boolean OBFUSCATED = false;
+	public static final String MODID = "thaifixes", NAME = "ThaiFixes", VERSION = "v1.7.10-2.1-pre-1", MCVERSION = "1.7.10";
+	public static final boolean OBFUSCATED = true;
 	
 	@EventHandler
 	public void init(FMLInitializationEvent evt) {
