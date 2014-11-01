@@ -34,8 +34,6 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
 
-import com.lion328.thaifixes.nmod.ThaiFixesConfiguration.FONT_STYLE;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -56,8 +54,11 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 	public static final int THAI_CHAR_START = 3584, THAI_CHAR_END = 3675, THAI_CHAR_SIZE = THAI_CHAR_END - THAI_CHAR_START;
 	public static final byte MCPX_CHATBLOCK_HEIGHT = 14, MCPX_CHATBLOCK_TEXT_YPOS = 11;
 	
-	public ThaiFixesFontRenderer(GameSettings gs, ResourceLocation resLoc, TextureManager texMan, boolean unicodeFlag) {
+	private FontRenderer originalObj;
+	
+	public ThaiFixesFontRenderer(FontRenderer originalObj, GameSettings gs, ResourceLocation resLoc, TextureManager texMan, boolean unicodeFlag) {
 		super(gs, resLoc, texMan, unicodeFlag);
+		this.originalObj = originalObj;
 		gameSettings = gs;
 		renderEngine = texMan;
 		setUnicodeFlag(unicodeFlag);
@@ -73,7 +74,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 			posY = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posY"));
 			posY.setAccessible(true);
 			
-			if(ThaiFixesConfiguration.getFontStyle() == FONT_STYLE.MCPX) {
+			if(ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX) {
 				thaiCharWidth = new int[THAI_CHAR_SIZE];
 				mcpx_font = new ResourceLocation("thaifixes", "textures/font/thai.png");
 				
@@ -167,26 +168,32 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 	
 	@Override
 	public int getCharWidth(char c) {
-		if(ThaiFixesUtils.isSpecialThaiChar(c) && (ThaiFixesConfiguration.getFontStyle() != FONT_STYLE.DISABLE)) return 0;
-		if(ThaiFixesUtils.isThaiChar(c) && (ThaiFixesConfiguration.getFontStyle() == FONT_STYLE.MCPX)) return thaiCharWidth[c - THAI_CHAR_START];
+		if(ThaiFixesUtils.isSpecialThaiChar(c) && (ThaiFixesConfiguration.getFontStyle() != ThaiFixesFontStyle.DISABLE)) return 0;
+		if(ThaiFixesUtils.isThaiChar(c) && (ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX)) return thaiCharWidth[c - THAI_CHAR_START];
 		return super.getCharWidth(c);
+	}
+	
+	public float getCharWidthFloat(char c) { // OptiFine compatibility
+		if(ThaiFixesUtils.isSpecialThaiChar(c) && (ThaiFixesConfiguration.getFontStyle() != ThaiFixesFontStyle.DISABLE)) return 0.0F;
+		if(ThaiFixesUtils.isThaiChar(c) && (ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX)) return (float)thaiCharWidth[c - THAI_CHAR_START];
+		try {
+			return (Float)invokeMethod("getCharWidthFloat", new Class[] {char.class}, c);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return 0.0F;
+		}
 	}
 	
 	@Override
 	public void setUnicodeFlag(boolean flag) {
-		if((ThaiFixesConfiguration.getFontStyle() == FONT_STYLE.MCPX) && gameSettings.language.equals("th-TH") && !gameSettings.forceUnicodeFont && !flag) super.setUnicodeFlag(false);;
+		if((ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX) && gameSettings.language.equalsIgnoreCase("th-TH") && !gameSettings.forceUnicodeFont && !flag) super.setUnicodeFlag(false);
 		super.setUnicodeFlag(flag);
 	}
 	
-	private final Object invokeMethod(String methodName, Class<?>[] methodParamsType, Object... params) {
-		try {
-			Method parentMethod = FontRenderer.class.getDeclaredMethod(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getMethod(methodName), methodParamsType);
-			parentMethod.setAccessible(true);
-			return parentMethod.invoke(this, params);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	private final Object invokeMethod(String methodName, Class<?>[] methodParamsType, Object... params) throws Exception {
+		Method parentMethod = FontRenderer.class.getDeclaredMethod(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getMethod(methodName), methodParamsType);
+		parentMethod.setAccessible(true);
+		return parentMethod.invoke(originalObj, params);
 	}
 	
 	private static Object fieldGet(FontRenderer renderer, String fieldName) {
@@ -206,6 +213,6 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 		ResourceLocation locationFontTexture = (ResourceLocation)fieldGet(renderer, "locationFontTexture");
 		TextureManager renderEngine = (TextureManager)fieldGet(renderer, "renderEngine");
 		boolean unicodeFlag = (Boolean)fieldGet(renderer, "unicodeFlag");
-		return new ThaiFixesFontRenderer(gs, locationFontTexture, renderEngine, unicodeFlag);
+		return new ThaiFixesFontRenderer(renderer, gs, locationFontTexture, renderEngine, unicodeFlag);
 	}
 }

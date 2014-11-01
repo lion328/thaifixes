@@ -49,7 +49,7 @@ import com.lion328.thaifixes.nmod.ClassMap;
 import com.lion328.thaifixes.nmod.ThaiFixesConfiguration;
 import com.lion328.thaifixes.nmod.ThaiFixesFontRenderer;
 import com.lion328.thaifixes.nmod.ThaiFixesUtils;
-import com.lion328.thaifixes.nmod.ThaiFixesConfiguration.FONT_STYLE;
+import com.lion328.thaifixes.nmod.ThaiFixesFontStyle;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -58,7 +58,7 @@ public class ThaiFixesClassTransformer implements IClassTransformer {
 	static {
 		ClassMap.load();
 		ThaiFixesConfiguration.load();
-		ThaiFixesConfiguration.FONT_STYLE.values(); // load
+		ThaiFixesFontStyle.values(); // load
 	}
 	
 	@Override

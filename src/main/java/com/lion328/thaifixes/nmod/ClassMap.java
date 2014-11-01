@@ -41,21 +41,17 @@ public class ClassMap {
 	public void putField(String key, String value) {
 		fields.put(key, value);
 	}
-	
-	public void putFieldSame(String key) {
-		putField(key, key);
-	}
-	
+
 	public void putMethod(String key, String value) {
 		methods.put(key, value);
 	}
 	
 	public String getField(String key) {
-		return ThaiFixesCore.OBFUSCATED ? fields.get(key) : key;
+		return fields.containsKey(key) ? (ThaiFixesCore.OBFUSCATED ? fields.get(key) : key) : key;
 	}
 	
 	public String getMethod(String key) {
-		return ThaiFixesCore.OBFUSCATED ? methods.get(key) : key;
+		return methods.containsKey(key) ? (ThaiFixesCore.OBFUSCATED ? methods.get(key) : key) : key;
 	}
 	
 	public ClassInfo getClassInfo() {
@@ -86,9 +82,6 @@ public class ClassMap {
 		
 		ClassMap guiNewChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiNewChat", "bcc"));
 		guiNewChat.putField("mc", "field_146247_f");
-		guiNewChat.putFieldSame("field_146253_i");
-		guiNewChat.putFieldSame("field_146250_j");
-		guiNewChat.putFieldSame("field_146251_k");
 		guiNewChat.putMethod("func_146232_i", "i");
 		guiNewChat.putMethod("func_146236_a", "a");
 		guiNewChat.putMethod("drawChat", "a");

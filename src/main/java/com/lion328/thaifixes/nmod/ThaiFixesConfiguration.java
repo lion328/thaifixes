@@ -36,11 +36,12 @@ import net.minecraft.client.Minecraft;
 public class ThaiFixesConfiguration {
 	
 	private static Properties prop = new Properties();
-	private static FONT_STYLE fontstyle;
+	private static ThaiFixesFontStyle fontStyle;
 	
 	public static void load() {}
 	
-	public static boolean loadConfig(File basepath) {
+	public static void loadConfig(File basepath) {
+		fontStyle = ThaiFixesFontStyle.UNICODE;
 		try {
 			File cfg = new File(basepath, "/config/ThaiFixes.cfg");
 			if(!cfg.exists()) {
@@ -58,19 +59,18 @@ public class ThaiFixesConfiguration {
 			prop.load(in);
 			in.close();
 			if(prop.containsKey("font.style")) {
-				
+				for(ThaiFixesFontStyle style : ThaiFixesFontStyle.values())
+					if(style.compare(prop.getProperty("font.style"))) {
+						fontStyle = style;
+						break;
+					}
 			}
 		} catch(IOException e) {
 			e.printStackTrace();
-			fontstyle = FONT_STYLE.UNICODE;
-			return false;
 		}
-		return true;
 	}
 	
-	public static FONT_STYLE getFontStyle() {
-		return FONT_STYLE.MCPX;//fontstyle;
+	public static ThaiFixesFontStyle getFontStyle() {
+		return fontStyle;
 	}
-
-	public static enum FONT_STYLE {UNICODE, MCPX, DISABLE};
 }
