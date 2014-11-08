@@ -1,6 +1,4 @@
 /*
- * The MIT License (MIT)
- * 
  * Copyright (c) 2014 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -46,7 +44,7 @@ public class ThaiFixesUtils {
 		return "่้๊๋".indexOf(c) != -1;
 	}
 	
-	public static boolean isLongLongTailThaiChar(char c) {
+	public static boolean isVeryLongTailThaiChar(char c) {
 		return "ฟฝฬ".indexOf(c) != -1;
 	}
 	

@@ -1,6 +1,4 @@
 /*
- * The MIT License (MIT)
- * 
  * Copyright (c) 2014 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,7 +36,7 @@ public class ThaiFixesCore {
 	
 	@EventHandler
 	public void init(FMLInitializationEvent evt) {
-		if(USING_OPTIFINE) System.out.println("Found OptiFine");
+		if(USING_OPTIFINE) System.out.println("Found OptiFine.");
 		ThaiFixesConfiguration.loadConfig(Minecraft.getMinecraft().mcDataDir);
 		try {
 			if(ThaiFixesConfiguration.getFontStyle() != ThaiFixesFontStyle.DISABLE) {

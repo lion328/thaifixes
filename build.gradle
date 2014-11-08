@@ -17,7 +17,11 @@ buildscript {
 
 apply plugin: 'java'
 
-compileJava.options.encoding = 'UTF-8'
+compileJava {
+	options.encoding = 'UTF-8'
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+}
 
 jar {
 	manifest {
@@ -30,7 +34,7 @@ jar {
 apply plugin: 'forge'
 
 version = "v1.7.10-2.1-pre-2"
-group= "com.lion328.thaifixes" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "com.lion328.thaifixes" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ThaiFixes"
 
 minecraft {
