@@ -43,7 +43,7 @@ import com.lion328.thaifixes.nmod.ThaiFixesCore;
 import com.lion328.thaifixes.nmod.ThaiFixesFontRenderer;
 import com.lion328.thaifixes.nmod.ThaiFixesFontStyle;
 
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.MCVersion(ThaiFixesCore.MCVERSION)
 public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {

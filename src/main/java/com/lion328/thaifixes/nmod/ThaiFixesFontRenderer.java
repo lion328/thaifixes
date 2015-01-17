@@ -219,7 +219,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 
 	public static ThaiFixesFontRenderer convert(GameSettings gs, FontRenderer renderer) throws Exception {
 		if(gs == null) gs = Minecraft.getMinecraft().gameSettings;
-		if(renderer == null) renderer = Minecraft.getMinecraft().fontRenderer;
+		if(renderer == null) renderer = Minecraft.getMinecraft().fontRendererObj;
 		ResourceLocation locationFontTexture = (ResourceLocation)fieldGet(renderer, "locationFontTexture");
 		TextureManager renderEngine = (TextureManager)fieldGet(renderer, "renderEngine");
 		boolean unicodeFlag = (Boolean)fieldGet(renderer, "unicodeFlag");

@@ -24,9 +24,9 @@ package com.lion328.thaifixes.nmod;
 
 import net.minecraft.client.Minecraft;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 
 @Mod(name = ThaiFixesCore.NAME, modid = ThaiFixesCore.MODID, version = ThaiFixesCore.VERSION)
 public class ThaiFixesCore {
@@ -41,7 +41,7 @@ public class ThaiFixesCore {
 		try {
 			if(ThaiFixesConfiguration.getFontStyle() != ThaiFixesFontStyle.DISABLE) {
 				System.out.println("Converting Minecraft's font renderer...");
-				Minecraft.getMinecraft().fontRenderer = ThaiFixesFontRenderer.convert(null, null);
+				Minecraft.getMinecraft().fontRendererObj = ThaiFixesFontRenderer.convert(null, null);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
