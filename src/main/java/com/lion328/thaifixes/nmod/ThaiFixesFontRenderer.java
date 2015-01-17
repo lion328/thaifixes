@@ -71,10 +71,10 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 		}
 		
 		try {
-			Field page = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("unicodePageLocations"));
+			/*Field page = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("unicodePageLocations"));
 			page.setAccessible(true);
 			Object res = page.get(this);
-			Array.set(res, 0x0E, unicode_font);
+			Array.set(res, 0x0E, unicode_font);*/
 			
 			posX = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posX"));
 			posX.setAccessible(true);
@@ -124,6 +124,12 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 		}
 	}
 
+	@Override
+	public ResourceLocation getUnicodePageLocation(int page) {
+		if(page == 0x0E) return unicode_font;
+		return super.getUnicodePageLocation(page);
+	}
+	
 	@Override
 	public float renderCharAtPos(int ascii, char c, boolean italic) {
 		float out = ThaiFixesUtils.isThaiChar(c) ? renderThaiChar(c, italic) : super.renderCharAtPos(ascii, c, italic);

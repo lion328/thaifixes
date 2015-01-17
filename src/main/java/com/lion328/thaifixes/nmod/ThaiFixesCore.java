@@ -32,7 +32,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 public class ThaiFixesCore {
 
 	public static final String MODID = "thaifixes", NAME = "ThaiFixes", VERSION = "v1.8-2.2-pre1", MCVERSION = "1.8";
-	public static final boolean OBFUSCATED = true, USING_OPTIFINE = isClassFound("optifine.OptiFineClassTransformer");
+	public static final boolean OBFUSCATED = false, USING_OPTIFINE = isClassFound("optifine.OptiFineClassTransformer");
 	
 	@EventHandler
 	public void init(FMLInitializationEvent evt) {

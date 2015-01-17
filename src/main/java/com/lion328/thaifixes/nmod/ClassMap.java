@@ -65,7 +65,7 @@ public class ClassMap {
 	}
 
 	static {
-		// Minecraft 1.7.10 fields and method mapping.
+		// Minecraft 1.8 classes, fields and method mapping.
 		
 		ClassMap fontRenderer = new ClassMap(new ClassInfo("net.minecraft.client.gui.FontRenderer", "bty"));
 		fontRenderer.putField("locationFontTexture", "field_111273_g");
