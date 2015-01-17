@@ -65,7 +65,7 @@ public class ClassMap {
 	}
 
 	static {
-		// Minecraft 1.8 classes, fields and method mapping.
+		// Minecraft 1.8 classes, fields and methods mapping.
 		
 		ClassMap fontRenderer = new ClassMap(new ClassInfo("net.minecraft.client.gui.FontRenderer", "bty"));
 		fontRenderer.putField("locationFontTexture", "field_111273_g");
@@ -81,12 +81,12 @@ public class ClassMap {
 		ClassMap guiNewChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiNewChat", "buh"));
 		guiNewChat.putField("mc", "field_146247_f");
 		guiNewChat.putMethod("getLineCount", "i"); //func_146232_i
-		guiNewChat.putMethod("func_146232_i", guiNewChat.getMethod("getLineCount")); // backwards compatibility (or lazy to fix it)
+		guiNewChat.putMethod("func_146232_i", guiNewChat.getMethod("getLineCount")); // backward compatibility (or lazy to fix it)
 		guiNewChat.putMethod("getChatComponent", "a"); //func_146236_a
 		guiNewChat.putMethod("func_146236_a", guiNewChat.getMethod("getChatComponent"));
 		guiNewChat.putMethod("drawChat", "func_146230_a");
 		addClassMap(guiNewChat);
-		net.minecraft.client.gui.GuiNewChat.calculateChatboxHeight(0);
+
 		ClassMap guiChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiChat", "bvx"));
 		guiChat.putMethod("initGui", "func_73866_w_");
 		guiChat.putMethod("drawScreen", "func_73863_a");
