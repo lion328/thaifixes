@@ -9,7 +9,7 @@ ThaiFixes
 วิธีการคอมไพล์
 ------------
 
-1. ติดตั้ง Java Development Kit 7 ขึ้นไป และ Git
+1. ติดตั้ง [Java Development Kit 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html) ขึ้นไป และ [Git](http://git-scm.com)
 2. หากไม่ได้อยู่ในโหมด command line ให้เปิด Command Prompt สำหรับ Windows, Terminal สำหรับ Linux, ฯลฯ
 3. เปลี่ยนตำแหน่งของไดเรกทอรี่ไปยังที่ที่ต้องการ
 4. โคลน Git ของ ThaiFixes โดยใช้คำสั่ง `git clone https://github.com/lion328/ThaiFixes.git`
