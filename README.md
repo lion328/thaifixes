@@ -14,7 +14,7 @@ ThaiFixes
 3. เปลี่ยนตำแหน่งของไดเรกทอรี่ไปยังที่ที่ต้องการ
 4. โคลน Git ของ ThaiFixes โดยใช้คำสั่ง `git clone https://github.com/lion328/ThaiFixes.git`
   - หากจะคอมไพล์ branch อื่นที่นอกเหนือจาก `master` ให้ทำการเปลี่ยน branch โดยการใช้คำสั่ง `git checkout [ชื่อ branch]` เช่น `git checkout forge-1.8`
-5. ดาวน์โหลดรหัสต้นฉบับของ Forge เวอร์ชันล่าสุด และแตกไฟล์ทังหมดกเว้นโฟลเดอร์ `src` และไฟล์ `build.gradle` ลงในโฟลเดอร์ `ThaiFixes`
+5. ดาวน์โหลดรหัสต้นฉบับของ Forge เวอร์ชันล่าสุด และแตกไฟล์ทั้งหมดยกเว้นโฟลเดอร์ `src` และไฟล์ `build.gradle` ลงในโฟลเดอร์ `ThaiFixes`
 6. ใน command line ใช้คำสั่ง `cd ThaiFixes` เพื่อเข้าไปยังโฟลเดอร์ `ThaiFixes`
 7. ใช้คำสั่ง `gradlew.bat clean build` สำหรับ Windows หรือ `./gradlew clean build` สำหรับ Linux และอื่นๆ
   - เมื่ออยู่บน Linux และระบปฏิบัติการที่คล้ายกับ Unix หากไฟล์ `gradlew` ไม่ได้ตั้งให้สามารถรันได้ สามารถตั้งให้สามารถรันได้โดยการใช้คำสั่ง `chmod +x gradlew`
