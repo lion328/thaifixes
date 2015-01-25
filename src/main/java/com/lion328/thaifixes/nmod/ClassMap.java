@@ -75,7 +75,9 @@ public class ClassMap {
 		fontRenderer.putField("posX", "field_78295_j");
 		fontRenderer.putField("posY", "field_78296_k");
 		fontRenderer.putField("FONT_HEIGHT", "field_78288_b");
+		fontRenderer.putField("glyphWidth", "field_78287_e");
 		fontRenderer.putMethod("renderUnicodeChar", "func_78277_a");
+		fontRenderer.putMethod("loadGlyphTexture", "func_78257_a");
 		addClassMap(fontRenderer);
 		
 		ClassMap guiNewChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiNewChat", "buh"));
