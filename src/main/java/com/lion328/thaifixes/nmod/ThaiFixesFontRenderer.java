@@ -44,8 +44,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class ThaiFixesFontRenderer extends FontRenderer {
 
-	private ResourceLocation unicode_font = new ResourceLocation("thaifixes", "textures/font/unicode_page_0e.png"), mcpx_font;
-	private Field posX, posY;
+	private ResourceLocation mcpx_font;
+	private Field posX, posY, glyphWidth;
 	private int[] thaiCharWidth;
 	private char beforeChar = 0;
 	
@@ -71,16 +71,14 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 		}
 		
 		try {
-			Field page = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("unicodePageLocations"));
-			page.setAccessible(true);
-			Object res = page.get(this);
-			Array.set(res, 0x0E, unicode_font);
-			
 			posX = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posX"));
 			posX.setAccessible(true);
 			
 			posY = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posY"));
 			posY.setAccessible(true);
+			
+			glyphWidth = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("glyphWidth"));
+			glyphWidth.setAccessible(true);
 			
 			if(ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX) {
 				thaiCharWidth = new int[THAI_CHAR_SIZE];
@@ -115,7 +113,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 						thaiCharWidth[charPos] = (int)(0.5D + (double)((float)l1 * f)) + space;
 						++charPos;
 						break;
-				    }
+					}
 				}
 			}
 			super.onResourceManagerReload(Minecraft.getMinecraft().getResourceManager());
@@ -136,7 +134,39 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 			switch(ThaiFixesConfiguration.getFontStyle()) {
 			default:
 			case UNICODE:
-				if(ThaiFixesUtils.isSpecialThaiChar(c)) posX.setFloat(this, posX.getFloat(this) - 4);
+				if(ThaiFixesUtils.isSpecialThaiChar(c)) {
+					posX.setFloat(this, posX.getFloat(this) - 4);
+					byte width = ((byte[])glyphWidth.get(this))[c];
+					float cPosX = posX.getFloat(this), cPosY = posY.getFloat(this);
+					if (width == 0) return 0.0F;
+					else
+					{
+						// it's work, but i don't know why.
+						float textureY = 4.98F, textureHeight = textureY / 2, textureBaseY = ThaiFixesUtils.isLowerThaiChar(c) ? (15.98F - textureY) : 0;
+						if(ThaiFixesUtils.isLowerThaiChar(c)) cPosY -= 4F;
+						int i = c / 256;
+						invokeMethod("loadGlyphTexture", new Class[] {int.class}, i);
+						int j = width >>> 4;
+						int k = width & 15;
+						float f = (float)j;
+						float f1 = (float)(k + 1);
+						float f2 = (float)(c % 16 * 16) + f;
+						float f3 = (float)((c & 255) / 16 * 16) + textureBaseY;
+						float f4 = f1 - f - 0.02F;
+						float f5 = italic ? 1.0F : 0.0F;
+						GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+						GL11.glTexCoord2f(f2 / 256.0F, f3 / 256.0F);
+						GL11.glVertex3f(cPosX + f5, cPosY + textureBaseY, 0.0F);
+						GL11.glTexCoord2f(f2 / 256.0F, (f3 + textureY) / 256.0F);
+						GL11.glVertex3f(cPosX - f5, cPosY + textureBaseY + textureHeight, 0.0F);
+						GL11.glTexCoord2f((f2 + f4) / 256.0F, f3 / 256.0F);
+						GL11.glVertex3f(cPosX + f4 / 2.0F + f5, cPosY + textureBaseY, 0.0F);
+						GL11.glTexCoord2f((f2 + f4) / 256.0F, (f3 + textureY) / 256.0F);
+						GL11.glVertex3f(cPosX + f4 / 2.0F - f5, cPosY + textureBaseY + textureHeight, 0.0F);
+						GL11.glEnd();
+						return (f1 - f) / 2.0F + 1.0F;
+					}
+				}
 			case DISABLE:
 				return (Float)invokeMethod("renderUnicodeChar", new Class[] {char.class, boolean.class}, c, italic);
 			case MCPX:
@@ -219,7 +249,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 
 	public static ThaiFixesFontRenderer convert(GameSettings gs, FontRenderer renderer) throws Exception {
 		if(gs == null) gs = Minecraft.getMinecraft().gameSettings;
-		if(renderer == null) renderer = Minecraft.getMinecraft().fontRenderer;
+		if(renderer == null) renderer = Minecraft.getMinecraft().fontRendererObj;
 		ResourceLocation locationFontTexture = (ResourceLocation)fieldGet(renderer, "locationFontTexture");
 		TextureManager renderEngine = (TextureManager)fieldGet(renderer, "renderEngine");
 		boolean unicodeFlag = (Boolean)fieldGet(renderer, "unicodeFlag");

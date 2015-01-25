@@ -65,9 +65,9 @@ public class ClassMap {
 	}
 
 	static {
-		// Minecraft 1.7.10 fields and method mapping.
+		// Minecraft 1.8 classes, fields and methods mapping.
 		
-		ClassMap fontRenderer = new ClassMap(new ClassInfo("net.minecraft.client.gui.FontRenderer", "bbu"));
+		ClassMap fontRenderer = new ClassMap(new ClassInfo("net.minecraft.client.gui.FontRenderer", "bty"));
 		fontRenderer.putField("locationFontTexture", "field_111273_g");
 		fontRenderer.putField("renderEngine", "field_78298_i");
 		fontRenderer.putField("unicodeFlag", "field_78293_l");
@@ -75,31 +75,35 @@ public class ClassMap {
 		fontRenderer.putField("posX", "field_78295_j");
 		fontRenderer.putField("posY", "field_78296_k");
 		fontRenderer.putField("FONT_HEIGHT", "field_78288_b");
+		fontRenderer.putField("glyphWidth", "field_78287_e");
 		fontRenderer.putMethod("renderUnicodeChar", "func_78277_a");
+		fontRenderer.putMethod("loadGlyphTexture", "func_78257_a");
 		addClassMap(fontRenderer);
 		
-		ClassMap guiNewChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiNewChat", "bcc"));
+		ClassMap guiNewChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiNewChat", "buh"));
 		guiNewChat.putField("mc", "field_146247_f");
-		guiNewChat.putMethod("func_146232_i", "i");
-		guiNewChat.putMethod("func_146236_a", "a");
-		guiNewChat.putMethod("drawChat", "a");
+		guiNewChat.putMethod("getLineCount", "i"); //func_146232_i
+		guiNewChat.putMethod("func_146232_i", guiNewChat.getMethod("getLineCount")); // backward compatibility (or lazy to fix it)
+		guiNewChat.putMethod("getChatComponent", "a"); //func_146236_a
+		guiNewChat.putMethod("func_146236_a", guiNewChat.getMethod("getChatComponent"));
+		guiNewChat.putMethod("drawChat", "func_146230_a");
 		addClassMap(guiNewChat);
-		
-		ClassMap guiChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiChat", "bct"));
-		guiChat.putMethod("initGui", "b");
-		guiChat.putMethod("drawScreen", "a");
+
+		ClassMap guiChat = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiChat", "bvx"));
+		guiChat.putMethod("initGui", "func_73866_w_");
+		guiChat.putMethod("drawScreen", "func_73863_a");
 		addClassMap(guiChat);
 		
-		ClassMap rendererLivingEnitity = new ClassMap(new ClassInfo("net.minecraft.client.renderer.entity.RendererLivingEntity", "boh"));
-		rendererLivingEnitity.putMethod("passSpecialRender", "b");
+		ClassMap rendererLivingEnitity = new ClassMap(new ClassInfo("net.minecraft.client.renderer.entity.RendererLivingEntity", "cqv"));
+		rendererLivingEnitity.putMethod("passSpecialRender", "func_77033_b");
 		addClassMap(rendererLivingEnitity);
 		
-		ClassMap guiLanguage$List = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiLanguage$List", "bdk"));
-		guiLanguage$List.putMethod("elementClicked", "a");
+		ClassMap guiLanguage$List = new ClassMap(new ClassInfo("net.minecraft.client.gui.GuiLanguage$List", "bwt"));
+		guiLanguage$List.putMethod("elementClicked", "func_148144_a");
 		addClassMap(guiLanguage$List);
 		
-		addClassMap(new ClassMap(new ClassInfo("net.minecraft.util.IChatComponent", "fj")));
-		addClassMap(new ClassMap(new ClassInfo("net.minecraft.entity.EntityLivingBase", "sv")));
+		addClassMap(new ClassMap(new ClassInfo("net.minecraft.util.IChatComponent", "ho")));
+		addClassMap(new ClassMap(new ClassInfo("net.minecraft.entity.EntityLivingBase", "xm")));
 	}
 	
 	public static void load() {} // nope
