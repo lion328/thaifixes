@@ -22,8 +22,10 @@
 
 package com.lion328.thaifixes.nmod;
 
-import net.minecraft.client.Minecraft;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -32,20 +34,26 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 public class ThaiFixesCore {
 
 	public static final String MODID = "thaifixes", NAME = "ThaiFixes", VERSION = "v1.8-2.2-pre2", MCVERSION = "1.8";
-	public static final boolean OBFUSCATED = true, USING_OPTIFINE = isClassFound("optifine.OptiFineClassTransformer");
+	public static final boolean OBFUSCATED = false, USING_OPTIFINE = isClassFound("optifine.OptiFineClassTransformer");
+	private static final Logger logger = LogManager.getFormatterLogger(NAME);
 	
 	@EventHandler
 	public void init(FMLInitializationEvent evt) {
-		if(USING_OPTIFINE) System.out.println("Found OptiFine.");
+		logger.info(NAME + " " + VERSION);
+		if(USING_OPTIFINE) logger.info("Found OptiFine.");
 		ThaiFixesConfiguration.loadConfig(Minecraft.getMinecraft().mcDataDir);
 		try {
 			if(ThaiFixesConfiguration.getFontStyle() != ThaiFixesFontStyle.DISABLE) {
-				System.out.println("Converting Minecraft's font renderer...");
+				logger.info("Converting Minecraft's font renderer...");
 				Minecraft.getMinecraft().fontRendererObj = ThaiFixesFontRenderer.convert(null, null);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static final Logger getLogger() {
+		return logger;
 	}
 	
 	public static boolean isClassFound(String name) {

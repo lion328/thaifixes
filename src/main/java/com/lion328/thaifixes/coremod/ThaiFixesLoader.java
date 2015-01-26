@@ -168,7 +168,7 @@ public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 
 		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		classNode.accept(writer);
-		System.out.println("Class \"" + classname + "\" is patched.");
+		ThaiFixesCore.getLogger().info("Class \"" + classname + "\" is patched.");
 		return writer.toByteArray();
 	}
 	
