@@ -136,40 +136,45 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 			default:
 			case UNICODE:
 				if(ThaiFixesUtils.isSpecialThaiChar(c)) {
-					posX.setFloat(this, posX.getFloat(this) - 4);
-					byte width = ((byte[])glyphWidth.get(this))[c];
+					//posX.setFloat(this, posX.getFloat(this) - 4);
+					///*
+					byte size = ((byte[])glyphWidth.get(this))[c];
 					cPosX = posX.getFloat(this); // get current position
 					cPosY = posY.getFloat(this);
-					if (width == 0) return 0.0F;
+					if (size == 0) return 0.0F;
 					else
 					{
 						// it's work, but i don't know why.
-						float textureY = ThaiFixesUtils.isLowerThaiChar(c) ? 15.98F : 4.98F,
-							textureHeight = textureY / 2;
+						invokeMethod("loadGlyphTexture", new Class[] {int.class}, (int)(c / 256)); // load texture
 						
-						int i = c / 256;
-						invokeMethod("loadGlyphTexture", new Class[] {int.class}, i);
-						int j = width >>> 4;
-						int k = width & 15;
-						float f = (float)j;
-						float f1 = (float)(k + 1);
-						float f2 = (float)(c % 16 * 16) + f;
-						float f3 = (float)((c & 255) / 16 * 16);
-						float f4 = f1 - f - 0.02F;
-						float f5 = italic ? 1.0F : 0.0F;
+						// DELETE 'o' variables
+						float charHeight = 3.98F,
+							beginTexcoordY = ThaiFixesUtils.isLowerThaiChar(c) ? 0F : 0F;
+						
+						// glyphWidth format:
+						// XXXXYYYY, XXXX as start X position on texture coordinate and YYYY as width.
+						float startTexcoordX = (float)(size >>> 4);
+						float charWidth = (float)((size & 0xF) + 1);
+						
+						float texcoordX = (float)(c % 16 * 16) + startTexcoordX;
+						float texcoordY = (float)((c & 255) / 16 * 16);
+						float realCharWidth = charWidth - startTexcoordX - 0.02F;
+						float italicSize = italic ? 1.0F : 0.0F;
 						GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-						GL11.glTexCoord2f(f2 / 256.0F, f3 / 256.0F);
-						GL11.glVertex2f(cPosX + f5, cPosY);
-						GL11.glTexCoord2f(f2 / 256.0F, (f3 + textureY) / 256.0F);
-						GL11.glVertex2f(cPosX - f5, cPosY + textureHeight);
-						GL11.glTexCoord2f((f2 + f4) / 256.0F, f3 / 256.0F);
-						GL11.glVertex2f(cPosX + f4 / 2.0F + f5, cPosY);
-						GL11.glTexCoord2f((f2 + f4) / 256.0F, (f3 + textureY) / 256.0F);
-						GL11.glVertex2f(cPosX + f4 / 2.0F - f5, cPosY + textureHeight);
+						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY) / 256.0F);
+						GL11.glVertex2f(cPosX + italicSize, cPosY + beginTexcoordY);
+						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY + charHeight) / 256.0F);
+						GL11.glVertex2f(cPosX - italicSize, cPosY + beginTexcoordY + 1.98F);
+						GL11.glTexCoord2f((texcoordX + realCharWidth) / 256.0F, (texcoordY + beginTexcoordY) / 256.0F);
+						GL11.glVertex2f(cPosX + realCharWidth / 2.0F + italicSize, cPosY + beginTexcoordY);
+						GL11.glTexCoord2f((texcoordX + realCharWidth) / 256.0F, (texcoordY + beginTexcoordY + charHeight) / 256.0F);
+						GL11.glVertex2f(cPosX + realCharWidth / 2.0F - italicSize, cPosY + beginTexcoordY + 1.98F);
 						GL11.glEnd();
-						return (f1 - f) / 2.0F + 1.0F;
+						return (charWidth - startTexcoordX) / 2.0F + 1.0F;
 					}
+					//*/
 				}
+				//return 0F;
 			case DISABLE:
 				return (Float)invokeMethod("renderUnicodeChar", new Class[] {char.class, boolean.class}, c, italic);
 			case MCPX:
