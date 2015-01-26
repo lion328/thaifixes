@@ -48,10 +48,12 @@ public class ThaiFixesUtils {
 		return "ฟฝฬ".indexOf(c) != -1;
 	}
 	
+	@Deprecated
 	public static char convertKeycharToUnicode(char c) {
 		return (char)((int)c + 3424);
 	}
 	
+	@Deprecated
 	public static char convertToThai(char c) {
 		return isThaiChar(convertKeycharToUnicode(c)) ? convertKeycharToUnicode(c) : c;
 	}
