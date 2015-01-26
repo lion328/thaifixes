@@ -33,7 +33,7 @@ jar {
 
 apply plugin: 'forge'
 
-version = "v1.8-2.2-pre1"
+version = "v1.8-2.2-pre2"
 group = "com.lion328.thaifixes" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ThaiFixes"
 
