@@ -136,7 +136,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 			default:
 			case UNICODE:
 				if(ThaiFixesUtils.isSpecialThaiChar(c)) {
-					//posX.setFloat(this, posX.getFloat(this) - 4);
+					posX.setFloat(this, posX.getFloat(this) - 4);
 					///*
 					byte size = ((byte[])glyphWidth.get(this))[c];
 					cPosX = posX.getFloat(this); // get current position
@@ -144,12 +144,11 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 					if (size == 0) return 0.0F;
 					else
 					{
-						// it's work, but i don't know why.
 						invokeMethod("loadGlyphTexture", new Class[] {int.class}, (int)(c / 256)); // load texture
-						
-						// DELETE 'o' variables
-						float charHeight = 3.98F,
-							beginTexcoordY = ThaiFixesUtils.isLowerThaiChar(c) ? 0F : 0F;
+
+						float charHeightOnTexture = 4.98F,
+							beginTexcoordY = ThaiFixesUtils.isUpperThaiChar(c) ? 0F : 15.98F - charHeightOnTexture,
+							quadHeight = charHeightOnTexture / 2; // vertex position, not for texture coordinate.
 						
 						// glyphWidth format:
 						// XXXXYYYY, XXXX as start X position on texture coordinate and YYYY as width.
@@ -162,13 +161,13 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 						float italicSize = italic ? 1.0F : 0.0F;
 						GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY) / 256.0F);
-						GL11.glVertex2f(cPosX + italicSize, cPosY + beginTexcoordY);
-						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY + charHeight) / 256.0F);
-						GL11.glVertex2f(cPosX - italicSize, cPosY + beginTexcoordY + 1.98F);
+						GL11.glVertex2f(cPosX + italicSize, cPosY + (beginTexcoordY / 2));
+						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY + charHeightOnTexture) / 256.0F);
+						GL11.glVertex2f(cPosX - italicSize, cPosY + (beginTexcoordY / 2) + quadHeight);
 						GL11.glTexCoord2f((texcoordX + realCharWidth) / 256.0F, (texcoordY + beginTexcoordY) / 256.0F);
-						GL11.glVertex2f(cPosX + realCharWidth / 2.0F + italicSize, cPosY + beginTexcoordY);
-						GL11.glTexCoord2f((texcoordX + realCharWidth) / 256.0F, (texcoordY + beginTexcoordY + charHeight) / 256.0F);
-						GL11.glVertex2f(cPosX + realCharWidth / 2.0F - italicSize, cPosY + beginTexcoordY + 1.98F);
+						GL11.glVertex2f(cPosX + realCharWidth / 2.0F + italicSize, cPosY + (beginTexcoordY / 2));
+						GL11.glTexCoord2f((texcoordX + realCharWidth) / 256.0F, (texcoordY + beginTexcoordY + charHeightOnTexture) / 256.0F);
+						GL11.glVertex2f(cPosX + realCharWidth / 2.0F - italicSize, cPosY + (beginTexcoordY / 2) + quadHeight);
 						GL11.glEnd();
 						return (charWidth - startTexcoordX) / 2.0F + 1.0F;
 					}
