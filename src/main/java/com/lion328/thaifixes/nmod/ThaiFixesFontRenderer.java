@@ -136,14 +136,10 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 			default:
 			case UNICODE:
 				if(ThaiFixesUtils.isSpecialThaiChar(c)) {
-					posX.setFloat(this, posX.getFloat(this) - 4);
-					///*
+					//posX.setFloat(this, posX.getFloat(this) - 4); // move character to before character position
 					byte size = ((byte[])glyphWidth.get(this))[c];
-					cPosX = posX.getFloat(this); // get current position
-					cPosY = posY.getFloat(this);
 					if (size == 0) return 0.0F;
-					else
-					{
+					else {
 						invokeMethod("loadGlyphTexture", new Class[] {int.class}, (int)(c / 256)); // load texture
 
 						float charHeightOnTexture = 4.98F,
@@ -159,6 +155,10 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 						float texcoordY = (float)((c & 255) / 16 * 16);
 						float realCharWidth = charWidth - startTexcoordX - 0.02F;
 						float italicSize = italic ? 1.0F : 0.0F;
+						
+						cPosX = posX.getFloat(this) - (realCharWidth + 0.02F) / 2 - 1; // get current position
+						cPosY = posY.getFloat(this);
+						
 						GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY) / 256.0F);
 						GL11.glVertex2f(cPosX + italicSize, cPosY + (beginTexcoordY / 2));
@@ -169,34 +169,33 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 						GL11.glTexCoord2f((texcoordX + realCharWidth) / 256.0F, (texcoordY + beginTexcoordY + charHeightOnTexture) / 256.0F);
 						GL11.glVertex2f(cPosX + realCharWidth / 2.0F - italicSize, cPosY + (beginTexcoordY / 2) + quadHeight);
 						GL11.glEnd();
-						return (charWidth - startTexcoordX) / 2.0F + 1.0F;
+						return 0;//(realCharWidth + 0.02F) / 2.0F + 1.0F;
 					}
-					//*/
 				}
-				//return 0F;
 			case DISABLE:
 				return (Float)invokeMethod("renderUnicodeChar", new Class[] {char.class, boolean.class}, c, italic);
 			case MCPX:
-				if(ThaiFixesUtils.isSpecialThaiChar(c)) posX.setFloat(this, posX.getFloat(this) - 5.0F);
-				cPosX = posX.getFloat(this); // get current position
+				//if(ThaiFixesUtils.isSpecialThaiChar(c)) posX.setFloat(this, posX.getFloat(this) - 5.0F);
+				cPosX = posX.getFloat(this) - (ThaiFixesUtils.isSpecialThaiChar(c) ? 5F : 0F); // get current position
 				cPosY = posY.getFloat(this) + (ThaiFixesUtils.isSpecialThaiChar(c) ? (ThaiFixesUtils.isUpperThaiChar(c) ? -7.0F : 2.0F) - (!ThaiFixesUtils.isSpecialSpecialThaiChar(beforeChar) ? (ThaiFixesUtils.isSpecialThaiChar(beforeChar) ? 2.0F : (ThaiFixesUtils.isVeryLongTailThaiChar(beforeChar) ? 1.0F : 0.0F)) : 0.0F) : 0.0F);
-				c -= THAI_CHAR_START;
-				float f = (float)(c % 16 * 8);
-				float f1 = (float)(c / 16 * 8);
-				float f2 = italic ? 1.0F : 0.0F;
+				
+				int posOnArray = c - THAI_CHAR_START;
+				float texcoordX = (float)(posOnArray % 16 * 8);
+				float texcoordY = (float)(posOnArray / 16 * 8);
+				float italicSize = italic ? 1.0F : 0.0F;
 				renderEngine.bindTexture(mcpx_font);
-				float f3 = (float)thaiCharWidth[c] - 0.01F;
+				float f3 = (float)thaiCharWidth[posOnArray] - 0.01F;
 				GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-				GL11.glTexCoord2f(f / 128.0F, f1 / 128.0F);
-				GL11.glVertex2f(cPosX + f2, cPosY);
-				GL11.glTexCoord2f(f / 128.0F, (f1 + 7.99F) / 128.0F);
-				GL11.glVertex2f(cPosX - f2, cPosY + 7.99F);
-				GL11.glTexCoord2f((f + f3 - 1.0F) / 128.0F, f1 / 128.0F);
-				GL11.glVertex2f(cPosX + f3 - 1.0F + f2, cPosY);
-				GL11.glTexCoord2f((f + f3 - 1.0F) / 128.0F, (f1 + 7.99F) / 128.0F);
-				GL11.glVertex2f(cPosX + f3 - 1.0F - f2, cPosY + 7.99F);
+				GL11.glTexCoord2f(texcoordX / 128.0F, texcoordY / 128.0F);
+				GL11.glVertex2f(cPosX + italicSize, cPosY);
+				GL11.glTexCoord2f(texcoordX / 128.0F, (texcoordY + 7.99F) / 128.0F);
+				GL11.glVertex2f(cPosX - italicSize, cPosY + 7.99F);
+				GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, texcoordY / 128.0F);
+				GL11.glVertex2f(cPosX + f3 - 1.0F + italicSize, cPosY);
+				GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, (texcoordY + 7.99F) / 128.0F);
+				GL11.glVertex2f(cPosX + f3 - 1.0F - italicSize, cPosY + 7.99F);
 				GL11.glEnd();
-				return (float)thaiCharWidth[c];
+				return ThaiFixesUtils.isSpecialThaiChar(c) ? 0 : (float)thaiCharWidth[posOnArray];
 			}
 		} catch(Exception e) {
 			System.out.println("[ThaiFixes] Error during render an thai character '" + c + "'" + (italic ? " with italic style" : "") + ".");

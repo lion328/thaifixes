@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.classloading.FMLForgePlugin;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -34,7 +35,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 public class ThaiFixesCore {
 
 	public static final String MODID = "thaifixes", NAME = "ThaiFixes", VERSION = "v1.8-2.2-pre2", MCVERSION = "1.8";
-	public static final boolean OBFUSCATED = false, USING_OPTIFINE = isClassFound("optifine.OptiFineClassTransformer");
+	public static final boolean OBFUSCATED = FMLForgePlugin.RUNTIME_DEOBF, USING_OPTIFINE = isPackageFound("optifine");
 	private static final Logger logger = LogManager.getFormatterLogger(NAME);
 	
 	@EventHandler
@@ -63,5 +64,9 @@ public class ThaiFixesCore {
 		} catch(Exception e) {
 			return false;
 		}
+	}
+	
+	public static boolean isPackageFound(String name) {
+		return Package.getPackage(name) != null;
 	}
 }
