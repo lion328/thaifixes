@@ -35,7 +35,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 public class ThaiFixesCore {
 
 	public static final String MODID = "thaifixes", NAME = "ThaiFixes", VERSION = "v1.8-2.2-pre2", MCVERSION = "1.8";
-	public static final boolean OBFUSCATED = FMLForgePlugin.RUNTIME_DEOBF, USING_OPTIFINE = isPackageFound("optifine");
+	public static final boolean OBFUSCATED = false, USING_OPTIFINE = isPackageFound("optifine");
 	private static final Logger logger = LogManager.getFormatterLogger(NAME);
 	
 	@EventHandler
