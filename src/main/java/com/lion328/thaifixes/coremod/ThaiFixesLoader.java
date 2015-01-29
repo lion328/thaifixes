@@ -24,6 +24,7 @@ package com.lion328.thaifixes.coremod;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
@@ -38,6 +39,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import com.lion328.thaifixes.coremod.patcher.*;
 import com.lion328.thaifixes.nmod.ClassMap;
 import com.lion328.thaifixes.nmod.ThaiFixesConfiguration;
 import com.lion328.thaifixes.nmod.ThaiFixesCore;
@@ -49,6 +51,8 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 @IFMLLoadingPlugin.MCVersion(ThaiFixesCore.MCVERSION)
 public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 
+	private static final Map<String, IBytecodePatcher> patchers = new HashMap<String, IBytecodePatcher>();
+	
 	@Override
 	public String[] getASMTransformerClass() {
 		return new String[] {this.getClass().getName()};
@@ -74,103 +78,27 @@ public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 		return null;
 	}
 
-
+	@Override
+	public byte[] transform(String className, String arg1, byte[] source) {
+		if(patchers.containsKey(className)) {
+			ThaiFixesCore.getLogger().info("Patching class \"" + className + "\"...");
+			return patchers.get(className).patchClass(source);
+		}
+		return source;
+	}
+	
+	private static void addBytecodePatcherClass(IBytecodePatcher patcher) {
+		String className = patcher.getClassMap().getClassInfo().getProductionClassName();
+		if(patchers.containsKey(className)) return;
+		patchers.put(className, patcher);
+	}
+	
 	static {
 		ClassMap.load();
 		ThaiFixesConfiguration.load();
 		ThaiFixesFontStyle.values(); // load
-	}
-	
-	@Override
-	public byte[] transform(String arg0, String arg1, byte[] arg2) {
-		return patchClass(arg0, arg2);
-	}
-	
-	private byte[] patchClass(String classname, byte[] b) {
-		String[] maps_str = new String[] {
-			"net.minecraft.client.gui.GuiNewChat",
-			"net.minecraft.client.gui.GuiChat",
-			"net.minecraft.client.renderer.entity.RendererLivingEntity",
-		};
 		
-		ClassMap[] maps = new ClassMap[maps_str.length];
-		for(int i = 0; i < maps.length; i++) maps[i] = ClassMap.getClassMap(maps_str[i]);
-		
-		boolean breakFlag = true;
-		for(ClassMap map : maps) if(map.getClassInfo().getProductionClassName().equals(classname)) {
-			breakFlag = false;
-			break;
-		}
-		if(breakFlag) return b;
-		
-		ClassNode classNode = new ClassNode();
-		ClassReader classReader = new ClassReader(b);
-		classReader.accept(classNode, 0);
-
-		if(ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX) {
-			for(MethodNode method : classNode.methods) {
-				if(classname.equals(maps[0].getClassInfo().getProductionClassName())) {
-					if(method.name.equals(maps[0].getMethod("drawChat")) && method.desc.equals("(I)V")) {
-						AbstractInsnNode currentNode = null;
-						for(int i = 0; i < method.instructions.size(); i++) {
-							currentNode = method.instructions.get(i);
-							if(currentNode.getOpcode() == Opcodes.BIPUSH) {
-								if(method.instructions.get(i + 1).getOpcode() == Opcodes.IMUL) method.instructions.set(currentNode, new VarInsnNode(Opcodes.BIPUSH, ThaiFixesFontRenderer.MCPX_CHATBLOCK_HEIGHT));
-								else if(method.instructions.get(i + 1).getOpcode() == Opcodes.ISUB && method.instructions.get(i - 1).getOpcode() == Opcodes.ILOAD) {
-									IntInsnNode node = (IntInsnNode)currentNode;
-									if(node.operand == 9) method.instructions.set(currentNode, new VarInsnNode(Opcodes.BIPUSH, ThaiFixesFontRenderer.MCPX_CHATBLOCK_HEIGHT));
-									else if(node.operand == 8) method.instructions.set(currentNode, new VarInsnNode(Opcodes.BIPUSH, ThaiFixesFontRenderer.MCPX_CHATBLOCK_TEXT_YPOS));
-								}
-							}
-						}
-					} else if(method.name.equals(maps[0].getMethod("func_146236_a")) && method.desc.equals("(II)L" + ClassMap.getClassMap("net.minecraft.util.IChatComponent").getClassInfo().getProductionClassName().replace('.', '/') + ";")) {
-						for(int i = 0; i < method.instructions.size(); i++) {
-							if(method.instructions.get(i).getOpcode() == Opcodes.GETFIELD) {
-								FieldInsnNode node = (FieldInsnNode)method.instructions.get(i);
-								if(node.owner.equals(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getClassInfo().getProductionClassName().replace('.', '/')) && node.name.equals(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("FONT_HEIGHT"))) {
-									method.instructions.set(node, new VarInsnNode(Opcodes.BIPUSH, ThaiFixesFontRenderer.MCPX_CHATBLOCK_HEIGHT));
-									method.instructions.remove(method.instructions.get(i - 1)); // GETFIELD Minecraft.mc
-									method.instructions.remove(method.instructions.get(i - 2)); // GETFIELD GuiNewChat.mc
-									method.instructions.remove(method.instructions.get(i - 3)); // ALOAD 0
-								}
-							}
-						}
-					}
-				} else if(classname.equals(maps[1].getClassInfo().getProductionClassName())) {
-					boolean drawScreenFlag;
-					if((drawScreenFlag = (method.name.equals(maps[1].getMethod("drawScreen")) && method.desc.equals("(IIF)V"))) || (method.name.equals(maps[1].getMethod("initGui")) && method.desc.equals("()V"))) {
-						for(int i = 0; i < method.instructions.size(); i++) {
-							if((method.instructions.get(i).getOpcode() == Opcodes.BIPUSH) && (method.instructions.get(i + 1).getOpcode() == Opcodes.ISUB)) {
-								IntInsnNode node = (IntInsnNode)method.instructions.get(i);
-								if(node.operand == (drawScreenFlag ? 14 : 12)) method.instructions.set(node, new VarInsnNode(Opcodes.BIPUSH, (drawScreenFlag ? ThaiFixesFontRenderer.MCPX_CHATBLOCK_HEIGHT + 2 : ThaiFixesFontRenderer.MCPX_CHATBLOCK_TEXT_YPOS + 2)));
-							}
-						}
-					}
-				} else if(classname.equals(maps[2].getClassInfo().getProductionClassName())) {
-					/*  LDC 8.0
-	    			 *	DCONST_0 
-	    			 *  height = a_height - 1.0D
-	    			 *  LdcInsnNode
-	    			 */
-					/*if(method.name.equals(entityRendererClassMap.getMethod("passSpecialRender")) && method.desc.equals("(L" + ClassMap.getClassMap("net.minecraft.entity.EntityLivingBase").getClassInfo().getProductionClassName().replace('.', '/') + ";DDD)V")) {
-						for(int i = 0; i < method.instructions.size(); i++) {
-							if(method.instructions.get(i).getOpcode() == Opcodes.LDC) {
-								LdcInsnNode node = (LdcInsnNode)method.instructions.get(i);
-								if((new Double(8.0D).equals(node.cst) || new Float(8.0F).equals(node.cst)) && (method.instructions.get(i + 1).getOpcode() == Opcodes.DCONST_0)) {
-									System.out.println("HI");
-									method.instructions.set(node, new LdcInsnNode((double)20.D - 1.0D));
-								}
-							}
-						}
-					}*/
-				}
-			}
-		}
-
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		classNode.accept(writer);
-		ThaiFixesCore.getLogger().info("Class \"" + classname + "\" is patched.");
-		return writer.toByteArray();
+		addBytecodePatcherClass(new GuiNewChatBytecodePatcher());
+		addBytecodePatcherClass(new GuiChatBytecodePatcher());
 	}
-	
 }

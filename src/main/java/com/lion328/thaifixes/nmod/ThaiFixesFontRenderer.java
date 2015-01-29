@@ -176,10 +176,11 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 				return (Float)invokeMethod("renderUnicodeChar", new Class[] {char.class, boolean.class}, c, italic);
 			case MCPX:
 				//if(ThaiFixesUtils.isSpecialThaiChar(c)) posX.setFloat(this, posX.getFloat(this) - 5.0F);
-				cPosX = posX.getFloat(this) - (ThaiFixesUtils.isSpecialThaiChar(c) ? 5F : 0F); // get current position
-				cPosY = posY.getFloat(this) + (ThaiFixesUtils.isSpecialThaiChar(c) ? (ThaiFixesUtils.isUpperThaiChar(c) ? -7.0F : 2.0F) - (!ThaiFixesUtils.isSpecialSpecialThaiChar(beforeChar) ? (ThaiFixesUtils.isSpecialThaiChar(beforeChar) ? 2.0F : (ThaiFixesUtils.isVeryLongTailThaiChar(beforeChar) ? 1.0F : 0.0F)) : 0.0F) : 0.0F);
-				
 				int posOnArray = c - THAI_CHAR_START;
+				
+				cPosX = posX.getFloat(this) - (ThaiFixesUtils.isSpecialThaiChar(c) ? thaiCharWidth[posOnArray] : 0F); // get current position
+				cPosY = posY.getFloat(this) + (ThaiFixesUtils.isSpecialThaiChar(c) ? (ThaiFixesUtils.isUpperThaiChar(c) ? -7.0F : 2.0F) - (!ThaiFixesUtils.isSpecialSpecialThaiChar(beforeChar) ? (ThaiFixesUtils.isSpecialThaiChar(beforeChar) ? 2.0F : (ThaiFixesUtils.isVeryLongTailThaiChar(beforeChar) ? 1.0F : 0.0F)) : 0.0F) : 0.0F);
+
 				float texcoordX = (float)(posOnArray % 16 * 8);
 				float texcoordY = (float)(posOnArray / 16 * 8);
 				float italicSize = italic ? 1.0F : 0.0F;

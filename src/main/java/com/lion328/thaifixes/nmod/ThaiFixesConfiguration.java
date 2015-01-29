@@ -36,8 +36,6 @@ public class ThaiFixesConfiguration {
 	private static Properties prop = new Properties();
 	private static ThaiFixesFontStyle fontStyle;
 	
-	public static void load() {}
-	
 	public static void loadConfig(File basepath) {
 		fontStyle = ThaiFixesFontStyle.UNICODE;
 		try {
@@ -71,4 +69,6 @@ public class ThaiFixesConfiguration {
 	public static ThaiFixesFontStyle getFontStyle() {
 		return fontStyle;
 	}
+
+	public static void load() {}
 }

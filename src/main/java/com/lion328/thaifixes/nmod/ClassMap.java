@@ -105,6 +105,7 @@ public class ClassMap {
 		addClassMap(new ClassMap(new ClassInfo("net.minecraft.util.IChatComponent", "ho")));
 		addClassMap(new ClassMap(new ClassInfo("net.minecraft.entity.EntityLivingBase", "xm")));
 	}
+
+	public static void load() {}
 	
-	public static void load() {} // nope
 }
