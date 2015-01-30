@@ -143,7 +143,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 						invokeMethod("loadGlyphTexture", new Class[] {int.class}, (int)(c / 256)); // load texture
 
 						float charHeightOnTexture = 4.98F,
-							beginTexcoordY = ThaiFixesUtils.isUpperThaiChar(c) ? 0F : 15.98F - charHeightOnTexture,
+							beginTexcoordY = ThaiFixesUtils.isLowerThaiChar(c) ? 15.98F - charHeightOnTexture : 0F,
 							quadHeight = charHeightOnTexture / 2; // vertex position, not for texture coordinate.
 						
 						// glyphWidth format:
