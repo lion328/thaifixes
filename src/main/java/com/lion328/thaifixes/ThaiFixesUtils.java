@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.nmod;
+package com.lion328.thaifixes;
 
 public class ThaiFixesUtils {
 	
@@ -29,7 +29,7 @@ public class ThaiFixesUtils {
 	}
 	
 	public static boolean isSpecialThaiChar(char c) {
-		return isUpperThaiChar(c) || isLowerThaiChar(c);
+		return isLowerThaiChar(c) || isUpperThaiChar(c);
 	}
 	
 	public static boolean isUpperThaiChar(char c) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,12 +39,12 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import com.lion328.thaifixes.ThaiFixesConfiguration;
+import com.lion328.thaifixes.ThaiFixesCore;
+import com.lion328.thaifixes.ThaiFixesFontRenderer;
+import com.lion328.thaifixes.ThaiFixesFontStyle;
+import com.lion328.thaifixes.classmap.ClassMap;
 import com.lion328.thaifixes.coremod.patcher.*;
-import com.lion328.thaifixes.nmod.ClassMap;
-import com.lion328.thaifixes.nmod.ThaiFixesConfiguration;
-import com.lion328.thaifixes.nmod.ThaiFixesCore;
-import com.lion328.thaifixes.nmod.ThaiFixesFontRenderer;
-import com.lion328.thaifixes.nmod.ThaiFixesFontStyle;
 
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 

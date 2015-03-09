@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,12 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.nmod;
+package com.lion328.thaifixes.classmap;
 
-public enum ThaiFixesFontStyle {
+public interface IClassInformation {
 
-	UNICODE("unicode", "default"), MCPX("mcpx"), DISABLE("disable");
-	
-	private String[] s;
-	
-	ThaiFixesFontStyle(String... s) {
-		this.s = s;
-	}
-	
-	@Override
-	public String toString() {
-		return s[0];
-	}
-	
-	public String[] toStringArray() {
-		return s.clone();
-	}
-	
-	public boolean compare(String g) {
-		for(String h : s) if(h.equalsIgnoreCase(g)) return true;
-		return false;
-	}
+	public void setObfuscated(boolean obfuscated);
+	public Class<?> getClassObject() throws ClassNotFoundException;
+	public String getMethodName(Class<?> returnType, Class<?>... parametersType);
+	public String getFieldName(String name);
 }

@@ -1,0 +1,40 @@
+{
+    "minecraft_version": "1.8",
+    "packagename": "net.minecraft.client.gui",
+    "classname": "GuiNewChat",
+    "obfuscated_classname": "buh",
+    "methods": [
+        {
+            "method_name": "getLineCount",
+            "obfuscated_name": "func_146232_i",
+            "type": {
+                "return_type": "int",
+            }
+        },
+        {
+            "method_name": "getChatComponent",
+            "obfuscated_name": "func_146236_a",
+            "type": {
+                "parameters_type": [
+                    "int", "int"
+                ],
+                "return_type": "object:net.minecraft.util.IChatComponent",
+            }
+        },
+        {
+            "method_name": "drawChat",
+            "obfuscated_name": "func_146230_a",
+            "type": {
+                "parameters_type": [
+                    "int"
+                ]
+            }
+        }
+    ],
+    "fields": [
+        {
+            "field_name": "mc",
+            "obfuscated_name: "field_146247_f"
+        }
+    ]
+}

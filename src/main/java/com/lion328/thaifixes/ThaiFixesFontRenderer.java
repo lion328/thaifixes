@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.nmod;
+package com.lion328.thaifixes;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -34,6 +34,8 @@ import java.lang.reflect.Method;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
+
+import com.lion328.thaifixes.classmap.ClassMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -158,6 +160,9 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 						
 						cPosX = posX.getFloat(this) - (realCharWidth + 0.02F) / 2 - 1; // get current position
 						cPosY = posY.getFloat(this);
+						
+						if(ThaiFixesUtils.isSpecialThaiChar(c) && ThaiFixesUtils.isSpecialThaiChar(beforeChar) && c != beforeChar)
+							cPosY -= 0.5F;
 						
 						GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY) / 256.0F);

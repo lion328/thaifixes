@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,9 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.nmod;
+package com.lion328.thaifixes.classmap;
 
-public class ClassInfo {
+public class JSONClassMapLoader {
 	
-	private String className, obfName;
 	
-	public ClassInfo(String className, String obfName) {
-		this.className = className;
-		this.obfName = obfName;
-	}
-	
-	public String getProductionClassName() {
-		return ThaiFixesCore.OBFUSCATED ? obfName : className;
-	}
-	
-	public String getClassName() {
-		return className;
-	}
-	
-	public String getObfuscatedClassName() {
-		return obfName;
-	}
 }

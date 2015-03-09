@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,10 @@ import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.lion328.thaifixes.nmod.ClassMap;
-import com.lion328.thaifixes.nmod.ThaiFixesConfiguration;
-import com.lion328.thaifixes.nmod.ThaiFixesFontRenderer;
-import com.lion328.thaifixes.nmod.ThaiFixesFontStyle;
+import com.lion328.thaifixes.ThaiFixesConfiguration;
+import com.lion328.thaifixes.ThaiFixesFontRenderer;
+import com.lion328.thaifixes.ThaiFixesFontStyle;
+import com.lion328.thaifixes.classmap.ClassMap;
 
 public class GuiChatBytecodePatcher implements IBytecodePatcher {
 

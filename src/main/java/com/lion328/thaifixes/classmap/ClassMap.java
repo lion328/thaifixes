@@ -20,12 +20,16 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod.patcher;
+package com.lion328.thaifixes.classmap;
 
-import com.lion328.thaifixes.classmap.ClassMap;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface IBytecodePatcher {
+import com.lion328.thaifixes.ThaiFixesCore;
 
-	public ClassMap getClassMap();
-	public byte[] patchClass(byte[] source);
+public class ClassMap {
+
+
+	public static void load() {}
+	
 }
