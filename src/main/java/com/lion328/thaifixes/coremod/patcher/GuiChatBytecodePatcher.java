@@ -35,11 +35,12 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.lion328.thaifixes.ThaiFixesConfiguration;
 import com.lion328.thaifixes.ThaiFixesFontRenderer;
 import com.lion328.thaifixes.ThaiFixesFontStyle;
+import com.lion328.thaifixes.classmap.ClassInformation;
 import com.lion328.thaifixes.classmap.ClassMap;
 
 public class GuiChatBytecodePatcher implements IBytecodePatcher {
 
-	public static final ClassMap CLASSMAP = ClassMap.getClassMap("net.minecraft.client.gui.GuiChat");
+	public static final ClassInformation CLASSMAP = ClassMap.instance.getClassInformation("net.minecraft.client.gui.GuiChat");
 	
 	@Override
 	public byte[] patchClass(byte[] source) {
@@ -51,7 +52,7 @@ public class GuiChatBytecodePatcher implements IBytecodePatcher {
 		
 		for(MethodNode method : classNode.methods) {
 			boolean drawScreenFlag;
-			if((drawScreenFlag = (method.name.equals(CLASSMAP.getMethod("drawScreen")) && method.desc.equals("(IIF)V"))) || (method.name.equals(CLASSMAP.getMethod("initGui")) && method.desc.equals("()V"))) {
+			if((drawScreenFlag = (method.name.equals(CLASSMAP.getMethod("drawScreen").getName()) && method.desc.equals("(IIF)V"))) || (method.name.equals(CLASSMAP.getMethod("initGui")) && method.desc.equals("()V"))) {
 				for(int i = 0; i < method.instructions.size(); i++) {
 					if((method.instructions.get(i).getOpcode() == Opcodes.BIPUSH) && (method.instructions.get(i + 1).getOpcode() == Opcodes.ISUB)) {
 						IntInsnNode node = (IntInsnNode)method.instructions.get(i);
@@ -67,7 +68,7 @@ public class GuiChatBytecodePatcher implements IBytecodePatcher {
 	}
 
 	@Override
-	public ClassMap getClassMap() {
+	public ClassInformation getClassInformation() {
 		return CLASSMAP;
 	}
 

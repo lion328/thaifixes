@@ -38,10 +38,15 @@ group = "com.lion328.thaifixes"
 archivesBaseName = "ThaiFixes"
 
 minecraft {
-    version = "1.8-11.14.0.1289-1.8"
+    version = "1.8-11.14.1.1334"
     runDir = "eclipse"
 
     mappings = "snapshot_nodoc_20141130"
+
+	replace "%VERSION%", project.version
+	replace "%MCVERSION%", project.minecraft.version
+	replace "OBFUSCATED = false", "OBFUSCATED = true"
+	replaceIn "ThaiFixesCore.java"
 }
 
 processResources

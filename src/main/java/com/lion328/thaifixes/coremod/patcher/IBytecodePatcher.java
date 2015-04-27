@@ -22,10 +22,11 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
+import com.lion328.thaifixes.classmap.ClassInformation;
 import com.lion328.thaifixes.classmap.ClassMap;
 
 public interface IBytecodePatcher {
 
-	public ClassMap getClassMap();
+	public ClassInformation getClassInformation();
 	public byte[] patchClass(byte[] source);
 }

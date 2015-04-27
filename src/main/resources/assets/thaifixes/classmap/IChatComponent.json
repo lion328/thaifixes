@@ -1,6 +1,6 @@
 {
     "minecraft_version": "1.8",
-    "packagename": "net.minecraft.util",
-    "classname": "IChatComponent",
-    "obfuscated_classname": "ho",
+    "package_name": "net.minecraft.util",
+    "class_name": "IChatComponent",
+    "obfuscated_name": "ho"
 }

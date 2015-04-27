@@ -22,14 +22,45 @@
 
 package com.lion328.thaifixes.classmap;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.lion328.thaifixes.ThaiFixesCore;
 
 public class ClassMap {
-
-
-	public static void load() {}
 	
+	public static final boolean OBFUSCATED = false;
+
+	public static ClassMap instance = new ClassMap();
+	
+	public static void load() throws JsonSyntaxException, JsonIOException, FileNotFoundException {
+		File base = null;
+		try {
+			base = new File(ClassLoader.getSystemClassLoader().getResource("assets/thaifixes/classmap").toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		File[] files = base.listFiles();
+		Gson gson = new Gson();
+		for(File f : files) if(f.isFile()) if(f.getName().endsWith(".json")) ClassMap.instance.registerClassInformation(gson.fromJson(new FileReader(f), ClassInformation.class));
+	}
+	
+	private Map<String, ClassInformation> infos = new HashMap<String, ClassInformation>();
+	
+	public ClassInformation getClassInformation(String name) {
+		return infos.get(name);
+	}
+	
+	public void registerClassInformation(ClassInformation info) {
+		infos.put(info.getClassObject().getName(), info);
+	}
 }

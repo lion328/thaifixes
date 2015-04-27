@@ -73,13 +73,13 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 		}
 		
 		try {
-			posX = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posX"));
+			posX = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField("posX");
 			posX.setAccessible(true);
 			
-			posY = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posY"));
+			posY = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField("posY");
 			posY.setAccessible(true);
 			
-			glyphWidth = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("glyphWidth"));
+			glyphWidth = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField("glyphWidth");
 			glyphWidth.setAccessible(true);
 			
 			if(ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX) {
@@ -241,14 +241,14 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 	}
 	
 	private final Object invokeMethod(String methodName, Class<?>[] methodParamsType, Object... params) throws Exception {
-		Method parentMethod = FontRenderer.class.getDeclaredMethod(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getMethod(methodName), methodParamsType);
+		Method parentMethod = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getMethod(methodName);
 		parentMethod.setAccessible(true);
 		return parentMethod.invoke(this, params);
 	}
 	
 	private static Object fieldGet(FontRenderer renderer, String fieldName) {
 		try {
-			Field f = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField(fieldName));
+			Field f = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField(fieldName);
 			f.setAccessible(true);
 			return f.get(renderer);
 		} catch(Exception e) {
@@ -260,6 +260,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 	public static ThaiFixesFontRenderer convert(GameSettings gs, FontRenderer renderer) throws Exception {
 		if(gs == null) gs = Minecraft.getMinecraft().gameSettings;
 		if(renderer == null) renderer = Minecraft.getMinecraft().fontRendererObj;
+		assert renderer != null;
 		ResourceLocation locationFontTexture = (ResourceLocation)fieldGet(renderer, "locationFontTexture");
 		TextureManager renderEngine = (TextureManager)fieldGet(renderer, "renderEngine");
 		boolean unicodeFlag = (Boolean)fieldGet(renderer, "unicodeFlag");

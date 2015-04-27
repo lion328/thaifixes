@@ -25,11 +25,10 @@ package com.lion328.thaifixes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import scala.actors.threadpool.Arrays;
+import java.util.Arrays;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(name = ThaiFixesCore.NAME, modid = ThaiFixesCore.MODID, version = ThaiFixesCore.VERSION)
@@ -37,8 +36,8 @@ public class ThaiFixesCore {
 
 	public static final String MODID = "thaifixes",
 			NAME = "ThaiFixes",
-			VERSION = "${VERSION}",
-			MCVERSION = "${MCVERSION}";
+			VERSION = "%VERSION%",
+			MCVERSION = "%MCVERSION%";
 	
 	public static final boolean OBFUSCATED = false, USING_OPTIFINE = isPackageFound("optifine");
 	private static final Logger logger = LogManager.getFormatterLogger(NAME);

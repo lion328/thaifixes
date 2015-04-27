@@ -1,15 +1,15 @@
 {
     "minecraft_version": "1.8",
-    "packagename": "net.minecraft.client.renderer.entity",
-    "classname": "Render",
-    "obfuscated_classname": "cpu",
+    "package_name": "net.minecraft.client.renderer.entity",
+    "class_name": "Render",
+    "obfuscated_name": "cpu",
     "methods": [
         {
             "method_name": "renderLivingLabel",
             "obfuscated_name": "func_147906_a",
             "type": {
                 "parameters_type": [
-                    "object:net.minecraft.entity.Entity", "string", "double", "double", "double", "int"
+                    "class:net.minecraft.entity.Entity", "String", "double", "double", "double", "int"
                 ]
             }
         }

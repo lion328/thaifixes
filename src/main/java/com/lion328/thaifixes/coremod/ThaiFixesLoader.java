@@ -39,6 +39,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.lion328.thaifixes.ThaiFixesConfiguration;
 import com.lion328.thaifixes.ThaiFixesCore;
 import com.lion328.thaifixes.ThaiFixesFontRenderer;
@@ -88,13 +90,19 @@ public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 	}
 	
 	private static void addBytecodePatcherClass(IBytecodePatcher patcher) {
-		String className = patcher.getClassMap().getClassInfo().getProductionClassName();
+		System.out.println(patcher.getClass().getName());
+		String className = patcher.getClassInformation().getClassName();
 		if(patchers.containsKey(className)) return;
 		patchers.put(className, patcher);
 	}
 	
 	static {
-		ClassMap.load();
+		try {
+			ClassMap.load();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		ThaiFixesConfiguration.load();
 		ThaiFixesFontStyle.values(); // load
 		
