@@ -26,7 +26,10 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -53,7 +56,9 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 @IFMLLoadingPlugin.MCVersion(ThaiFixesCore.MCVERSION)
 public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 
-	private static final Map<String, IBytecodePatcher> patchers = new HashMap<String, IBytecodePatcher>();
+	private static final Logger logger = LogManager.getFormatterLogger("ThaiFixes-Patcher");
+	
+	private static Map<String, IBytecodePatcher> patchers = new HashMap<String, IBytecodePatcher>();
 	
 	@Override
 	public String[] getASMTransformerClass() {
@@ -82,16 +87,15 @@ public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 
 	@Override
 	public byte[] transform(String className, String arg1, byte[] source) {
-		if(patchers.containsKey(className)) {
-			ThaiFixesCore.getLogger().info("Patching class \"" + className + "\"...");
-			return patchers.get(className).patchClass(source);
+		if(patchers.get(className) != null) {
+			logger.info("Patching class " + className + "...");
+			return (source = patchers.get(className).patchClass(source));
 		}
 		return source;
 	}
 	
 	private static void addBytecodePatcherClass(IBytecodePatcher patcher) {
-		System.out.println(patcher.getClass().getName());
-		String className = patcher.getClassInformation().getClassName();
+		String className = patcher.getClassInformation().getClassObject().getName();
 		if(patchers.containsKey(className)) return;
 		patchers.put(className, patcher);
 	}

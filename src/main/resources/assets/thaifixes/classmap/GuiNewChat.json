@@ -1,5 +1,4 @@
 {
-    "minecraft_version": "1.8",
     "package_name": "net.minecraft.client.gui",
     "class_name": "GuiNewChat",
     "obfuscated_name": "buh",
@@ -13,7 +12,7 @@
             "obfuscated_name": "func_146236_a",
             "type": {
                 "parameters_type": [
-                    "int", "int"
+                    "primitive:java.lang.Integer", "primitive:java.lang.Integer"
                 ]
             }
         },
@@ -22,7 +21,7 @@
             "obfuscated_name": "func_146230_a",
             "type": {
                 "parameters_type": [
-                    "int"
+                    "primitive:java.lang.Integer"
                 ]
             }
         }

@@ -1,5 +1,4 @@
 {
-    "minecraft_version": "1.8",
     "package_name": "net.minecraft.client.gui",
     "class_name": "GuiChat",
     "obfuscated_name": "bvx",
@@ -9,7 +8,7 @@
             "obfuscated_name": "func_73866_w_",
             "type": {
                 "parameters_type": [
-                    "int", "int", "float"
+                    "่primitive:java.lang.Integer", "primitive:java.lang.Integer", "primitive:java.lang.Float"
                 ]
             }
         },

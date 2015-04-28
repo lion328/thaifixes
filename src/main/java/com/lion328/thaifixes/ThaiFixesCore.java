@@ -25,10 +25,14 @@ package com.lion328.thaifixes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.lion328.thaifixes.classmap.ClassMap;
+
 import java.util.Arrays;
+
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(name = ThaiFixesCore.NAME, modid = ThaiFixesCore.MODID, version = ThaiFixesCore.VERSION)
@@ -37,7 +41,7 @@ public class ThaiFixesCore {
 	public static final String MODID = "thaifixes",
 			NAME = "ThaiFixes",
 			VERSION = "%VERSION%",
-			MCVERSION = "%MCVERSION%";
+			MCVERSION = "1.8";//"%MCVERSION%";
 	
 	public static final boolean OBFUSCATED = false, USING_OPTIFINE = isPackageFound("optifine");
 	private static final Logger logger = LogManager.getFormatterLogger(NAME);
@@ -51,8 +55,18 @@ public class ThaiFixesCore {
 		event.getModMetadata().authorList = Arrays.asList(new String[] {"lion328"});
 		event.getModMetadata().credits = "PCXD, secretdataz";
 		event.getModMetadata().description = "ช่วยให้การแสดงผลของภาษาไทยออกมาอย่างถูกต้อง";
-		
+	}
+	
+	@EventHandler
+	public void init(FMLInitializationEvent event) {
 		logger.info(NAME + " " + VERSION);
+		
+		try {
+			ClassMap.load();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		if(USING_OPTIFINE) logger.info("Found OptiFine.");
 		ThaiFixesConfiguration.loadConfig(Minecraft.getMinecraft().mcDataDir);
 		try {

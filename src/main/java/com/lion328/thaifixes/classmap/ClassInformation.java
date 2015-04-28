@@ -28,7 +28,6 @@ import java.lang.reflect.Method;
 public class ClassInformation {
 
 	// JSON fields
-	private String minecraft_version;
 	private String package_name;
 	private String class_name;
 	private String obfuscated_name;
@@ -36,7 +35,6 @@ public class ClassInformation {
 	private ClassField[] fields;
 
 	public Class getClassObject() {
-		System.out.println(ClassMap.OBFUSCATED ? obfuscated_name : new StringBuilder().append(package_name).append('.').append(class_name).toString());
 		try {
 			return Class.forName(ClassMap.OBFUSCATED ? obfuscated_name : new StringBuilder().append(package_name).append('.').append(class_name).toString());
 		} catch (ClassNotFoundException e) {
@@ -48,17 +46,17 @@ public class ClassInformation {
 	public String getUnobfuscatedClassName() {
 		return class_name;
 	}
-
-	public String getClassName() {
-		return getClassObject().getName();
-	}
 	
 	public ClassMethod[] getClassMethods() {
 		return methods.clone();
 	}
 	
-	public Method getMethod(String name) {
-		for(ClassMethod cm : methods) if(cm.getMethodName().equals(name)) {
+	public Method getMethod(String name, Class<?>... params) {
+		main_loop: for(ClassMethod cm : methods) if(cm.getMethodName().equals(name)) {
+			if(params != null) {
+				if(cm.getType().getParametersType().length != params.length) continue;
+				for(int i = 0; i < params.length; i++) if(!params[i].getName().equals(cm.getType().getParametersType()[i].getName())) continue main_loop;
+			}
 			try {
 				return cm.getMethod(getClassObject());
 			} catch (NoSuchMethodException e) {
@@ -66,6 +64,7 @@ public class ClassInformation {
 				return null;
 			}
 		}
+		System.out.println("OCTOPUSSY");
 		return null;
 	}
 
@@ -95,7 +94,6 @@ public class ClassInformation {
 		}
 		
 		public Field getField(Class clazz) throws NoSuchFieldException {
-			System.out.println(clazz.getName());
 			return clazz.getDeclaredField(ClassMap.OBFUSCATED ? obfuscated_name : field_name);
 		}
 	}

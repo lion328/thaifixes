@@ -1,5 +1,4 @@
 {
-    "minecraft_version": "1.8",
     "package_name": "net.minecraft.client.gui",
     "class_name": "FontRenderer",
     "obfuscated_name": "bty",
@@ -7,9 +6,20 @@
         {
             "method_name": "renderUnicodeChar",
             "obfuscated_name": "func_78277_a",
-            "parameters_type": [
-                "char", "boolean"
-            ]
+            "type": {
+                "parameters_type": [
+                    "primitive:java.lang.Character", "primitive:java.lang.Boolean"
+                ]
+            }
+        },
+        {
+            "method_name": "loadGlyphTexture",
+            "obfuscated_name": "func_78257_a",
+            "type": {
+                "parameters_type": [
+                    "primitive:java.lang.Integer"
+                ]
+            }
         }
     ],
     "fields": [

@@ -23,7 +23,9 @@
 package com.lion328.thaifixes.classmap;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +48,7 @@ public class ClassMethod {
 	}
 	
 	public Method getMethod(Class clazz) throws NoSuchMethodException {
-		return clazz.getMethod(ClassMap.OBFUSCATED ? obfuscated_name : method_name, type.realParametersType);
+		return clazz.getDeclaredMethod(ClassMap.OBFUSCATED ? obfuscated_name : method_name, type.getParametersType());
 	}
 	
 	public static class MethodType {
@@ -54,7 +56,6 @@ public class ClassMethod {
 		private static Map<String, Class> typeCache = new HashMap<String, Class>();
 		
 		private String[] parameters_type;
-		private String return_type;
 		
 		private volatile Class[] realParametersType = null;
 		
@@ -62,21 +63,33 @@ public class ClassMethod {
 			realParametersType = paramsType;
 		}
 		
-		public Class[] getParametersType() throws ClassNotFoundException {
-			if(realParametersType == null) {
-				realParametersType = new Class[parameters_type.length];
-				for(int i = 0; i < realParametersType.length; i++) realParametersType[i] = parseType(parameters_type[i]);
+		public Class[] getParametersType() {
+			try {
+				if(realParametersType == null) {
+					realParametersType = new Class[parameters_type == null ? 0 : parameters_type.length];
+					if(parameters_type != null) for(int i = 0; i < realParametersType.length; i++) realParametersType[i] = parseType(parameters_type[i]);
+				}
+				return realParametersType.clone();
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
-			return realParametersType.clone();
+			return null;
 		}
 		
 		private Class parseType(String type) throws ClassNotFoundException {
 			if(typeCache.containsKey(type)) return typeCache.get(type);
-			
+
 			Class clazz = null;
 			if(type.startsWith("class:")) {
 				clazz = ClassMap.instance.getClassInformation(type.substring(6)).getClassObject();
 				if(type.endsWith("[]")) clazz = Array.newInstance(clazz, 0).getClass();
+			}
+			else if(type.startsWith("primitive:")) {
+				try {
+					clazz = Class.forName(type.substring(10));
+					Field TYPE = clazz.getField("TYPE");
+					if(TYPE.getType().getName().equals("java.lang.Class") && Modifier.isStatic(TYPE.getModifiers())) clazz = (Class)TYPE.get(null);
+				} catch(Exception e) {}
 			}
 			else clazz = Class.forName(type);
 			
@@ -85,8 +98,8 @@ public class ClassMethod {
 		}
 		
 		public boolean compare(MethodType t) {
-			if(t.realParametersType.length != realParametersType.length) return false;
-			for(int i = 0; i < realParametersType.length; i++) if(!realParametersType[i].getName().equals(t.realParametersType[i].getName())) return false;
+			if(t.getParametersType().length != getParametersType().length) return false;
+			for(int i = 0; i < getParametersType().length; i++) if(!getParametersType()[i].getName().equals(t.getParametersType()[i].getName())) return false;
 			return true;
 		}
 

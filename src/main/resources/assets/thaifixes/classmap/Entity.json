@@ -1,5 +1,4 @@
 {
-    "minecraft_version": "1.8",
     "package_name": "net.minecraft.entity",
     "class_name": "Entity",
     "obfuscated_name": "wv"
