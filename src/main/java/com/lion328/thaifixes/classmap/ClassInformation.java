@@ -64,7 +64,6 @@ public class ClassInformation {
 				return null;
 			}
 		}
-		System.out.println("OCTOPUSSY");
 		return null;
 	}
 
