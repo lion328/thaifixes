@@ -7,8 +7,6 @@
         "mcversion": "1.8",
         "url": "http://thaifixes.lion328.com/",
         "authorList": ["lion328"],
-        "credits": "PCXD, secretdataz",
-        "dependencies": ["Forge1.8-11.14.0.1289-1.8"]
+        "credits": "PCXD, secretdataz"
     }
 ]
-

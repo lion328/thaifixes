@@ -1,0 +1,59 @@
+{
+    "package_name": "net.minecraft.client.gui",
+    "class_name": "FontRenderer",
+    "obfuscated_name": "bty",
+    "methods": [
+        {
+            "method_name": "renderUnicodeChar",
+            "obfuscated_name": "func_78277_a",
+            "type": {
+                "parameters_type": [
+                    "primitive:java.lang.Character", "primitive:java.lang.Boolean"
+                ]
+            }
+        },
+        {
+            "method_name": "loadGlyphTexture",
+            "obfuscated_name": "func_78257_a",
+            "type": {
+                "parameters_type": [
+                    "primitive:java.lang.Integer"
+                ]
+            }
+        }
+    ],
+    "fields": [
+        {
+            "field_name": "locationFontTexture",
+            "obfuscated_name": "field_111273_g"
+        },
+        {
+            "field_name": "renderEngine",
+            "obfuscated_name": "field_78298_i"
+        },
+        {
+            "field_name": "unicodeFlag",
+            "obfuscated_name": "field_78293_l"
+        },
+        {
+            "field_name": "unicodePageLocations",
+            "obfuscated_name": "field_111274_c"
+        },
+        {
+            "field_name": "posX",
+            "obfuscated_name": "field_78295_j"
+        },
+        {
+            "field_name": "posY",
+            "obfuscated_name": "field_78296_k"
+        },
+        {
+            "field_name": "FONT_HEIGHT",
+            "obfuscated_name": "field_78288_b"
+        },
+        {
+            "field_name": "glyphWidth",
+            "obfuscated_name": "field_78287_e"
+        }
+    ]
+}

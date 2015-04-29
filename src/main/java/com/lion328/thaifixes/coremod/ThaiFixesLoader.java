@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,10 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -39,19 +42,23 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.lion328.thaifixes.ThaiFixesConfiguration;
+import com.lion328.thaifixes.ThaiFixesCore;
+import com.lion328.thaifixes.ThaiFixesFontRenderer;
+import com.lion328.thaifixes.ThaiFixesFontStyle;
+import com.lion328.thaifixes.classmap.ClassMap;
 import com.lion328.thaifixes.coremod.patcher.*;
-import com.lion328.thaifixes.nmod.ClassMap;
-import com.lion328.thaifixes.nmod.ThaiFixesConfiguration;
-import com.lion328.thaifixes.nmod.ThaiFixesCore;
-import com.lion328.thaifixes.nmod.ThaiFixesFontRenderer;
-import com.lion328.thaifixes.nmod.ThaiFixesFontStyle;
 
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.MCVersion(ThaiFixesCore.MCVERSION)
 public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 
-	private static final Map<String, IBytecodePatcher> patchers = new HashMap<String, IBytecodePatcher>();
+	private static final Logger logger = LogManager.getFormatterLogger("ThaiFixes-Patcher");
+	
+	private static Map<String, IBytecodePatcher> patchers = new HashMap<String, IBytecodePatcher>();
 	
 	@Override
 	public String[] getASMTransformerClass() {
@@ -80,21 +87,26 @@ public class ThaiFixesLoader implements IFMLLoadingPlugin, IClassTransformer {
 
 	@Override
 	public byte[] transform(String className, String arg1, byte[] source) {
-		if(patchers.containsKey(className)) {
-			ThaiFixesCore.getLogger().info("Patching class \"" + className + "\"...");
-			return patchers.get(className).patchClass(source);
+		if(patchers.get(className) != null) {
+			logger.info("Patching class " + className + "...");
+			return (source = patchers.get(className).patchClass(source));
 		}
 		return source;
 	}
 	
 	private static void addBytecodePatcherClass(IBytecodePatcher patcher) {
-		String className = patcher.getClassMap().getClassInfo().getProductionClassName();
+		String className = patcher.getClassInformation().getClassObject().getName();
 		if(patchers.containsKey(className)) return;
 		patchers.put(className, patcher);
 	}
 	
 	static {
-		ClassMap.load();
+		try {
+			ClassMap.load();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		ThaiFixesConfiguration.load();
 		ThaiFixesFontStyle.values(); // load
 		

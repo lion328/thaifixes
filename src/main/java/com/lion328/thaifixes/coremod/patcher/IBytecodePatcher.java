@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,11 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import com.lion328.thaifixes.nmod.ClassMap;
+import com.lion328.thaifixes.classmap.ClassInformation;
+import com.lion328.thaifixes.classmap.ClassMap;
 
 public interface IBytecodePatcher {
 
-	public ClassMap getClassMap();
+	public ClassInformation getClassInformation();
 	public byte[] patchClass(byte[] source);
 }

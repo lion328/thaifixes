@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.nmod;
+package com.lion328.thaifixes;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -34,6 +34,8 @@ import java.lang.reflect.Method;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
+
+import com.lion328.thaifixes.classmap.ClassMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -71,13 +73,13 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 		}
 		
 		try {
-			posX = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posX"));
+			posX = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField("posX");
 			posX.setAccessible(true);
 			
-			posY = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("posY"));
+			posY = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField("posY");
 			posY.setAccessible(true);
 			
-			glyphWidth = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("glyphWidth"));
+			glyphWidth = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField("glyphWidth");
 			glyphWidth.setAccessible(true);
 			
 			if(ThaiFixesConfiguration.getFontStyle() == ThaiFixesFontStyle.MCPX) {
@@ -156,8 +158,11 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 						float realCharWidth = charWidth - startTexcoordX - 0.02F;
 						float italicSize = italic ? 1.0F : 0.0F;
 						
-						cPosX = posX.getFloat(this) - (realCharWidth + 0.02F) / 2 - 1; // get current position
+						cPosX = posX.getFloat(this) - (realCharWidth - 0.02F) / 2 - 1 + 0.5F; // get current position
 						cPosY = posY.getFloat(this);
+						
+						if(ThaiFixesUtils.isLowerThaiChar(c)) cPosY += 0.5F;
+						if(ThaiFixesUtils.isSpecialThaiChar(c) && ThaiFixesUtils.isSpecialThaiChar(beforeChar) && c != beforeChar) cPosY -= 0.5F;
 						
 						GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 						GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + beginTexcoordY) / 256.0F);
@@ -181,6 +186,8 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 				cPosX = posX.getFloat(this) - (ThaiFixesUtils.isSpecialThaiChar(c) ? thaiCharWidth[posOnArray] : 0F); // get current position
 				cPosY = posY.getFloat(this) + (ThaiFixesUtils.isSpecialThaiChar(c) ? (ThaiFixesUtils.isUpperThaiChar(c) ? -7.0F : 2.0F) - (!ThaiFixesUtils.isSpecialSpecialThaiChar(beforeChar) ? (ThaiFixesUtils.isSpecialThaiChar(beforeChar) ? 2.0F : (ThaiFixesUtils.isVeryLongTailThaiChar(beforeChar) ? 1.0F : 0.0F)) : 0.0F) : 0.0F);
 
+				//if(c == 'ำ') cPosX -= 1F;
+				
 				float texcoordX = (float)(posOnArray % 16 * 8);
 				float texcoordY = (float)(posOnArray / 16 * 8);
 				float italicSize = italic ? 1.0F : 0.0F;
@@ -199,7 +206,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 				return ThaiFixesUtils.isSpecialThaiChar(c) ? 0 : (float)thaiCharWidth[posOnArray];
 			}
 		} catch(Exception e) {
-			System.out.println("[ThaiFixes] Error during render an thai character '" + c + "'" + (italic ? " with italic style" : "") + ".");
+			ThaiFixesCore.getLogger().error("Error during render an thai character '" + c + "'" + (italic ? " with italic style" : "") + ".");
 			e.printStackTrace();
 		}
 		return 0.0F;
@@ -236,14 +243,14 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 	}
 	
 	private final Object invokeMethod(String methodName, Class<?>[] methodParamsType, Object... params) throws Exception {
-		Method parentMethod = FontRenderer.class.getDeclaredMethod(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getMethod(methodName), methodParamsType);
+		Method parentMethod = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getMethod(methodName, methodParamsType);
 		parentMethod.setAccessible(true);
 		return parentMethod.invoke(this, params);
 	}
 	
 	private static Object fieldGet(FontRenderer renderer, String fieldName) {
 		try {
-			Field f = FontRenderer.class.getDeclaredField(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField(fieldName));
+			Field f = ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField(fieldName);
 			f.setAccessible(true);
 			return f.get(renderer);
 		} catch(Exception e) {
@@ -255,6 +262,7 @@ public class ThaiFixesFontRenderer extends FontRenderer {
 	public static ThaiFixesFontRenderer convert(GameSettings gs, FontRenderer renderer) throws Exception {
 		if(gs == null) gs = Minecraft.getMinecraft().gameSettings;
 		if(renderer == null) renderer = Minecraft.getMinecraft().fontRendererObj;
+		assert renderer != null;
 		ResourceLocation locationFontTexture = (ResourceLocation)fieldGet(renderer, "locationFontTexture");
 		TextureManager renderEngine = (TextureManager)fieldGet(renderer, "renderEngine");
 		boolean unicodeFlag = (Boolean)fieldGet(renderer, "unicodeFlag");

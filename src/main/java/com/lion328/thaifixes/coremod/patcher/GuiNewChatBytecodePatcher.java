@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,14 +32,15 @@ import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.lion328.thaifixes.nmod.ClassMap;
-import com.lion328.thaifixes.nmod.ThaiFixesConfiguration;
-import com.lion328.thaifixes.nmod.ThaiFixesFontRenderer;
-import com.lion328.thaifixes.nmod.ThaiFixesFontStyle;
+import com.lion328.thaifixes.ThaiFixesConfiguration;
+import com.lion328.thaifixes.ThaiFixesFontRenderer;
+import com.lion328.thaifixes.ThaiFixesFontStyle;
+import com.lion328.thaifixes.classmap.ClassInformation;
+import com.lion328.thaifixes.classmap.ClassMap;
 
 public class GuiNewChatBytecodePatcher implements IBytecodePatcher {
 
-	public static final ClassMap CLASSMAP = ClassMap.getClassMap("net.minecraft.client.gui.GuiNewChat");
+	public static final ClassInformation CLASSMAP = ClassMap.instance.getClassInformation("net.minecraft.client.gui.GuiNewChat");
 	
 	@Override
 	public byte[] patchClass(byte[] source) {
@@ -63,11 +64,11 @@ public class GuiNewChatBytecodePatcher implements IBytecodePatcher {
 						}
 					}
 				}
-			} else if(method.name.equals(CLASSMAP.getMethod("func_146236_a")) && method.desc.equals("(II)L" + ClassMap.getClassMap("net.minecraft.util.IChatComponent").getClassInfo().getProductionClassName().replace('.', '/') + ";")) {
+			} else if(method.name.equals(CLASSMAP.getMethod("getChatComponent")) && method.desc.equals("(II)L" + ClassMap.instance.getClassInformation("net.minecraft.util.IChatComponent").getClassObject().getName().replace('.', '/') + ";")) {
 				for(int i = 0; i < method.instructions.size(); i++) {
 					if(method.instructions.get(i).getOpcode() == Opcodes.GETFIELD) {
 						FieldInsnNode node = (FieldInsnNode)method.instructions.get(i);
-						if(node.owner.equals(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getClassInfo().getProductionClassName().replace('.', '/')) && node.name.equals(ClassMap.getClassMap("net.minecraft.client.gui.FontRenderer").getField("FONT_HEIGHT"))) {
+						if(node.owner.equals(ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getClassObject().getName().replace('.', '/')) && node.name.equals(ClassMap.instance.getClassInformation("net.minecraft.client.gui.FontRenderer").getField("FONT_HEIGHT").getName())) {
 							method.instructions.set(node, new VarInsnNode(Opcodes.BIPUSH, ThaiFixesFontRenderer.MCPX_CHATBLOCK_HEIGHT));
 							method.instructions.remove(method.instructions.get(i - 1)); // GETFIELD Minecraft.mc
 							method.instructions.remove(method.instructions.get(i - 2)); // GETFIELD GuiNewChat.mc
@@ -84,7 +85,7 @@ public class GuiNewChatBytecodePatcher implements IBytecodePatcher {
 	}
 
 	@Override
-	public ClassMap getClassMap() {
+	public ClassInformation getClassInformation() {
 		return CLASSMAP;
 	}
 

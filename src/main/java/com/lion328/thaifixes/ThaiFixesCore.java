@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Waritnan Sookbuntherng
+ * Copyright (c) 2014-2015 Waritnan Sookbuntherng
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,53 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.nmod;
+package com.lion328.thaifixes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.lion328.thaifixes.classmap.ClassMap;
+
+import java.util.Arrays;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(name = ThaiFixesCore.NAME, modid = ThaiFixesCore.MODID, version = ThaiFixesCore.VERSION)
 public class ThaiFixesCore {
 
-	public static final String MODID = "thaifixes", NAME = "ThaiFixes", VERSION = "v1.8-2.2-pre2", MCVERSION = "1.8";
+	public static final String MODID = "thaifixes",
+			NAME = "ThaiFixes",
+			VERSION = "%VERSION%",
+			MCVERSION = "1.8";//"%MCVERSION%";
+	
 	public static final boolean OBFUSCATED = false, USING_OPTIFINE = isPackageFound("optifine");
 	private static final Logger logger = LogManager.getFormatterLogger(NAME);
 	
 	@EventHandler
-	public void init(FMLInitializationEvent evt) {
+	public void preInit(FMLPreInitializationEvent event) {
+		event.getModMetadata().modId = MODID;
+		event.getModMetadata().name = NAME;
+		event.getModMetadata().version = VERSION;
+		event.getModMetadata().url = "http://thaifixes.lion328.com/";
+		event.getModMetadata().authorList = Arrays.asList(new String[] {"lion328"});
+		event.getModMetadata().credits = "PCXD, secretdataz";
+		event.getModMetadata().description = "ช่วยให้การแสดงผลของภาษาไทยออกมาอย่างถูกต้อง";
+	}
+	
+	@EventHandler
+	public void init(FMLInitializationEvent event) {
 		logger.info(NAME + " " + VERSION);
+		
+		try {
+			ClassMap.load();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		if(USING_OPTIFINE) logger.info("Found OptiFine.");
 		ThaiFixesConfiguration.loadConfig(Minecraft.getMinecraft().mcDataDir);
 		try {
@@ -54,15 +81,6 @@ public class ThaiFixesCore {
 	
 	public static final Logger getLogger() {
 		return logger;
-	}
-	
-	public static boolean isClassFound(String name) {
-		try {
-			Class.forName(name);
-			return true;
-		} catch(Exception e) {
-			return false;
-		}
 	}
 	
 	public static boolean isPackageFound(String name) {

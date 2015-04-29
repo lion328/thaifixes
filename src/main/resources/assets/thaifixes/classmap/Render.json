@@ -1,0 +1,16 @@
+{
+    "package_name": "net.minecraft.client.renderer.entity",
+    "class_name": "Render",
+    "obfuscated_name": "cpu",
+    "methods": [
+        {
+            "method_name": "renderLivingLabel",
+            "obfuscated_name": "func_147906_a",
+            "type": {
+                "parameters_type": [
+                    "net.minecraft.entity.Entity", "java.lang.String", "primitive:java.lang.Double", "primitive:java.lang.Double", "primitive:java.lang.Double", "primitive:java.lang.Integer"
+                ]
+            }
+        }
+    ]
+}
