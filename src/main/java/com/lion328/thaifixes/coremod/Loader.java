@@ -26,11 +26,9 @@ import com.lion328.thaifixes.coremod.patcher.FontRendererPatcher;
 import com.lion328.thaifixes.coremod.patcher.FontRendererWrapperPatcher;
 import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
 import com.lion328.thaifixes.coremod.patcher.MinecraftPatcher;
-import com.typesafe.config.Config;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +38,7 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[] {getClass().getName()};
+        return new String[]{getClass().getName()};
     }
 
     @Override
@@ -54,7 +52,8 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
     }
 
     @Override
-    public void injectData(Map<String, Object> data) { }
+    public void injectData(Map<String, Object> data) {
+    }
 
     @Override
     public String getAccessTransformerClass() {
@@ -63,9 +62,9 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
 
     @Override
     public byte[] transform(String s, String s1, byte[] bytes) {
-        if(!s.equals(s1))
+        if (!s.equals(s1))
             Configuration.LOGGER.debug("Test 1: " + s + ", " + s1);
-        if(patchers.containsKey(s)) {
+        if (patchers.containsKey(s)) {
             Configuration.LOGGER.info("Patching " + s);
             return patchers.get(s).patch(bytes);
         }

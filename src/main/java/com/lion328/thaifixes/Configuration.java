@@ -24,7 +24,6 @@ package com.lion328.thaifixes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.security.krb5.Config;
 
 import java.io.*;
 import java.util.Properties;
@@ -39,12 +38,12 @@ public class Configuration {
     public static final Properties config = new Properties();
 
     public static void loadConfig(File configFile) throws IOException {
-        if(!configFile.exists()) {
+        if (!configFile.exists()) {
             InputStream in = Configuration.class.getResourceAsStream("/assets/thaifixes/config/config_default.cfg");
             FileOutputStream out = new FileOutputStream(configFile);
             byte[] buffer = new byte[1024];
             int count;
-            while((count = in.read(buffer)) != -1)
+            while ((count = in.read(buffer)) != -1)
                 out.write(buffer, 0, count);
             out.close();
         }

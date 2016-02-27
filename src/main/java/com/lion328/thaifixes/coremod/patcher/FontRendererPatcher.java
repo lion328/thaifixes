@@ -44,27 +44,27 @@ public class FontRendererPatcher implements IClassPatcher {
         ClassNode n = new ClassNode();
         r.accept(n, 0);
 
-        for(MethodNode mn : n.methods) {
-            if((mn.access & Opcodes.ACC_PRIVATE) != 0) {
+        for (MethodNode mn : n.methods) {
+            if ((mn.access & Opcodes.ACC_PRIVATE) != 0) {
                 mn.access |= Opcodes.ACC_PROTECTED;
                 mn.access &= ~Opcodes.ACC_PRIVATE;
             }
             InsnList insns = mn.instructions;
-            for(int i = 0; i < insns.size(); i++) {
+            for (int i = 0; i < insns.size(); i++) {
                 AbstractInsnNode insn = insns.get(i);
-                if(insn.getOpcode() == Opcodes.INVOKESPECIAL) {
-                    MethodInsnNode methodInsn = (MethodInsnNode)insn;
-                    if(methodInsn.owner.equals(Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer")))
+                if (insn.getOpcode() == Opcodes.INVOKESPECIAL) {
+                    MethodInsnNode methodInsn = (MethodInsnNode) insn;
+                    if (methodInsn.owner.equals(Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer")))
                         insns.set(insn, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, methodInsn.owner, methodInsn.name, methodInsn.desc, false));
                 }
             }
         }
 
         ArrayList<FieldNode> allObjectField = new ArrayList<FieldNode>();
-        for(FieldNode fn : n.fields) {
-            if((fn.access & Opcodes.ACC_STATIC) == 0)
+        for (FieldNode fn : n.fields) {
+            if ((fn.access & Opcodes.ACC_STATIC) == 0)
                 allObjectField.add(fn);
-            if((fn.access & Opcodes.ACC_PRIVATE) != 0) {
+            if ((fn.access & Opcodes.ACC_PRIVATE) != 0) {
                 fn.access |= Opcodes.ACC_PROTECTED;
                 fn.access &= ~Opcodes.ACC_PRIVATE;
             }
@@ -74,15 +74,14 @@ public class FontRendererPatcher implements IClassPatcher {
 
         MethodVisitor mv = w.visitMethod(Opcodes.ACC_PRIVATE, "<init>", "()V", null, null);
         mv.visitCode();
-        for(FieldNode fn : allObjectField) {
+        for (FieldNode fn : allObjectField) {
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            if(fn.desc.length() == 1) { // primitives
-                if(fn.desc.equals("F"))
+            if (fn.desc.length() == 1) { // primitives
+                if (fn.desc.equals("F"))
                     mv.visitInsn(Opcodes.FCONST_0);
                 else
                     mv.visitInsn(Opcodes.ICONST_0);
-            }
-            else
+            } else
                 mv.visitInsn(Opcodes.ACONST_NULL);
             mv.visitFieldInsn(Opcodes.PUTFIELD, Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer"), fn.name, fn.desc);
         }

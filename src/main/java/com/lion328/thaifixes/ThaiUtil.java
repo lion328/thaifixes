@@ -26,32 +26,32 @@ public class ThaiUtil {
 
     public static final char THAI_CHAR_RANGE_MIN = 3585;
     public static final char THAI_CHAR_RANGE_MAX = 3675;
-	public static final String LOWER_CHARS = "ฺุู";
+    public static final String LOWER_CHARS = "ฺุู";
     public static final String SPECIAL_UPPER_CHARS = "่้๊๋";
-	public static final String UPPER_CHARS = "ัิีึื็์ํ๎" + SPECIAL_UPPER_CHARS;
+    public static final String UPPER_CHARS = "ัิีึื็์ํ๎" + SPECIAL_UPPER_CHARS;
     public static final String LONG_TAIL_CHARS = "ฟฝฬ";
 
-	public static boolean isThaiChar(char c) {
-		return c >= THAI_CHAR_RANGE_MIN && c <= THAI_CHAR_RANGE_MAX;
-	}
-	
-	public static boolean isSpecialThaiChar(char c) {
-		return isUpperThaiChar(c) || isLowerThaiChar(c);
-	}
-	
-	public static boolean isUpperThaiChar(char c) {
-		return UPPER_CHARS.indexOf(c) != -1;
-	}
-	
-	public static boolean isLowerThaiChar(char c) {
-		return LOWER_CHARS.indexOf(c) != -1;
-	}
-	
-	public static boolean isSpecialUpperThaiChar(char c) {
-		return SPECIAL_UPPER_CHARS.indexOf(c) != -1;
-	}
-	
-	public static boolean isVeryLongTailThaiChar(char c) {
-		return LONG_TAIL_CHARS.indexOf(c) != -1;
-	}
+    public static boolean isThaiChar(char c) {
+        return c >= THAI_CHAR_RANGE_MIN && c <= THAI_CHAR_RANGE_MAX;
+    }
+
+    public static boolean isSpecialThaiChar(char c) {
+        return isUpperThaiChar(c) || isLowerThaiChar(c);
+    }
+
+    public static boolean isUpperThaiChar(char c) {
+        return UPPER_CHARS.indexOf(c) != -1;
+    }
+
+    public static boolean isLowerThaiChar(char c) {
+        return LOWER_CHARS.indexOf(c) != -1;
+    }
+
+    public static boolean isSpecialUpperThaiChar(char c) {
+        return SPECIAL_UPPER_CHARS.indexOf(c) != -1;
+    }
+
+    public static boolean isVeryLongTailThaiChar(char c) {
+        return LONG_TAIL_CHARS.indexOf(c) != -1;
+    }
 }

@@ -32,12 +32,12 @@ public class Util {
 
     public static byte[] readZipEntry(ZipEntry entry, ZipFile zip) throws IOException {
         InputStream in = zip.getInputStream(entry);
-        if(entry.isDirectory()) {
+        if (entry.isDirectory()) {
             throw new IOException("Not a file (directory)");
         }
         int b;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        while((b = in.read()) != -1) out.write(b);
+        while ((b = in.read()) != -1) out.write(b);
         return out.toByteArray();
     }
 }

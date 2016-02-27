@@ -28,7 +28,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -53,7 +52,7 @@ public class Core {
         event.getModMetadata().name = NAME;
         event.getModMetadata().version = VERSION;
         event.getModMetadata().url = "http://thaifixes.lion328.com/";
-        event.getModMetadata().authorList = Arrays.asList(new String[] {"lion328"});
+        event.getModMetadata().authorList = Arrays.asList("lion328");
         event.getModMetadata().credits = "PCXD, secretdataz";
         event.getModMetadata().description = "ช่วยให้การแสดงผลของภาษาไทยออกมาอย่างถูกต้อง";
     }
@@ -68,9 +67,9 @@ public class Core {
             Field fontRendererObjField = mcClass.getDeclaredField(map.get("net.minecraft.client.Minecraft.fontRendererObj"));
             fontRendererObjField.setAccessible(true);
             Object fontRenderer = fontRendererObjField.get(mc);
-            if(fontRenderer instanceof FontRendererWrapper) {
+            if (fontRenderer instanceof FontRendererWrapper) {
                 Field patchedField = FontRendererWrapper.class.getDeclaredField("PATCHED");
-                if(!patchedField.getBoolean(null)) {
+                if (!patchedField.getBoolean(null)) {
                     LOGGER.error("Unpatched FontRendererWrapper, converting to default");
                     Class<?> fontRendererClass = Class.forName(map.get("net.minecraft.client.gui.FontRenderer").replace('/', '.'));
                     Field[] fields = fontRendererClass.getDeclaredFields();
@@ -79,10 +78,9 @@ public class Core {
                     Object newFontRenderer = constructor.newInstance();
                     Field modifiersField = Field.class.getDeclaredField("modifiers");
                     modifiersField.setAccessible(true);
-                    for(Field field : fields) {
+                    for (Field field : fields) {
                         field.setAccessible(true);
-                        if((field.getModifiers() & Modifier.FINAL) != 0)
-                            modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
+                        modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
                         field.set(newFontRenderer, field.get(fontRenderer));
                     }
                     fontRendererObjField.set(mc, newFontRenderer);
@@ -92,7 +90,7 @@ public class Core {
                     String rendererClass = Configuration.config.getProperty("font.rendererclass", "disable");
                     if (!rendererClass.equalsIgnoreCase("disable")) {
                         Class<?> customRendererClass = Class.forName(rendererClass);
-                        IFontRenderer customRenderer = (IFontRenderer)customRendererClass.newInstance();
+                        IFontRenderer customRenderer = (IFontRenderer) customRendererClass.newInstance();
                         ((FontRendererWrapper) fontRenderer).addRenderer(customRenderer);
                         LOGGER.info("Added " + rendererClass + " as font renderer");
                     }

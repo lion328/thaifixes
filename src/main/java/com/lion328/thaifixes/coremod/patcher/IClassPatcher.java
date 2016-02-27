@@ -25,5 +25,6 @@ package com.lion328.thaifixes.coremod.patcher;
 public interface IClassPatcher {
 
     String getClassName();
+
     byte[] patch(byte[] original);
 }

@@ -56,26 +56,26 @@ public class MCPXFontRenderer implements IFontRenderer {
         int xSize = width / 16;
         int ySize = height / 16;
         byte space = 1;
-        float f = 8.0F / (float)xSize;
+        float f = 8.0F / (float) xSize;
         int charPos = 0;
 
-        while(charPos < 256) {
+        while (charPos < 256) {
             int col = charPos % 16;
             int row = charPos / 16;
             int l1 = xSize - 1;
-            while(true) {
-                if(l1 >= 0) {
+            while (true) {
+                if (l1 >= 0) {
                     boolean end = true;
-                    for(int j2 = 0; j2 < ySize && end; ++j2)
-                        if((texture[(col * xSize + l1) + (row * xSize + j2) * width] >> 24 & 0xFF) != 0)
+                    for (int j2 = 0; j2 < ySize && end; ++j2)
+                        if ((texture[(col * xSize + l1) + (row * xSize + j2) * width] >> 24 & 0xFF) != 0)
                             end = false;
-                    if(end) {
+                    if (end) {
                         --l1;
                         continue;
                     }
                 }
                 ++l1;
-                thaiCharWidth[charPos] = (int)(0.5D + (double)((float)l1 * f)) + space;
+                thaiCharWidth[charPos] = (int) (0.5D + (double) ((float) l1 * f)) + space;
                 ++charPos;
                 break;
             }
@@ -99,22 +99,22 @@ public class MCPXFontRenderer implements IFontRenderer {
         float cPosX = wrapper.getX();
         float cPosY = wrapper.getY();
 
-        if(ThaiUtil.isSpecialThaiChar(c)) {
+        if (ThaiUtil.isSpecialThaiChar(c)) {
             cPosX -= thaiCharWidth[offset];
-            if(ThaiUtil.isUpperThaiChar(c))
+            if (ThaiUtil.isUpperThaiChar(c))
                 cPosY -= 7.0F;
             else
                 cPosY += 2.0F;
-            if(ThaiUtil.isVeryLongTailThaiChar(wrapper.getLastCharacterRenderered()))
+            if (ThaiUtil.isVeryLongTailThaiChar(wrapper.getLastCharacterRenderered()))
                 cPosY -= 1.0F;
-            if(ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
+            if (ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
                 cPosY -= 3.0F;
         }
 
-        float texcoordX = (float)(offset % 16 * 8);
-        float texcoordY = (float)(offset / 16 * 8);
+        float texcoordX = (float) (offset % 16 * 8);
+        float texcoordY = (float) (offset / 16 * 8);
         float italicSize = italic ? 1.0F : 0.0F;
-        float f3 = (float)thaiCharWidth[offset] - 0.01F;
+        float f3 = (float) thaiCharWidth[offset] - 0.01F;
 
         wrapper.bindTexture(mcpxFontLocation);
 
@@ -128,12 +128,12 @@ public class MCPXFontRenderer implements IFontRenderer {
         GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, (texcoordY + 7.99F) / 128.0F);
         GL11.glVertex2f(cPosX + f3 - 1.0F - italicSize, cPosY + 7.99F);
         GL11.glEnd();
-        return ThaiUtil.isSpecialThaiChar(c) ? 0 : (float)thaiCharWidth[offset];
+        return ThaiUtil.isSpecialThaiChar(c) ? 0 : (float) thaiCharWidth[offset];
     }
 
     @Override
     public int getCharacterWidth(char c) {
-        if(ThaiUtil.isSpecialThaiChar(c)) return 0;
+        if (ThaiUtil.isSpecialThaiChar(c)) return 0;
         return thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
     }
 }

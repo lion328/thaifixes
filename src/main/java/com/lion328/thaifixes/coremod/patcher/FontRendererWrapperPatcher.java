@@ -22,10 +22,10 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import java.util.*;
-
 import com.lion328.thaifixes.coremod.Configuration;
 import org.objectweb.asm.*;
+
+import java.util.Map;
 
 public class FontRendererWrapperPatcher implements IClassPatcher, Opcodes {
 
@@ -225,7 +225,7 @@ public class FontRendererWrapperPatcher implements IClassPatcher, Opcodes {
             mv.visitJumpInsn(GOTO, l0);
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitFrame(Opcodes.F_FULL, 7, new Object[] {"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT, Opcodes.TOP, "java/util/Iterator"}, 0, new Object[] {});
+            mv.visitFrame(Opcodes.F_FULL, 7, new Object[]{"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT, Opcodes.TOP, "java/util/Iterator"}, 0, new Object[]{});
             mv.visitVarInsn(ALOAD, 6);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
             mv.visitTypeInsn(CHECKCAST, "com/lion328/thaifixes/IFontRenderer");
@@ -255,7 +255,7 @@ public class FontRendererWrapperPatcher implements IClassPatcher, Opcodes {
             mv.visitMethodInsn(INVOKESPECIAL, map.get("net.minecraft.client.gui.FontRenderer"), map.get("net.minecraft.client.gui.FontRenderer.renderCharAtPos"), "(ICZ)F", false);
             mv.visitVarInsn(FSTORE, 4);
             mv.visitLabel(l2);
-            mv.visitFrame(Opcodes.F_FULL, 5, new Object[] {"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT}, 0, new Object[] {});
+            mv.visitFrame(Opcodes.F_FULL, 5, new Object[]{"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT}, 0, new Object[]{});
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ILOAD, 2);
             mv.visitFieldInsn(PUTFIELD, "com/lion328/thaifixes/FontRendererWrapper", "lastChar", "C");
@@ -276,7 +276,7 @@ public class FontRendererWrapperPatcher implements IClassPatcher, Opcodes {
             mv.visitJumpInsn(GOTO, l0);
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitFrame(Opcodes.F_FULL, 6, new Object[] {"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT, Opcodes.TOP, "java/util/Iterator"}, 0, new Object[] {});
+            mv.visitFrame(Opcodes.F_FULL, 6, new Object[]{"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT, Opcodes.TOP, "java/util/Iterator"}, 0, new Object[]{});
             mv.visitVarInsn(ALOAD, 5);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
             mv.visitTypeInsn(CHECKCAST, "com/lion328/thaifixes/IFontRenderer");
@@ -305,7 +305,7 @@ public class FontRendererWrapperPatcher implements IClassPatcher, Opcodes {
             mv.visitMethodInsn(INVOKESPECIAL, map.get("net.minecraft.client.gui.FontRenderer"), map.get("net.minecraft.client.gui.FontRenderer.renderCharAtPos"), "(CZ)F", false);
             mv.visitVarInsn(FSTORE, 3);
             mv.visitLabel(l2);
-            mv.visitFrame(Opcodes.F_FULL, 4, new Object[] {"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT}, 0, new Object[] {});
+            mv.visitFrame(Opcodes.F_FULL, 4, new Object[]{"com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.FLOAT}, 0, new Object[]{});
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ILOAD, 1);
             mv.visitFieldInsn(PUTFIELD, "com/lion328/thaifixes/FontRendererWrapper", "lastChar", "C");
@@ -324,9 +324,9 @@ public class FontRendererWrapperPatcher implements IClassPatcher, Opcodes {
             mv.visitJumpInsn(GOTO, l0);
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitFrame(Opcodes.F_FULL, 4, new Object[] {
+            mv.visitFrame(Opcodes.F_FULL, 4, new Object[]{
                     "com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.TOP, "java/util/Iterator"
-            }, 0, new Object[] {});
+            }, 0, new Object[]{});
             mv.visitVarInsn(ALOAD, 3);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
             mv.visitTypeInsn(CHECKCAST, "com/lion328/thaifixes/IFontRenderer");
@@ -361,9 +361,9 @@ public class FontRendererWrapperPatcher implements IClassPatcher, Opcodes {
             mv.visitJumpInsn(GOTO, l0);
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitFrame(Opcodes.F_FULL, 4, new Object[] {
+            mv.visitFrame(Opcodes.F_FULL, 4, new Object[]{
                     "com/lion328/thaifixes/FontRendererWrapper", Opcodes.INTEGER, Opcodes.TOP, "java/util/Iterator"
-            }, 0, new Object[] {});
+            }, 0, new Object[]{});
             mv.visitVarInsn(ALOAD, 3);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
             mv.visitTypeInsn(CHECKCAST, "com/lion328/thaifixes/IFontRenderer");

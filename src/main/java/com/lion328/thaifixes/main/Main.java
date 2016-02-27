@@ -23,7 +23,6 @@
 package com.lion328.thaifixes.main;
 
 import com.lion328.thaifixes.coremod.mapper.IClassMapper;
-import com.lion328.thaifixes.coremod.mapper.V1_6_2ClassMapper;
 import com.lion328.thaifixes.coremod.mapper.reader.FileJarReader;
 
 import java.io.File;
@@ -35,7 +34,7 @@ import java.util.jar.JarFile;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        if(args.length == 3 && args[0].equalsIgnoreCase("generate-classmap")) {
+        if (args.length == 3 && args[0].equalsIgnoreCase("generate-classmap")) {
             Class<?> c = null;
             try {
                 c = Class.forName(args[1]);
@@ -50,12 +49,12 @@ public class Main {
                 System.out.println("Can't create class instance");
                 return;
             }
-            if(!(o instanceof IClassMapper)) {
+            if (!(o instanceof IClassMapper)) {
                 System.out.println("Invalid IClassMapper");
                 return;
             }
             Map<String, String> map = new HashMap<String, String>();
-            System.out.println("Valid map? : " + (((IClassMapper)o).getMap(new FileJarReader(new JarFile(new File(args[2]))), map) ? "true" : "false"));
+            System.out.println("Valid map? : " + (((IClassMapper) o).getMap(new FileJarReader(new JarFile(new File(args[2]))), map) ? "true" : "false"));
             for (Map.Entry<String, String> entry : map.entrySet())
                 System.out.println(entry.getKey() + " = " + entry.getValue());
         }

@@ -22,7 +22,6 @@
 
 package com.lion328.thaifixes.coremod.mapper;
 
-import com.lion328.thaifixes.Util;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -31,8 +30,6 @@ import org.objectweb.asm.tree.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class V1_6_2ClassMapper implements IClassMapper {
 
@@ -297,11 +294,11 @@ public class V1_6_2ClassMapper implements IClassMapper {
                 insns = method.instructions;
                 for (i = 0; i < insns.size(); i++) {
                     insn = insns.get(i);
-                    if(insn.getType() == AbstractInsnNode.LDC_INSN) {
+                    if (insn.getType() == AbstractInsnNode.LDC_INSN) {
                         LdcInsnNode ldcInsn = (LdcInsnNode) insn;
-                        if(ldcInsn.cst instanceof String) {
+                        if (ldcInsn.cst instanceof String) {
                             String s = (String) ldcInsn.cst;
-                            if(!s.equals("chat")) continue;
+                            if (!s.equals("chat")) continue;
                             j = i + 1;
                             while ((insn = insns.get(++j)).getOpcode() != Opcodes.INVOKEVIRTUAL) ;
                             MethodInsnNode methodInsn = (MethodInsnNode) insn;
@@ -329,9 +326,9 @@ public class V1_6_2ClassMapper implements IClassMapper {
                 insns = method.instructions;
                 for (i = 0; i < insns.size(); i++) {
                     insn = insns.get(i);
-                    if(insn.getOpcode() == Opcodes.BIPUSH) {
+                    if (insn.getOpcode() == Opcodes.BIPUSH) {
                         IntInsnNode intInsn = (IntInsnNode) insn;
-                        if(intInsn.operand == 9 && insns.get(i + 1).getOpcode() == Opcodes.IDIV) {
+                        if (intInsn.operand == 9 && insns.get(i + 1).getOpcode() == Opcodes.IDIV) {
                             map.put("net.minecraft.client.gui.GuiNewChat.getLineCount", method.name);
                             break L6;
                         }
