@@ -3,8 +3,8 @@
         "modid": "thaifixes",
         "name": "ThaiFixes",
         "description": "ช่วยให้การแสดงผลของภาษาไทยออกมาอย่างถูกต้อง",
-        "version": "v1.8-2.2-pre2",
-        "mcversion": "1.8",
+        "version": "$version",
+        "mcversion": "$mcversion",
         "url": "http://thaifixes.lion328.com/",
         "authorList": ["lion328"],
         "credits": "PCXD, secretdataz"
