@@ -108,7 +108,7 @@ public class MCPXFontRenderer implements IFontRenderer {
             if (ThaiUtil.isVeryLongTailThaiChar(wrapper.getLastCharacterRenderered()))
                 cPosY -= 1.0F;
             if (ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
-                cPosY -= 3.0F;
+                cPosY -= 3.5F;
         }
 
         float texcoordX = (float) (offset % 16 * 8);
