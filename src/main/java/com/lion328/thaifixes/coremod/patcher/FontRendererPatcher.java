@@ -79,6 +79,10 @@ public class FontRendererPatcher implements IClassPatcher {
             if (fn.desc.length() == 1) { // primitives
                 if (fn.desc.equals("F"))
                     mv.visitInsn(Opcodes.FCONST_0);
+                else if (fn.desc.equals("D"))
+                    mv.visitInsn(Opcodes.DCONST_0);
+                else if (fn.desc.equals("J"))
+                    mv.visitInsn(Opcodes.LCONST_0);
                 else
                     mv.visitInsn(Opcodes.ICONST_0);
             } else

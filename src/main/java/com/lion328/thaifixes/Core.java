@@ -25,7 +25,6 @@ package com.lion328.thaifixes;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -36,15 +35,15 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 
-@Mod(name = Core.NAME, modid = Core.MODID, version = Core.VERSION)
+@Mod(name = Core.NAME, modid = Core.MODID, version = Core.VERSION, acceptedMinecraftVersions = Core.MCVERSION)
 public class Core {
 
     public static final String MODID = "thaifixes";
     public static final String NAME = "ThaiFixes";
     public static final String VERSION = "%VERSION%";
-    public static final String MCVERSION = "1.8.9";//"%MCVERSION%";
+    public static final String MCVERSION = "%MCVERSION%";
 
-    public static final Logger LOGGER = LogManager.getFormatterLogger(NAME);
+    public static final Logger LOGGER = Configuration.LOGGER;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -59,6 +58,7 @@ public class Core {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        com.lion328.thaifixes.coremod.Configuration.generateClassmap();
         try {
             Map<String, String> map = com.lion328.thaifixes.coremod.Configuration.getDefaultClassmap();
             Class<?> mcClass = Class.forName(map.get("net.minecraft.client.Minecraft").replace('/', '.'));

@@ -25,11 +25,14 @@ package com.lion328.thaifixes.coremod;
 import com.lion328.thaifixes.coremod.mapper.IClassMapper;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.MinecraftClassLoaderJarReader;
+import com.lion328.thaifixes.coremod.mapper.reader.TransformedJarReader;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,11 +47,23 @@ public class Configuration {
         return Collections.unmodifiableMap(defaultClassmap);
     }
 
-    static {
+    public static void generateClassmap() {
         defaultClassmap = new HashMap<String, String>();
         if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader) {
             LaunchClassLoader cl = (LaunchClassLoader) Thread.currentThread().getContextClassLoader();
-            IJarReader reader = new MinecraftClassLoaderJarReader(cl);
+            boolean deobfuscatedEnvironment = false;
+            try {
+                deobfuscatedEnvironment = cl.getClassBytes("net.minecraft.client.gui.FontRenderer") != null;
+            } catch (IOException e) {
+
+            }
+            DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
+            MinecraftClassLoaderJarReader mcJarReader = new MinecraftClassLoaderJarReader(cl);
+            IJarReader reader;
+            if (deobfuscatedEnvironment)
+                reader = mcJarReader;
+            else
+                reader = new TransformedJarReader(mcJarReader, deobfTransformer, deobfTransformer);
             BufferedReader br = new BufferedReader(new InputStreamReader(Configuration.class.getResourceAsStream("/assets/thaifixes/config/classmap/classlist")));
             String s;
             try {
@@ -79,5 +94,9 @@ public class Configuration {
             LOGGER.error("Can't run runtime mapping (Invalid classloader type)");
         if (defaultClassmap.size() == 0)
             LOGGER.error("Runtime mapping not working");
+    }
+
+    static {
+        generateClassmap();
     }
 }

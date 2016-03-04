@@ -2,6 +2,7 @@
 !src/
 !src/*
 !build.gradle
+!gradle.properties
 !LICENSE
 !README.md
 !.gitignore

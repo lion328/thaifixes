@@ -83,7 +83,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.Minecraft").replace('/', '.'));
         if (b == null) {
-            throw new IOException("Minecraft.class not found!");
+            throw new IOException("Minecraft.class not found! (" + map.get("net.minecraft.client.Minecraft").replace('/', '.') + ")");
         }
 
         reader = new ClassReader(b);

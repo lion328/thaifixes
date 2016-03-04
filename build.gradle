@@ -20,8 +20,6 @@ plugins {
 }
 */
 
-systemProp.file.encoding = 'UTF-8'
-
 apply plugin: 'java'
 
 compileJava {
@@ -42,7 +40,7 @@ group = "com.lion328.thaifixes" // http://maven.apache.org/guides/mini/guide-nam
 archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.8.9-11.15.0.1715"
+    version = "1.8.9-11.15.1.1764"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -52,6 +50,10 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "stable_20"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+    replace "%VERSION%", project.version
+    replace "%MCVERSION%", project.minecraft.version
+    replaceIn "Core.java"
 }
 
 dependencies {
@@ -78,22 +80,21 @@ dependencies {
 
 }
 
-processResources
-        {
-            // this will ensure that this task is redone when the versions change.
-            inputs.property "version", project.version
-            inputs.property "mcversion", project.minecraft.version
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
-            // replace stuff in mcmod.info, nothing else
-            from(sourceSets.main.resources.srcDirs) {
-                include 'mcmod.info'
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
 
-                // replace version and mcversion
-                expand 'version': project.version, 'mcversion': project.minecraft.version
-            }
+        // replace version and mcversion
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
 
-            // copy everything else, thats not the mcmod.info
-            from(sourceSets.main.resources.srcDirs) {
-                exclude 'mcmod.info'
-            }
-        }
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
