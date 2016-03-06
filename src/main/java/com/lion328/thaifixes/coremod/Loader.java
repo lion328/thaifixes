@@ -22,16 +22,15 @@
 
 package com.lion328.thaifixes.coremod;
 
-import com.lion328.thaifixes.coremod.patcher.FontRendererPatcher;
-import com.lion328.thaifixes.coremod.patcher.FontRendererWrapperPatcher;
-import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
-import com.lion328.thaifixes.coremod.patcher.MinecraftPatcher;
+import com.lion328.thaifixes.Constant;
+import com.lion328.thaifixes.coremod.patcher.*;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@IFMLLoadingPlugin.MCVersion(Constant.MCVERSION)
 public class Loader implements IFMLLoadingPlugin, IClassTransformer {
 
     private static final Map<String, IClassPatcher> patchers = new HashMap<String, IClassPatcher>();
@@ -77,8 +76,13 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
     }
 
     static {
-        addPatcher(new FontRendererPatcher());
-        addPatcher(new FontRendererWrapperPatcher());
-        addPatcher(new MinecraftPatcher());
+        try {
+            addPatcher(new MinecraftPatcher());
+            addPatcher(new FontRendererPatcher());
+            addPatcher(new FontRendererWrapperPatcher());
+            addPatcher(new GuiNewChatPatcher());
+        } catch (Exception e) {
+            Configuration.LOGGER.catching(e);
+        }
     }
 }

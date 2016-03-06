@@ -97,25 +97,21 @@ public class FontRendererWrapper extends FontRenderer {
 /*
 package com.lion328.thaifixes;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class FontRendererWrapper extends FontRenderer {
 
-    public static final boolean PATCHED = false;
+    public static final boolean PATCHED = true;
 
     private static Map<String, ResourceLocation> resourceLocationPool = new HashMap<String, ResourceLocation>();
 
@@ -134,7 +130,7 @@ public class FontRendererWrapper extends FontRenderer {
     }
 
     public void addRenderer(IFontRenderer renderer) {
-        if(renderers.contains(renderer)) return;
+        if (renderers.contains(renderer)) return;
         renderer.setFontRendererWrapper(this);
         renderers.add(renderer);
     }
@@ -148,7 +144,7 @@ public class FontRendererWrapper extends FontRenderer {
     }
 
     public void bindTexture(String location) {
-        if(!resourceLocationPool.containsKey(location))
+        if (!resourceLocationPool.containsKey(location))
             resourceLocationPool.put(location, new ResourceLocation(location));
         renderEngine.bindTexture(resourceLocationPool.get(location));
     }
@@ -168,10 +164,12 @@ public class FontRendererWrapper extends FontRenderer {
     @Override
     public float renderCharAtPos(int asciiPos, char c, boolean italic) {
         float ret = Float.NaN;
-        for(IFontRenderer renderer : renderers)
-            if(renderer.isSupportedCharacter(c))
+        for (IFontRenderer renderer : renderers)
+            if (renderer.isSupportedCharacter(c)) {
                 ret = renderer.renderCharacter(c, italic);
-        if(Float.isNaN(ret))
+                break;
+            }
+        if (Float.isNaN(ret))
             ret = super.renderCharAtPos(asciiPos, c, italic);
         lastChar = c;
         return ret;
@@ -179,27 +177,29 @@ public class FontRendererWrapper extends FontRenderer {
 
     public float renderCharAtPos(char c, boolean italic) {
         float ret = Float.NaN;
-        for(IFontRenderer renderer : renderers)
-            if(renderer.isSupportedCharacter(c))
+        for (IFontRenderer renderer : renderers)
+            if (renderer.isSupportedCharacter(c)) {
                 ret = renderer.renderCharacter(c, italic);
-        if(Float.isNaN(ret))
-            ret = super.renderCharAtPos(c, c, italic);
+                break;
+            }
+        if (Float.isNaN(ret))
+            ret = super.renderCharAtPos(c, italic);
         lastChar = c;
         return ret;
     }
 
     @Override
     public int getCharWidth(char c) {
-        for(IFontRenderer renderer : renderers)
-            if(renderer.isSupportedCharacter(c))
+        for (IFontRenderer renderer : renderers)
+            if (renderer.isSupportedCharacter(c))
                 return renderer.getCharacterWidth(c);
         return super.getCharWidth(c);
     }
 
     public float getCharWidthFloat(char c) {
-        for(IFontRenderer renderer : renderers)
-            if(renderer.isSupportedCharacter(c))
-                return (float)renderer.getCharacterWidth(c);
+        for (IFontRenderer renderer : renderers)
+            if (renderer.isSupportedCharacter(c))
+                return (float) renderer.getCharacterWidth(c);
         return super.getCharWidthFloat(c);
     }
 

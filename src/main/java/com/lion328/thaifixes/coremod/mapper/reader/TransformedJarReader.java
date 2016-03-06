@@ -41,8 +41,9 @@ public class TransformedJarReader implements IJarReader {
 
     @Override
     public byte[] getClassBytes(String name) throws IOException {
+        String untransformedName = name;
         if (nameTransformer != null)
-            name = nameTransformer.unmapClassName(name);
-        return classTransformer.transform(name, name, parent.getClassBytes(name));
+            untransformedName = nameTransformer.unmapClassName(name);
+        return classTransformer.transform(untransformedName, name, parent.getClassBytes(name));
     }
 }

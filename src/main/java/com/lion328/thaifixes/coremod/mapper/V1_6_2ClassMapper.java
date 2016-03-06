@@ -35,8 +35,6 @@ public class V1_6_2ClassMapper implements IClassMapper {
 
     private final HashMap<String, String> map = new HashMap<String, String>();
 
-    public static final V1_6_2ClassMapper instance = new V1_6_2ClassMapper();
-
     @Override
     public boolean getMap(IJarReader jarReader, Map<String, String> map) throws IOException {
         int defaultMapSize = map.size();
@@ -83,7 +81,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.Minecraft").replace('/', '.'));
         if (b == null) {
-            throw new IOException("Minecraft.class not found! (" + map.get("net.minecraft.client.Minecraft").replace('/', '.') + ")");
+            throw new IOException("Minecraft.class not found!");
         }
 
         reader = new ClassReader(b);
@@ -96,7 +94,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
             if (bFlag >= 5) break;
             insns = method.instructions;
             if (method.desc.equals("()L" + map.get("net.minecraft.client.Minecraft") + ";")) {
-                map.put("net.minecraft.client.Minecraft.getMinecraft", method.name);
+                map.put("net.minecraft.client.Minecraft.getMinecraft:()Lnet/minecraft/client/Minecraft;", method.name);
                 bFlag++;
                 continue;
             }
@@ -113,7 +111,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             map.put("net.minecraft.util.ResourceLocation", typeInsn.desc);
                             while ((insn = insns.get(j++)).getOpcode() != Opcodes.PUTFIELD) ;
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
-                            map.put("net.minecraft.client.Minecraft.fontRendererObj", fieldInsn.name);
+                            map.put("net.minecraft.client.Minecraft.fontRendererObj:Lnet/minecraft/client/gui/FontRenderer;", fieldInsn.name);
                             map.put("net.minecraft.client.gui.FontRenderer", fieldInsn.desc.substring(1, fieldInsn.desc.length() - 1));
                             j = i;
                             MethodInsnNode methodInsn = null;
@@ -122,9 +120,8 @@ public class V1_6_2ClassMapper implements IClassMapper {
                                 methodInsn = (MethodInsnNode) insn;
                                 if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer"))) break;
                             }
-                            map.put("net.minecraft.client.gui.FontRenderer.FontRenderer@structure", methodInsn.desc);
-                            map.put("net.minecraft.client.settings.GameSettings", map.get("net.minecraft.client.gui.FontRenderer.FontRenderer@structure").substring(2, map.get("net.minecraft.client.gui.FontRenderer.FontRenderer@structure").indexOf(';')));
-                            map.put("net.minecraft.client.renderer.texture.TextureManager", map.get("net.minecraft.client.gui.FontRenderer.FontRenderer@structure").substring(6 + map.get("net.minecraft.client.settings.GameSettings").length() + map.get("net.minecraft.util.ResourceLocation").length(), map.get("net.minecraft.client.gui.FontRenderer.FontRenderer@structure").lastIndexOf(';')));
+                            map.put("net.minecraft.client.settings.GameSettings", methodInsn.desc.substring(2, methodInsn.desc.indexOf(';')));
+                            map.put("net.minecraft.client.renderer.texture.TextureManager", methodInsn.desc.substring(6 + map.get("net.minecraft.client.settings.GameSettings").length() + map.get("net.minecraft.util.ResourceLocation").length(), methodInsn.desc.lastIndexOf(';')));
                             bFlag++;
                             continue L2;
                         } else if (cst.equals("crash-reports")) {
@@ -132,7 +129,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             while ((insn = insns.get(--j)).getOpcode() != Opcodes.GETFIELD) ;
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
                             if (fieldInsn.desc.equals("Ljava/io/File;")) {
-                                map.put("net.minecraft.client.Minecraft.mcDataDir", fieldInsn.name);
+                                map.put("net.minecraft.client.Minecraft.mcDataDir:Ljava/io/File;", fieldInsn.name);
                                 bFlag++;
                                 continue L2;
                             }
@@ -140,7 +137,6 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             MethodInsnNode methodInsn = (MethodInsnNode) insns.get(i + 1);
                             map.put("net.minecraft.client.gui.GuiChat", methodInsn.owner);
                             bFlag++;
-                            continue;
                         } else if (cst.equals("gui")) {
                             j = i;
                             while ((insn = insns.get(++j)).getOpcode() != Opcodes.GETFIELD) ;
@@ -148,7 +144,6 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
                             map.put("net.minecraft.client.gui.GuiIngame", fieldInsn.desc.substring(1, fieldInsn.desc.length() - 1));
                             bFlag++;
-                            continue;
                         }
                     }
                 }
@@ -173,7 +168,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
                     if (insn.getOpcode() == Opcodes.GETFIELD) {
                         FieldInsnNode fieldInsn = (FieldInsnNode) insn;
                         if (fieldInsn.desc.equals("Ljava/util/Map;")) {
-                            map.put("net.minecraft.client.renderer.texture.TextureManager.bindTexture", method.name);
+                            map.put("net.minecraft.client.renderer.texture.TextureManager.bindTexture:(Lnet/minecraft/util/ResourceLocation;)V", method.name);
                             break L3;
                         }
                     }
@@ -203,14 +198,14 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
                             if (fieldInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer"))) {
                                 if (fieldInsn.desc.equals("[B") && (bFlag & 1) == 0) {
-                                    map.put("net.minecraft.client.gui.FontRenderer.glyphWidth", fieldInsn.name);
+                                    map.put("net.minecraft.client.gui.FontRenderer.glyphWidth:[B", fieldInsn.name);
                                     bFlag |= 1;
                                 } else if (fieldInsn.desc.equals("F") && (((bFlag & 8) == 0) | (bFlag & 16) == 0)) {
                                     if ((bFlag & 8) == 0) {
-                                        map.put("net.minecraft.client.gui.FontRenderer.posX", fieldInsn.name);
+                                        map.put("net.minecraft.client.gui.FontRenderer.posX:F", fieldInsn.name);
                                         bFlag |= 8;
                                     } else if ((bFlag & 16) == 0) {
-                                        map.put("net.minecraft.client.gui.FontRenderer.posY", fieldInsn.name);
+                                        map.put("net.minecraft.client.gui.FontRenderer.posY:F", fieldInsn.name);
                                         bFlag |= 16;
                                     }
                                 }
@@ -218,7 +213,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
                         } else if (((insn.getOpcode() == Opcodes.INVOKESPECIAL) || insn.getOpcode() == Opcodes.INVOKEVIRTUAL) && ((bFlag & 3) == 1)) {
                             MethodInsnNode methodInsn = (MethodInsnNode) insn;
                             if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")) && methodInsn.desc.equals("(I)V")) {
-                                map.put("net.minecraft.client.gui.FontRenderer.loadGlyphTexture", methodInsn.name);
+                                map.put("net.minecraft.client.gui.FontRenderer.loadGlyphTexture:(I)V", methodInsn.name);
                                 bFlag |= 2;
                             }
                         }
@@ -232,11 +227,11 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             if (methodInsn.name.startsWith("gl")) continue L4;
                         }
                     }
-                    map.put("net.minecraft.client.gui.FontRenderer.renderCharAtPos", method.name);
+                    map.put("net.minecraft.client.gui.FontRenderer.renderCharAtPos:(CZ)F", method.name);
                     bFlag |= 4;
                 }
             } else if (method.desc.equals("(ICZ)F") && (bFlag & 4) == 0) {
-                map.put("net.minecraft.client.gui.FontRenderer.renderCharAtPos", method.name);
+                map.put("net.minecraft.client.gui.FontRenderer.renderCharAtPos:(ICZ)F", method.name);
                 bFlag |= 4;
             } else if (method.desc.equals("(C)I") && (bFlag & 32) == 0) {
                 insns = method.instructions;
@@ -246,14 +241,14 @@ public class V1_6_2ClassMapper implements IClassMapper {
                         case Opcodes.SIPUSH:
                             IntInsnNode intInsn = (IntInsnNode) insn;
                             if (intInsn.operand == 167) {
-                                map.put("net.minecraft.client.gui.FontRenderer.getCharWidth", method.name);
+                                map.put("net.minecraft.client.gui.FontRenderer.getCharWidth:(C)I", method.name);
                                 bFlag |= 32;
                             }
                             break;
                         case Opcodes.INVOKESPECIAL:
                             MethodInsnNode methodInsn = (MethodInsnNode) insn;
                             if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")) && methodInsn.name.equals("getCharWidthFloat") && methodInsn.desc.equals("(C)F")) {
-                                map.put("net.minecraft.client.gui.FontRenderer.getCharWidth", method.name);
+                                map.put("net.minecraft.client.gui.FontRenderer.getCharWidth:(C)I", method.name);
                                 bFlag |= 32;
                             }
                             break;
@@ -271,10 +266,9 @@ public class V1_6_2ClassMapper implements IClassMapper {
         node = new ClassNode();
         reader.accept(node, 0);
 
-        L5:
         for (MethodNode method : node.methods) {
             if (method.desc.equals("(IIF)V")) {
-                map.put("net.minecraft.client.gui.GuiChat.drawScreen", method.name);
+                map.put("net.minecraft.client.gui.GuiChat.drawScreen:(IIF)V", method.name);
                 break;
             }
         }
@@ -329,7 +323,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
                     if (insn.getOpcode() == Opcodes.BIPUSH) {
                         IntInsnNode intInsn = (IntInsnNode) insn;
                         if (intInsn.operand == 9 && insns.get(i + 1).getOpcode() == Opcodes.IDIV) {
-                            map.put("net.minecraft.client.gui.GuiNewChat.getLineCount", method.name);
+                            map.put("net.minecraft.client.gui.GuiNewChat.getLineCount:()I", method.name);
                             break L6;
                         }
                     }
@@ -337,6 +331,6 @@ public class V1_6_2ClassMapper implements IClassMapper {
             }
         }
 
-        return (map.size() - defaultMapSize) >= 21;
+        return (map.size() - defaultMapSize) >= 20;
     }
 }

@@ -55,7 +55,7 @@ public class FontRendererPatcher implements IClassPatcher {
                 if (insn.getOpcode() == Opcodes.INVOKESPECIAL) {
                     MethodInsnNode methodInsn = (MethodInsnNode) insn;
                     if (methodInsn.owner.equals(Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer")))
-                        insns.set(insn, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, methodInsn.owner, methodInsn.name, methodInsn.desc, false));
+                        methodInsn.setOpcode(Opcodes.INVOKEVIRTUAL);
                 }
             }
         }

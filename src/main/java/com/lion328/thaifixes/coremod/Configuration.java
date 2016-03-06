@@ -41,6 +41,7 @@ import java.util.Map;
 public class Configuration {
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
+    public static final String DEFAULT_ORIGINAL_CLASSES_PATH = "/assets/thaifixes/classes/";
     private static Map<String, String> defaultClassmap;
 
     public static Map<String, String> getDefaultClassmap() {

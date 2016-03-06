@@ -20,24 +20,19 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes;
+package com.lion328.thaifixes.coremod.patcher;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import com.lion328.thaifixes.coremod.Configuration;
 
-public class Util {
+public class GuiNewChatPatcher implements IClassPatcher {
 
-    public static byte[] readZipEntry(ZipEntry entry, ZipFile zip) throws IOException {
-        InputStream in = zip.getInputStream(entry);
-        if (entry.isDirectory()) {
-            throw new IOException("Not a file (directory)");
-        }
-        int b;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        while ((b = in.read()) != -1) out.write(b);
-        return out.toByteArray();
+    @Override
+    public String getClassName() {
+        return Configuration.getDefaultClassmap().get("net.minecraft.client.gui.GuiNewChat");
+    }
+
+    @Override
+    public byte[] patch(byte[] original) {
+        return original;
     }
 }

@@ -40,8 +40,8 @@ public class Core {
 
     public static final String MODID = "thaifixes";
     public static final String NAME = "ThaiFixes";
-    public static final String VERSION = "%VERSION%";
-    public static final String MCVERSION = "%MCVERSION%";
+    public static final String VERSION = Constant.VERSION;
+    public static final String MCVERSION = Constant.MCVERSION;
 
     public static final Logger LOGGER = Configuration.LOGGER;
 
@@ -58,13 +58,12 @@ public class Core {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        com.lion328.thaifixes.coremod.Configuration.generateClassmap();
         try {
             Map<String, String> map = com.lion328.thaifixes.coremod.Configuration.getDefaultClassmap();
             Class<?> mcClass = Class.forName(map.get("net.minecraft.client.Minecraft").replace('/', '.'));
-            Method getMc = mcClass.getMethod(map.get("net.minecraft.client.Minecraft.getMinecraft"));
+            Method getMc = mcClass.getMethod(map.get("net.minecraft.client.Minecraft.getMinecraft:()Lnet/minecraft/client/Minecraft;"));
             Object mc = getMc.invoke(null);
-            Field fontRendererObjField = mcClass.getDeclaredField(map.get("net.minecraft.client.Minecraft.fontRendererObj"));
+            Field fontRendererObjField = mcClass.getDeclaredField(map.get("net.minecraft.client.Minecraft.fontRendererObj:Lnet/minecraft/client/gui/FontRenderer;"));
             fontRendererObjField.setAccessible(true);
             Object fontRenderer = fontRendererObjField.get(mc);
             if (fontRenderer instanceof FontRendererWrapper) {
@@ -85,7 +84,7 @@ public class Core {
                     }
                     fontRendererObjField.set(mc, newFontRenderer);
                 } else {
-                    LOGGER.info("FontRendererWrapper successfully patched");
+                    LOGGER.info("FontRendererWrapper is successfully patched");
                     Configuration.loadConfig(new File(FontRendererWrapper.getMinecraftDirectory(), "config/thaifixes.cfg"));
                     String rendererClass = Configuration.config.getProperty("font.rendererclass", "disable");
                     if (!rendererClass.equalsIgnoreCase("disable")) {

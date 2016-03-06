@@ -41,10 +41,8 @@ public class FileJarReader implements IJarReader {
         name = name.replace('.', '/') + ".class";
         JarEntry entry = jar.getJarEntry(name);
         InputStream in = jar.getInputStream(entry);
-        if (entry.isDirectory()) {
-            // throw new IOException("Not a file (directory)");
+        if (entry.isDirectory())
             return null;
-        }
         int b;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         while ((b = in.read()) != -1) out.write(b);

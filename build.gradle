@@ -53,7 +53,7 @@ minecraft {
     
     replace "%VERSION%", project.version
     replace "%MCVERSION%", project.minecraft.version
-    replaceIn "Core.java"
+    replaceIn "Constant.java"
 }
 
 dependencies {
