@@ -20,16 +20,29 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod.patcher;
+package com.lion328.thaifixes.coremod.mapper;
 
-import com.lion328.thaifixes.coremod.Configuration;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+public class SimpleClassMap implements IClassMap {
 
-public class FontRendererWrapperPatcher extends NameMapperPatcher {
+    private Map<String, IClassDetail> classesDetail;
 
-    public FontRendererWrapperPatcher() throws IOException {
-        super("com.lion328.thaifixes.FontRendererWrapper", FontRendererWrapperPatcher.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper.class"));
+    public SimpleClassMap() {
+        classesDetail = new HashMap<String, IClassDetail>();
+    }
+
+    @Override
+    public IClassDetail getClass(String name) {
+        return classesDetail.get(name);
+    }
+
+    @Override
+    public IClassDetail addClass(IClassDetail classDetail) {
+        if(classesDetail.containsKey(classDetail.getName()))
+            return classesDetail.get(classDetail.getName());
+        classesDetail.put(classDetail.getName(), classDetail);
+        return classDetail;
     }
 }

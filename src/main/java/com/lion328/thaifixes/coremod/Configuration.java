@@ -22,7 +22,9 @@
 
 package com.lion328.thaifixes.coremod;
 
+import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.coremod.mapper.IClassMapper;
+import com.lion328.thaifixes.coremod.mapper.SimpleClassMap;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.MinecraftClassLoaderJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.TransformedJarReader;
@@ -42,14 +44,14 @@ public class Configuration {
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
     public static final String DEFAULT_ORIGINAL_CLASSES_PATH = "/assets/thaifixes/classes/";
-    private static Map<String, String> defaultClassmap;
+    private static IClassMap defaultClassmap;
 
-    public static Map<String, String> getDefaultClassmap() {
-        return Collections.unmodifiableMap(defaultClassmap);
+    public static IClassMap getDefaultClassmap() {
+        return defaultClassmap;
     }
 
     public static void generateClassmap() {
-        defaultClassmap = new HashMap<String, String>();
+        defaultClassmap = new SimpleClassMap();
         if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader) {
             LaunchClassLoader cl = (LaunchClassLoader) Thread.currentThread().getContextClassLoader();
             boolean deobfuscatedEnvironment = false;
@@ -68,10 +70,11 @@ public class Configuration {
             BufferedReader br = new BufferedReader(new InputStreamReader(Configuration.class.getResourceAsStream("/assets/thaifixes/config/classmap/classlist")));
             String s;
             try {
+                boolean valid = false;
                 while ((s = br.readLine()) != null) {
                     if (s.length() == 0)
                         continue;
-                    defaultClassmap.clear();
+                    defaultClassmap = new SimpleClassMap();
                     Class<?> clazz = Class.forName(s);
                     Object o = clazz.newInstance();
                     if (!(o instanceof IClassMapper)) {
@@ -81,20 +84,19 @@ public class Configuration {
                     IClassMapper cm = (IClassMapper) o;
                     if (!cm.getMap(reader, defaultClassmap)) {
                         LOGGER.error(s + " can't complete mapping, skipped");
-                        defaultClassmap.clear();
+                        defaultClassmap = new SimpleClassMap();
                         continue;
                     }
-                    for (String k : defaultClassmap.keySet())
-                        LOGGER.debug("Classmap: " + k + " = " + defaultClassmap.get(k));
+                    valid = true;
                     break;
                 }
+                if(!valid)
+                    LOGGER.error("Runtime mapping not working");
             } catch (Exception e) {
                 LOGGER.catching(e);
             }
         } else
             LOGGER.error("Can't run runtime mapping (Invalid classloader type)");
-        if (defaultClassmap.size() == 0)
-            LOGGER.error("Runtime mapping not working");
     }
 
     static {

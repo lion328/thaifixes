@@ -22,7 +22,9 @@
 
 package com.lion328.thaifixes.main;
 
+import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.coremod.mapper.IClassMapper;
+import com.lion328.thaifixes.coremod.mapper.SimpleClassMap;
 import com.lion328.thaifixes.coremod.mapper.reader.FileJarReader;
 
 import java.io.File;
@@ -53,10 +55,8 @@ public class Main {
                 System.out.println("Invalid IClassMapper");
                 return;
             }
-            Map<String, String> map = new HashMap<String, String>();
+            IClassMap map = new SimpleClassMap();
             System.out.println("Valid map? : " + (((IClassMapper) o).getMap(new FileJarReader(new JarFile(new File(args[2]))), map) ? "true" : "false"));
-            for (Map.Entry<String, String> entry : map.entrySet())
-                System.out.println(entry.getKey() + " = " + entry.getValue());
         }
     }
 }

@@ -22,6 +22,7 @@
 
 package com.lion328.thaifixes;
 
+import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -35,42 +36,26 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 
-@Mod(name = Core.NAME, modid = Core.MODID, version = Core.VERSION, acceptedMinecraftVersions = Core.MCVERSION)
+@Mod(name = Constant.NAME, modid = Constant.MODID, version = Constant.VERSION, acceptedMinecraftVersions = Constant.MCVERSION)
 public class Core {
-
-    public static final String MODID = "thaifixes";
-    public static final String NAME = "ThaiFixes";
-    public static final String VERSION = Constant.VERSION;
-    public static final String MCVERSION = Constant.MCVERSION;
 
     public static final Logger LOGGER = Configuration.LOGGER;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        event.getModMetadata().modId = MODID;
-        event.getModMetadata().name = NAME;
-        event.getModMetadata().version = VERSION;
-        event.getModMetadata().url = "http://thaifixes.lion328.com/";
-        event.getModMetadata().authorList = Arrays.asList("lion328");
-        event.getModMetadata().credits = "PCXD, secretdataz";
-        event.getModMetadata().description = "ช่วยให้การแสดงผลของภาษาไทยออกมาอย่างถูกต้อง";
-    }
-
-    @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         try {
-            Map<String, String> map = com.lion328.thaifixes.coremod.Configuration.getDefaultClassmap();
-            Class<?> mcClass = Class.forName(map.get("net.minecraft.client.Minecraft").replace('/', '.'));
-            Method getMc = mcClass.getMethod(map.get("net.minecraft.client.Minecraft.getMinecraft:()Lnet/minecraft/client/Minecraft;"));
+            IClassMap map = com.lion328.thaifixes.coremod.Configuration.getDefaultClassmap();
+            Class<?> mcClass = Class.forName(map.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.'));
+            Method getMc = mcClass.getMethod(map.getClass("net/minecraft/client/Minecraft").getMethod("getMinecraft", "()Lnet/minecraft/client/Minecraft;"));
             Object mc = getMc.invoke(null);
-            Field fontRendererObjField = mcClass.getDeclaredField(map.get("net.minecraft.client.Minecraft.fontRendererObj:Lnet/minecraft/client/gui/FontRenderer;"));
+            Field fontRendererObjField = mcClass.getDeclaredField(map.getClass("net/minecraft/client/Minecraft").getField("fontRendererObj"));
             fontRendererObjField.setAccessible(true);
             Object fontRenderer = fontRendererObjField.get(mc);
             if (fontRenderer instanceof FontRendererWrapper) {
                 Field patchedField = FontRendererWrapper.class.getDeclaredField("PATCHED");
                 if (!patchedField.getBoolean(null)) {
                     LOGGER.error("Unpatched FontRendererWrapper, converting to default");
-                    Class<?> fontRendererClass = Class.forName(map.get("net.minecraft.client.gui.FontRenderer").replace('/', '.'));
+                    Class<?> fontRendererClass = Class.forName(map.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.'));
                     Field[] fields = fontRendererClass.getDeclaredFields();
                     Constructor<?> constructor = fontRendererClass.getDeclaredConstructor();
                     constructor.setAccessible(true);

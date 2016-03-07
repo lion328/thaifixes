@@ -62,8 +62,6 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
 
     @Override
     public byte[] transform(String s, String s1, byte[] bytes) {
-        if (!s.equals(s1))
-            Configuration.LOGGER.debug("Test 1: " + s + ", " + s1);
         if (patchers.containsKey(s)) {
             Configuration.LOGGER.info("Patching " + s);
             return patchers.get(s).patch(bytes);

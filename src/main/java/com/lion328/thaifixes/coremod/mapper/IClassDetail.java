@@ -20,16 +20,15 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod.patcher;
+package com.lion328.thaifixes.coremod.mapper;
 
-import com.lion328.thaifixes.coremod.Configuration;
+public interface IClassDetail {
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-public class FontRendererWrapperPatcher extends NameMapperPatcher {
-
-    public FontRendererWrapperPatcher() throws IOException {
-        super("com.lion328.thaifixes.FontRendererWrapper", FontRendererWrapperPatcher.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper.class"));
-    }
+    String getName();
+    String getObfuscatedName();
+    String getField(String name);
+    String getMethod(String name, String desc);
+    void addField(String name, String obfuscatedName);
+    void addMethod(String name, String obfuscatedName, String desc);
+    IClassDetail getSuperclassMap();
 }

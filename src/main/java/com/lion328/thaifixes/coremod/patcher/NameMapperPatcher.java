@@ -23,6 +23,7 @@
 package com.lion328.thaifixes.coremod.patcher;
 
 import com.lion328.thaifixes.coremod.Configuration;
+import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingClassAdapter;
@@ -76,42 +77,41 @@ public class NameMapperPatcher implements IClassPatcher {
 
     public static class NameRemapper extends Remapper {
 
-        private final Map<String, String> classMap;
+        private final IClassMap classMap;
 
-        public NameRemapper(Map<String, String> classMap) {
+        public NameRemapper(IClassMap classMap) {
             this.classMap = classMap;
-        }
-
-        private String mapMemberName(String owner, String name, String desc) {
-            String ret = map((owner + '.' + name).replace('/', '.') + ':' + desc);
-            if (ret == null)
-                return name;
-            return ret;
         }
 
         @Override
         public String mapMethodName(String owner, String name, String desc) {
-            return mapMemberName(owner, name, desc);
+            if(classMap.getClass(owner) != null)
+                return classMap.getClass(owner).getMethod(name, desc);
+            return name;
         }
 
         @Override
         public String mapFieldName(String owner, String name, String desc) {
-            return mapMemberName(owner, name, desc);
+            if(classMap.getClass(owner) != null)
+                return classMap.getClass(owner).getField(name);
+            return name;
         }
 
         @Override
         public String map(String typeName) {
-            return classMap.get(typeName.replace('/', '.'));
+            if(classMap.getClass(typeName) != null)
+                return classMap.getClass(typeName).getObfuscatedName();
+            return typeName;
         }
     }
 
     public static class NameMapperVisitor extends ClassVisitor {
 
-        private Map<String, String> classMap;
+        private IClassMap classMap;
 
         private String currentSuperclassName;
 
-        public NameMapperVisitor(int api, ClassVisitor cv, Map<String, String> classMap) {
+        public NameMapperVisitor(int api, ClassVisitor cv, IClassMap classMap) {
             super(api, cv);
             this.classMap = classMap;
         }
@@ -124,11 +124,9 @@ public class NameMapperPatcher implements IClassPatcher {
 
         @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-            if (currentSuperclassName != null) {
-                String key = (currentSuperclassName + '.' + name).replace('/', '.') + ':' + desc;
-                if (classMap.containsKey(key))
-                    name = classMap.get(key);
-            }
+            if (currentSuperclassName != null)
+                if(classMap.getClass(currentSuperclassName) != null)
+                    name = classMap.getClass(currentSuperclassName).getMethod(name, desc);
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
     }

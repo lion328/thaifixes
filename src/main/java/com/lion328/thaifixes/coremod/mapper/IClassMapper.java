@@ -29,5 +29,5 @@ import java.util.Map;
 
 public interface IClassMapper {
 
-    boolean getMap(IJarReader reader, Map<String, String> map) throws IOException;
+    boolean getMap(IJarReader reader, IClassMap map) throws IOException;
 }

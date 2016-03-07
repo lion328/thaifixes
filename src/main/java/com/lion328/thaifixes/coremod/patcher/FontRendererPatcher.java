@@ -35,7 +35,7 @@ public class FontRendererPatcher implements IClassPatcher {
 
     @Override
     public String getClassName() {
-        return Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer").replace('/', '.');
+        return Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.');
     }
 
     @Override
@@ -54,7 +54,7 @@ public class FontRendererPatcher implements IClassPatcher {
                 AbstractInsnNode insn = insns.get(i);
                 if (insn.getOpcode() == Opcodes.INVOKESPECIAL) {
                     MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                    if (methodInsn.owner.equals(Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer")))
+                    if (methodInsn.owner.equals(Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
                         methodInsn.setOpcode(Opcodes.INVOKEVIRTUAL);
                 }
             }
@@ -87,7 +87,7 @@ public class FontRendererPatcher implements IClassPatcher {
                     mv.visitInsn(Opcodes.ICONST_0);
             } else
                 mv.visitInsn(Opcodes.ACONST_NULL);
-            mv.visitFieldInsn(Opcodes.PUTFIELD, Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer"), fn.name, fn.desc);
+            mv.visitFieldInsn(Opcodes.PUTFIELD, Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName(), fn.name, fn.desc);
         }
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);

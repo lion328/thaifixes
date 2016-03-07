@@ -35,7 +35,7 @@ public class MinecraftPatcher implements IClassPatcher {
 
     @Override
     public String getClassName() {
-        return Configuration.getDefaultClassmap().get("net.minecraft.client.Minecraft").replace('/', '.');
+        return Configuration.getDefaultClassmap().getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.');
     }
 
     @Override
@@ -55,14 +55,14 @@ public class MinecraftPatcher implements IClassPatcher {
                 for (i--; i < insns.size(); i--) {
                     if (insns.get(i).getOpcode() != Opcodes.NEW) continue;
                     TypeInsnNode type = (TypeInsnNode) insns.get(i);
-                    if (type.desc.equals(Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer"))) {
+                    if (type.desc.equals(Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
                         type.desc = "com/lion328/thaifixes/FontRendererWrapper";
                         break;
                     }
                 }
                 for (; i < insns.size(); i++) {
                     if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL) continue;
-                    if (((MethodInsnNode) insns.get(i)).owner.equals(Configuration.getDefaultClassmap().get("net.minecraft.client.gui.FontRenderer"))) {
+                    if (((MethodInsnNode) insns.get(i)).owner.equals(Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
                         MethodInsnNode method = (MethodInsnNode) insns.get(i);
                         method.owner = "com/lion328/thaifixes/FontRendererWrapper";
                         break;

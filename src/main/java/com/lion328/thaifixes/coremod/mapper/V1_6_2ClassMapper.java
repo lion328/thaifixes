@@ -28,16 +28,28 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class V1_6_2ClassMapper implements IClassMapper {
 
-    private final HashMap<String, String> map = new HashMap<String, String>();
-
     @Override
-    public boolean getMap(IJarReader jarReader, Map<String, String> map) throws IOException {
-        int defaultMapSize = map.size();
+    public boolean getMap(IJarReader jarReader, IClassMap classMap) throws IOException {
+        Map<String, String> map = new TreeMap<String, String>(new Comparator<String>() {
+
+            @Override
+            public int compare(String o1, String o2) {
+                boolean member1 = o1.indexOf(':') != -1;
+                boolean member2 = o2.indexOf(':') != -1;
+                if(member1 == member2)
+                    return o1.compareTo(o2);
+                if(!member1 == member2)
+                    return 1;
+                return -1;
+            }
+        });
+
         byte[] b = jarReader.getClassBytes("net.minecraft.client.main.Main");
         if (b == null) {
             throw new IOException("Main.class not found!");
@@ -331,6 +343,20 @@ public class V1_6_2ClassMapper implements IClassMapper {
             }
         }
 
-        return (map.size() - defaultMapSize) >= 20;
+        int index, tmp;
+        String className, key;
+        for(Map.Entry<String, String> entry : map.entrySet()) {
+            key = entry.getKey().replace('.', '/');
+            if((index = key.indexOf(':')) != -1) {
+                className = key.substring(0, (tmp = key.substring(0, index).lastIndexOf('/') ));
+                if(key.charAt(index + 1) == '(')
+                    classMap.getClass(className).addMethod(key.substring(tmp + 1, index), entry.getValue(), key.substring(index + 1));
+                else
+                    classMap.getClass(className).addField(key.substring(tmp + 1, index), entry.getValue());
+            } else
+                classMap.addClass(new SimpleClassDetail(key, entry.getValue()));
+        }
+
+        return map.size() >= 20;
     }
 }
