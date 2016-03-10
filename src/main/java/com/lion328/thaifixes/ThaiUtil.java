@@ -30,6 +30,7 @@ public class ThaiUtil {
     public static final String SPECIAL_UPPER_CHARS = "่้๊๋";
     public static final String UPPER_CHARS = "ัิีึื็์ํ๎" + SPECIAL_UPPER_CHARS;
     public static final String LONG_TAIL_CHARS = "ปฟฝฬ";
+    public static final char SARA_UM = 'ำ';
 
     public static boolean isThaiChar(char c) {
         return c >= THAI_CHAR_RANGE_MIN && c <= THAI_CHAR_RANGE_MAX;

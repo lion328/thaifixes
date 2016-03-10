@@ -48,6 +48,7 @@ public class Configuration {
     }
 
     public static void generateClassmap() {
+        LOGGER.info("Generating class mapping...");
         defaultClassmap = new SimpleClassMap();
         if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader) {
             LaunchClassLoader cl = (LaunchClassLoader) Thread.currentThread().getContextClassLoader();
@@ -57,13 +58,14 @@ public class Configuration {
             } catch (IOException e) {
                 deobfuscatedEnvironment = false;
             }
-            DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
             MinecraftClassLoaderJarReader mcJarReader = new MinecraftClassLoaderJarReader(cl);
             IJarReader reader;
             if (deobfuscatedEnvironment)
                 reader = mcJarReader;
-            else
+            else {
+                DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
                 reader = new TransformedJarReader(mcJarReader, deobfTransformer, deobfTransformer);
+            }
             BufferedReader br = new BufferedReader(new InputStreamReader(Configuration.class.getResourceAsStream("/assets/thaifixes/config/classmap/classlist")));
             String s;
             try {

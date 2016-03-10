@@ -109,7 +109,8 @@ public class MCPXFontRenderer implements IFontRenderer {
                 cPosY -= 1.0F;
             if (ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
                 cPosY -= 2.25F;
-        }
+        } else if (c == ThaiUtil.SARA_UM)
+            cPosX -= 2.0F;
 
         float texcoordX = (float) (offset % 16 * 8);
         float texcoordY = (float) (offset / 16 * 8);
