@@ -23,6 +23,7 @@
 package com.lion328.thaifixes.coremod;
 
 import com.lion328.thaifixes.Constant;
+import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.coremod.patcher.*;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -61,10 +62,14 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
     }
 
     @Override
-    public byte[] transform(String s, String s1, byte[] bytes) {
-        if (patchers.containsKey(s)) {
-            Configuration.LOGGER.info("Patching " + s);
-            return patchers.get(s).patch(bytes);
+    public byte[] transform(String untransformedName, String transformedName, byte[] bytes) {
+        if (patchers.containsKey(untransformedName)) {
+            Configuration.LOGGER.info("Patching " + transformedName);
+            try {
+                return patchers.get(untransformedName).patch(bytes);
+            } catch(Exception e) {
+                Configuration.LOGGER.catching(e);
+            }
         }
         return bytes;
     }
@@ -74,11 +79,13 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
     }
 
     static {
+        IClassMap classMap = Configuration.getDefaultClassmap();
         try {
-            addPatcher(new MinecraftPatcher());
-            addPatcher(new FontRendererPatcher());
-            addPatcher(new FontRendererWrapperPatcher());
-            addPatcher(new GuiNewChatPatcher());
+            addPatcher(new MinecraftPatcher(classMap));
+            addPatcher(new FontRendererPatcher(classMap));
+            addPatcher(new GuiNewChatPatcher(classMap));
+
+            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", Loader.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper.class"),classMap));
         } catch (Exception e) {
             Configuration.LOGGER.catching(e);
         }

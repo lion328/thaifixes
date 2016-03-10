@@ -36,9 +36,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Configuration {
 
@@ -54,11 +51,11 @@ public class Configuration {
         defaultClassmap = new SimpleClassMap();
         if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader) {
             LaunchClassLoader cl = (LaunchClassLoader) Thread.currentThread().getContextClassLoader();
-            boolean deobfuscatedEnvironment = false;
+            boolean deobfuscatedEnvironment;
             try {
                 deobfuscatedEnvironment = cl.getClassBytes("net.minecraft.client.gui.FontRenderer") != null;
             } catch (IOException e) {
-
+                deobfuscatedEnvironment = false;
             }
             DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
             MinecraftClassLoaderJarReader mcJarReader = new MinecraftClassLoaderJarReader(cl);
@@ -90,7 +87,7 @@ public class Configuration {
                     valid = true;
                     break;
                 }
-                if(!valid)
+                if (!valid)
                     LOGGER.error("Runtime mapping not working");
             } catch (Exception e) {
                 LOGGER.catching(e);

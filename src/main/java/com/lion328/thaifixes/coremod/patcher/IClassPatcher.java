@@ -26,5 +26,5 @@ public interface IClassPatcher {
 
     String getClassName();
 
-    byte[] patch(byte[] original);
+    byte[] patch(byte[] original) throws Exception;
 }

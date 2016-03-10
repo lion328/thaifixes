@@ -22,7 +22,6 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import com.lion328.thaifixes.coremod.Configuration;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Remapper;
@@ -32,15 +31,15 @@ import org.objectweb.asm.tree.ClassNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 public class NameMapperPatcher implements IClassPatcher {
 
     private String className;
     private byte[] originalBytecode;
+    private IClassMap classMap;
 
-    public NameMapperPatcher(String className, InputStream classBytecode) throws IOException {
-        this(className, new byte[0]);
+    public NameMapperPatcher(String className, InputStream classBytecode, IClassMap classMap) throws IOException {
+        this(className, new byte[0], classMap);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int b;
         while ((b = classBytecode.read()) != -1)
@@ -48,9 +47,10 @@ public class NameMapperPatcher implements IClassPatcher {
         originalBytecode = out.toByteArray();
     }
 
-    public NameMapperPatcher(String className, byte[] classBytecode) {
+    public NameMapperPatcher(String className, byte[] classBytecode, IClassMap classMap) {
         this.className = className;
         originalBytecode = classBytecode.clone();
+        this.classMap = classMap;
     }
 
     @Override
@@ -59,20 +59,15 @@ public class NameMapperPatcher implements IClassPatcher {
     }
 
     @Override
-    public byte[] patch(byte[] original) {
-        try {
-            ClassReader reader = new ClassReader(originalBytecode);
-            ClassNode classNode = new ClassNode();
-            ClassVisitor mapper = new RemappingClassAdapter(classNode, new NameRemapper(Configuration.getDefaultClassmap()));
-            mapper = new NameMapperVisitor(Opcodes.ASM5, mapper, Configuration.getDefaultClassmap());
-            reader.accept(mapper, ClassReader.EXPAND_FRAMES);
-            ClassWriter w = new ClassWriter(0);
-            classNode.accept(w);
-            return w.toByteArray();
-        } catch (Exception e) {
-            Configuration.LOGGER.catching(e);
-        }
-        return original;
+    public byte[] patch(byte[] original) throws Exception {
+         ClassReader reader = new ClassReader(originalBytecode);
+         ClassNode classNode = new ClassNode();
+         ClassVisitor mapper = new RemappingClassAdapter(classNode, new NameRemapper(classMap));
+         mapper = new NameMapperVisitor(Opcodes.ASM5, mapper, classMap);
+         reader.accept(mapper, ClassReader.EXPAND_FRAMES);
+         ClassWriter w = new ClassWriter(0);
+         classNode.accept(w);
+         return w.toByteArray();
     }
 
     public static class NameRemapper extends Remapper {

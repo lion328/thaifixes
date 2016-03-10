@@ -23,6 +23,7 @@
 package com.lion328.thaifixes.coremod.patcher;
 
 import com.lion328.thaifixes.coremod.Configuration;
+import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -33,9 +34,15 @@ import java.util.ArrayList;
 
 public class FontRendererPatcher implements IClassPatcher {
 
+    private IClassMap classMap;
+
+    public FontRendererPatcher(IClassMap classMap) {
+        this.classMap = classMap;
+    }
+
     @Override
     public String getClassName() {
-        return Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.');
+        return classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.');
     }
 
     @Override
@@ -54,7 +61,7 @@ public class FontRendererPatcher implements IClassPatcher {
                 AbstractInsnNode insn = insns.get(i);
                 if (insn.getOpcode() == Opcodes.INVOKESPECIAL) {
                     MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                    if (methodInsn.owner.equals(Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
+                    if (methodInsn.owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
                         methodInsn.setOpcode(Opcodes.INVOKEVIRTUAL);
                 }
             }
@@ -87,7 +94,7 @@ public class FontRendererPatcher implements IClassPatcher {
                     mv.visitInsn(Opcodes.ICONST_0);
             } else
                 mv.visitInsn(Opcodes.ACONST_NULL);
-            mv.visitFieldInsn(Opcodes.PUTFIELD, Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName(), fn.name, fn.desc);
+            mv.visitFieldInsn(Opcodes.PUTFIELD, classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName(), fn.name, fn.desc);
         }
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);

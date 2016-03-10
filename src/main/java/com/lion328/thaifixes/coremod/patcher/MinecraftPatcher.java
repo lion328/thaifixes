@@ -23,6 +23,7 @@
 package com.lion328.thaifixes.coremod.patcher;
 
 import com.lion328.thaifixes.coremod.Configuration;
+import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -33,13 +34,19 @@ import java.io.FileOutputStream;
 
 public class MinecraftPatcher implements IClassPatcher {
 
-    @Override
-    public String getClassName() {
-        return Configuration.getDefaultClassmap().getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.');
+    private IClassMap classMap;
+
+    public MinecraftPatcher(IClassMap classMap) {
+        this.classMap = classMap;
     }
 
     @Override
-    public byte[] patch(byte[] original) {
+    public String getClassName() {
+        return classMap.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.');
+    }
+
+    @Override
+    public byte[] patch(byte[] original) throws Exception {
         ClassReader r = new ClassReader(original);
         ClassNode n = new ClassNode();
         r.accept(n, 0);
@@ -55,14 +62,14 @@ public class MinecraftPatcher implements IClassPatcher {
                 for (i--; i < insns.size(); i--) {
                     if (insns.get(i).getOpcode() != Opcodes.NEW) continue;
                     TypeInsnNode type = (TypeInsnNode) insns.get(i);
-                    if (type.desc.equals(Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+                    if (type.desc.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
                         type.desc = "com/lion328/thaifixes/FontRendererWrapper";
                         break;
                     }
                 }
                 for (; i < insns.size(); i++) {
                     if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL) continue;
-                    if (((MethodInsnNode) insns.get(i)).owner.equals(Configuration.getDefaultClassmap().getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+                    if (((MethodInsnNode) insns.get(i)).owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
                         MethodInsnNode method = (MethodInsnNode) insns.get(i);
                         method.owner = "com/lion328/thaifixes/FontRendererWrapper";
                         break;
@@ -74,15 +81,6 @@ public class MinecraftPatcher implements IClassPatcher {
 
         ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         n.accept(w);
-        try {
-            File f = new File("f.class");
-            f.createNewFile();
-            FileOutputStream out = new FileOutputStream(f);
-            out.write(w.toByteArray());
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return w.toByteArray();
     }
 }
