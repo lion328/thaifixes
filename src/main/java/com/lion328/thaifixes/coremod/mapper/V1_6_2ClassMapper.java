@@ -200,8 +200,36 @@ public class V1_6_2ClassMapper implements IClassMapper {
         bFlag = 0;
         L4:
         for (MethodNode method : node.methods) {
-            if (bFlag == 63) break;
-            if (method.desc.equals("(CZ)F")) {
+            if (bFlag == 127) break;
+            if (method.name.equals("<init>") && (bFlag & 64) == 0) {
+                insns = method.instructions;
+                for (i = 0; i < insns.size(); i++)
+                {
+                    insn = insns.get(i);
+
+                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode)insn).var != 0)
+                    {
+                        continue;
+                    }
+
+                    insn = insns.get(++i);
+
+                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode)insn).var != 3)
+                    {
+                        continue;
+                    }
+
+                    insn = insns.get(++i);
+
+                    if (insn.getOpcode() != Opcodes.PUTFIELD)
+                    {
+                        continue;
+                    }
+
+                    map.put("net.minecraft.client.gui.FontRenderer.renderEngine:net.minecraft.client.renderer.texture.TextureManager", ((FieldInsnNode)insn).name);
+                    bFlag |= 64;
+                }
+            } else if (method.desc.equals("(CZ)F")) {
                 insns = method.instructions;
                 if ((bFlag & 3) != 3) {
                     for (i = 0; i < insns.size(); i++) {
