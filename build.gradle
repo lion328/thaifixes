@@ -35,12 +35,12 @@ jar {
     }
 }
 
-version = "4.0-1.9.4"
+version = "4.1-1.10.2"
 group = "com.lion328.thaifixes" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.9.4-12.17.0.1976"
+    version = "1.10.2-12.18.1.2018"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
