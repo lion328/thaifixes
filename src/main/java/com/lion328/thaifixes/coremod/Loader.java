@@ -24,7 +24,11 @@ package com.lion328.thaifixes.coremod;
 
 import com.lion328.thaifixes.Constant;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
-import com.lion328.thaifixes.coremod.patcher.*;
+import com.lion328.thaifixes.coremod.patcher.FontRendererPatcher;
+import com.lion328.thaifixes.coremod.patcher.GuiNewChatPatcher;
+import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
+import com.lion328.thaifixes.coremod.patcher.MinecraftPatcher;
+import com.lion328.thaifixes.coremod.patcher.NameMapperPatcher;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
@@ -32,62 +36,78 @@ import java.util.HashMap;
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion(Constant.MCVERSION)
-public class Loader implements IFMLLoadingPlugin, IClassTransformer {
+public class Loader implements IFMLLoadingPlugin, IClassTransformer
+{
 
     private static final Map<String, IClassPatcher> patchers = new HashMap<String, IClassPatcher>();
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{getClass().getName()};
-    }
-
-    @Override
-    public String getModContainerClass() {
-        return null;
-    }
-
-    @Override
-    public String getSetupClass() {
-        return null;
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {
-
-    }
-
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
-    }
-
-    @Override
-    public byte[] transform(String untransformedName, String transformedName, byte[] bytes) {
-        if (patchers.containsKey(untransformedName)) {
-            Configuration.LOGGER.info("Patching " + transformedName);
-            try {
-                return patchers.get(untransformedName).patch(bytes);
-            } catch(Exception e) {
-                Configuration.LOGGER.catching(e);
-            }
-        }
-        return bytes;
-    }
-
-    public static void addPatcher(IClassPatcher patcher) {
-        patchers.put(patcher.getClassName(), patcher);
-    }
-
-    static {
+    static
+    {
         IClassMap classMap = Configuration.getDefaultClassmap();
-        try {
+        try
+        {
             addPatcher(new MinecraftPatcher(classMap));
             addPatcher(new FontRendererPatcher(classMap));
             addPatcher(new GuiNewChatPatcher(classMap));
 
-            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", Loader.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"),classMap));
-        } catch (Exception e) {
+            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", Loader.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), classMap));
+        }
+        catch (Exception e)
+        {
             Configuration.LOGGER.catching(e);
         }
+    }
+
+    public static void addPatcher(IClassPatcher patcher)
+    {
+        patchers.put(patcher.getClassName(), patcher);
+    }
+
+    @Override
+    public String[] getASMTransformerClass()
+    {
+        return new String[] {getClass().getName()};
+    }
+
+    @Override
+    public String getModContainerClass()
+    {
+        return null;
+    }
+
+    @Override
+    public String getSetupClass()
+    {
+        return null;
+    }
+
+    @Override
+    public void injectData(Map<String, Object> data)
+    {
+
+    }
+
+    @Override
+    public String getAccessTransformerClass()
+    {
+        return null;
+    }
+
+    @Override
+    public byte[] transform(String untransformedName, String transformedName, byte[] bytes)
+    {
+        if (patchers.containsKey(untransformedName))
+        {
+            Configuration.LOGGER.info("Patching " + transformedName);
+            try
+            {
+                return patchers.get(untransformedName).patch(bytes);
+            }
+            catch (Exception e)
+            {
+                Configuration.LOGGER.catching(e);
+            }
+        }
+        return bytes;
     }
 }

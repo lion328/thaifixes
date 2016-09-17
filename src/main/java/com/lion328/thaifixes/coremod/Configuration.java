@@ -37,51 +37,72 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class Configuration {
+public class Configuration
+{
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
     public static final String DEFAULT_ORIGINAL_CLASSES_PATH = "/assets/thaifixes/classes/";
     private static IClassMap defaultClassmap;
 
-    public static IClassMap getDefaultClassmap() {
+    static
+    {
+        generateClassmap();
+    }
+
+    public static IClassMap getDefaultClassmap()
+    {
         return defaultClassmap;
     }
 
-    public static void generateClassmap() {
+    public static void generateClassmap()
+    {
         LOGGER.info("Generating class mapping...");
         defaultClassmap = new SimpleClassMap();
-        if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader) {
+        if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader)
+        {
             LaunchClassLoader cl = (LaunchClassLoader) Thread.currentThread().getContextClassLoader();
             boolean deobfuscatedEnvironment;
-            try {
+            try
+            {
                 deobfuscatedEnvironment = cl.getClassBytes("net.minecraft.client.gui.FontRenderer") != null;
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 deobfuscatedEnvironment = false;
             }
             MinecraftClassLoaderJarReader mcJarReader = new MinecraftClassLoaderJarReader(cl);
             IJarReader reader;
             if (deobfuscatedEnvironment)
+            {
                 reader = mcJarReader;
-            else {
+            }
+            else
+            {
                 DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
                 reader = new TransformedJarReader(mcJarReader, deobfTransformer, deobfTransformer);
             }
             BufferedReader br = new BufferedReader(new InputStreamReader(Configuration.class.getResourceAsStream("/assets/thaifixes/config/classmap/classlist")));
             String s;
-            try {
+            try
+            {
                 boolean valid = false;
-                while ((s = br.readLine()) != null) {
+                while ((s = br.readLine()) != null)
+                {
                     if (s.length() == 0)
+                    {
                         continue;
+                    }
                     defaultClassmap = new SimpleClassMap();
                     Class<?> clazz = Class.forName(s);
                     Object o = clazz.newInstance();
-                    if (!(o instanceof IClassMapper)) {
+                    if (!(o instanceof IClassMapper))
+                    {
                         LOGGER.error(s + " is invalid IClassMapper, skipped");
                         continue;
                     }
                     IClassMapper cm = (IClassMapper) o;
-                    if (!cm.getMap(reader, defaultClassmap)) {
+                    if (!cm.getMap(reader, defaultClassmap))
+                    {
                         LOGGER.error(s + " can't complete mapping, skipped");
                         defaultClassmap = new SimpleClassMap();
                         continue;
@@ -90,15 +111,18 @@ public class Configuration {
                     break;
                 }
                 if (!valid)
+                {
                     LOGGER.error("Runtime mapping not working");
-            } catch (Exception e) {
+                }
+            }
+            catch (Exception e)
+            {
                 LOGGER.catching(e);
             }
-        } else
+        }
+        else
+        {
             LOGGER.error("Can't run runtime mapping (Invalid classloader type)");
-    }
-
-    static {
-        generateClassmap();
+        }
     }
 }

@@ -25,33 +25,51 @@ package com.lion328.thaifixes.coremod.mapper;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class V1_6_2ClassMapper implements IClassMapper {
+public class V1_6_2ClassMapper implements IClassMapper
+{
 
     @Override
-    public boolean getMap(IJarReader jarReader, IClassMap classMap) throws IOException {
-        Map<String, String> map = new TreeMap<String, String>(new Comparator<String>() {
+    public boolean getMap(IJarReader jarReader, IClassMap classMap) throws IOException
+    {
+        Map<String, String> map = new TreeMap<String, String>(new Comparator<String>()
+        {
 
             @Override
-            public int compare(String o1, String o2) {
+            public int compare(String o1, String o2)
+            {
                 boolean member1 = o1.indexOf(':') != -1;
                 boolean member2 = o2.indexOf(':') != -1;
-                if(member1 == member2)
+                if (member1 == member2)
+                {
                     return o1.compareTo(o2);
-                if(!member1 == member2)
+                }
+                if (!member1 == member2)
+                {
                     return 1;
+                }
                 return -1;
             }
         });
 
         byte[] b = jarReader.getClassBytes("net.minecraft.client.main.Main");
-        if (b == null) {
+        if (b == null)
+        {
             throw new IOException("Main.class not found!");
         }
 
@@ -64,16 +82,22 @@ public class V1_6_2ClassMapper implements IClassMapper {
         int i, j;
         boolean flag = false;
         L1:
-        for (MethodNode method : node.methods) {
-            if (method.name.equals("main") && method.desc.equals("([Ljava/lang/String;)V") && (method.access & Opcodes.ACC_PUBLIC) != 0 && (method.access & Opcodes.ACC_STATIC) != 0) {
+        for (MethodNode method : node.methods)
+        {
+            if (method.name.equals("main") && method.desc.equals("([Ljava/lang/String;)V") && (method.access & Opcodes.ACC_PUBLIC) != 0 && (method.access & Opcodes.ACC_STATIC) != 0)
+            {
                 insns = method.instructions;
-                for (i = insns.size() - 1; i > 0; i--) {
+                for (i = insns.size() - 1; i > 0; i--)
+                {
                     insn = insns.get(i);
-                    switch (insn.getType()) {
+                    switch (insn.getType())
+                    {
                         case AbstractInsnNode.METHOD_INSN:
-                            if (!flag) {
+                            if (!flag)
+                            {
                                 MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                                if (methodInsn.desc.equals("()V")) {
+                                if (methodInsn.desc.equals("()V"))
+                                {
                                     map.put("net.minecraft.client.Minecraft", methodInsn.owner);
                                     flag = true;
                                 }
@@ -81,7 +105,8 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             break;
                         case AbstractInsnNode.LDC_INSN:
                             LdcInsnNode ldcInsn = (LdcInsnNode) insn;
-                            if (ldcInsn.cst instanceof String && (ldcInsn.cst.equals("Client thread") || ldcInsn.cst.equals("Minecraft main thread")) && flag) {
+                            if (ldcInsn.cst instanceof String && (ldcInsn.cst.equals("Client thread") || ldcInsn.cst.equals("Minecraft main thread")) && flag)
+                            {
                                 break L1;
                             }
                             break;
@@ -92,7 +117,8 @@ public class V1_6_2ClassMapper implements IClassMapper {
         }
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.Minecraft").replace('/', '.'));
-        if (b == null) {
+        if (b == null)
+        {
             throw new IOException("Minecraft.class not found!");
         }
 
@@ -102,57 +128,95 @@ public class V1_6_2ClassMapper implements IClassMapper {
 
         byte bFlag = 0;
         L2:
-        for (MethodNode method : node.methods) {
-            if (bFlag >= 5) break;
+        for (MethodNode method : node.methods)
+        {
+            if (bFlag >= 5)
+            {
+                break;
+            }
             insns = method.instructions;
-            if (method.desc.equals("()L" + map.get("net.minecraft.client.Minecraft") + ";")) {
+            if (method.desc.equals("()L" + map.get("net.minecraft.client.Minecraft") + ";"))
+            {
                 map.put("net.minecraft.client.Minecraft.getMinecraft:()Lnet/minecraft/client/Minecraft;", method.name);
                 bFlag++;
                 continue;
             }
-            for (i = 0; i < insns.size(); i++) {
+            for (i = 0; i < insns.size(); i++)
+            {
                 insn = insns.get(i);
-                if (insn.getType() == AbstractInsnNode.LDC_INSN) {
+                if (insn.getType() == AbstractInsnNode.LDC_INSN)
+                {
                     LdcInsnNode ldcInsn = (LdcInsnNode) insn;
-                    if (ldcInsn.cst instanceof String) {
+                    if (ldcInsn.cst instanceof String)
+                    {
                         String cst = (String) ldcInsn.cst;
-                        if (cst.equals("textures/font/ascii.png")) {
+                        if (cst.equals("textures/font/ascii.png"))
+                        {
                             j = i;
-                            while ((insn = insns.get(--j)).getOpcode() != Opcodes.NEW) ;
+                            while ((insn = insns.get(--j)).getOpcode() != Opcodes.NEW)
+                            {
+                                ;
+                            }
                             TypeInsnNode typeInsn = (TypeInsnNode) insn;
                             map.put("net.minecraft.util.ResourceLocation", typeInsn.desc);
-                            while ((insn = insns.get(j++)).getOpcode() != Opcodes.PUTFIELD) ;
+                            while ((insn = insns.get(j++)).getOpcode() != Opcodes.PUTFIELD)
+                            {
+                                ;
+                            }
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
                             map.put("net.minecraft.client.Minecraft.fontRendererObj:Lnet/minecraft/client/gui/FontRenderer;", fieldInsn.name);
                             map.put("net.minecraft.client.gui.FontRenderer", fieldInsn.desc.substring(1, fieldInsn.desc.length() - 1));
                             j = i;
                             MethodInsnNode methodInsn = null;
-                            while (true) {
-                                while ((insn = insns.get(++j)).getOpcode() != Opcodes.INVOKESPECIAL) ;
+                            while (true)
+                            {
+                                while ((insn = insns.get(++j)).getOpcode() != Opcodes.INVOKESPECIAL)
+                                {
+                                    ;
+                                }
                                 methodInsn = (MethodInsnNode) insn;
-                                if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer"))) break;
+                                if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")))
+                                {
+                                    break;
+                                }
                             }
                             map.put("net.minecraft.client.settings.GameSettings", methodInsn.desc.substring(2, methodInsn.desc.indexOf(';')));
                             map.put("net.minecraft.client.renderer.texture.TextureManager", methodInsn.desc.substring(6 + map.get("net.minecraft.client.settings.GameSettings").length() + map.get("net.minecraft.util.ResourceLocation").length(), methodInsn.desc.lastIndexOf(';')));
                             bFlag++;
                             continue L2;
-                        } else if (cst.equals("crash-reports")) {
+                        }
+                        else if (cst.equals("crash-reports"))
+                        {
                             j = i;
-                            while ((insn = insns.get(--j)).getOpcode() != Opcodes.GETFIELD) ;
+                            while ((insn = insns.get(--j)).getOpcode() != Opcodes.GETFIELD)
+                            {
+                                ;
+                            }
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
-                            if (fieldInsn.desc.equals("Ljava/io/File;")) {
+                            if (fieldInsn.desc.equals("Ljava/io/File;"))
+                            {
                                 map.put("net.minecraft.client.Minecraft.mcDataDir:Ljava/io/File;", fieldInsn.name);
                                 bFlag++;
                                 continue L2;
                             }
-                        } else if (cst.equals("/")) {
+                        }
+                        else if (cst.equals("/"))
+                        {
                             MethodInsnNode methodInsn = (MethodInsnNode) insns.get(i + 1);
                             map.put("net.minecraft.client.gui.GuiChat", methodInsn.owner);
                             bFlag++;
-                        } else if (cst.equals("gui")) {
+                        }
+                        else if (cst.equals("gui"))
+                        {
                             j = i;
-                            while ((insn = insns.get(++j)).getOpcode() != Opcodes.GETFIELD) ;
-                            while ((insn = insns.get(++j)).getOpcode() != Opcodes.GETFIELD) ;
+                            while ((insn = insns.get(++j)).getOpcode() != Opcodes.GETFIELD)
+                            {
+                                ;
+                            }
+                            while ((insn = insns.get(++j)).getOpcode() != Opcodes.GETFIELD)
+                            {
+                                ;
+                            }
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
                             map.put("net.minecraft.client.gui.GuiIngame", fieldInsn.desc.substring(1, fieldInsn.desc.length() - 1));
                             bFlag++;
@@ -163,7 +227,8 @@ public class V1_6_2ClassMapper implements IClassMapper {
         }
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.renderer.texture.TextureManager").replace('/', '.'));
-        if (b == null) {
+        if (b == null)
+        {
             throw new IOException("TextureManager.class not found!");
         }
 
@@ -172,14 +237,19 @@ public class V1_6_2ClassMapper implements IClassMapper {
         reader.accept(node, 0);
 
         L3:
-        for (MethodNode method : node.methods) {
-            if (method.desc.equals("(L" + map.get("net.minecraft.util.ResourceLocation") + ";)V")) {
+        for (MethodNode method : node.methods)
+        {
+            if (method.desc.equals("(L" + map.get("net.minecraft.util.ResourceLocation") + ";)V"))
+            {
                 insns = method.instructions;
-                for (i = 0; i < insns.size(); i++) {
+                for (i = 0; i < insns.size(); i++)
+                {
                     insn = insns.get(i);
-                    if (insn.getOpcode() == Opcodes.GETFIELD) {
+                    if (insn.getOpcode() == Opcodes.GETFIELD)
+                    {
                         FieldInsnNode fieldInsn = (FieldInsnNode) insn;
-                        if (fieldInsn.desc.equals("Ljava/util/Map;")) {
+                        if (fieldInsn.desc.equals("Ljava/util/Map;"))
+                        {
                             map.put("net.minecraft.client.renderer.texture.TextureManager.bindTexture:(Lnet/minecraft/util/ResourceLocation;)V", method.name);
                             break L3;
                         }
@@ -189,7 +259,8 @@ public class V1_6_2ClassMapper implements IClassMapper {
         }
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.gui.FontRenderer").replace('/', '.'));
-        if (b == null) {
+        if (b == null)
+        {
             throw new IOException("FontRenderer.class not found!");
         }
 
@@ -199,22 +270,27 @@ public class V1_6_2ClassMapper implements IClassMapper {
 
         bFlag = 0;
         L4:
-        for (MethodNode method : node.methods) {
-            if (bFlag == 127) break;
-            if (method.name.equals("<init>") && (bFlag & 64) == 0) {
+        for (MethodNode method : node.methods)
+        {
+            if (bFlag == 127)
+            {
+                break;
+            }
+            if (method.name.equals("<init>") && (bFlag & 64) == 0)
+            {
                 insns = method.instructions;
                 for (i = 0; i < insns.size(); i++)
                 {
                     insn = insns.get(i);
 
-                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode)insn).var != 0)
+                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode) insn).var != 0)
                     {
                         continue;
                     }
 
                     insn = insns.get(++i);
 
-                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode)insn).var != 3)
+                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode) insn).var != 3)
                     {
                         continue;
                     }
@@ -226,68 +302,97 @@ public class V1_6_2ClassMapper implements IClassMapper {
                         continue;
                     }
 
-                    map.put("net.minecraft.client.gui.FontRenderer.renderEngine:net.minecraft.client.renderer.texture.TextureManager", ((FieldInsnNode)insn).name);
+                    map.put("net.minecraft.client.gui.FontRenderer.renderEngine:net.minecraft.client.renderer.texture.TextureManager", ((FieldInsnNode) insn).name);
                     bFlag |= 64;
                 }
-            } else if (method.desc.equals("(CZ)F")) {
+            }
+            else if (method.desc.equals("(CZ)F"))
+            {
                 insns = method.instructions;
-                if ((bFlag & 3) != 3) {
-                    for (i = 0; i < insns.size(); i++) {
+                if ((bFlag & 3) != 3)
+                {
+                    for (i = 0; i < insns.size(); i++)
+                    {
                         insn = insns.get(i);
-                        if ((insn.getOpcode() == Opcodes.GETFIELD)) {
+                        if ((insn.getOpcode() == Opcodes.GETFIELD))
+                        {
                             FieldInsnNode fieldInsn = (FieldInsnNode) insn;
-                            if (fieldInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer"))) {
-                                if (fieldInsn.desc.equals("[B") && (bFlag & 1) == 0) {
+                            if (fieldInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")))
+                            {
+                                if (fieldInsn.desc.equals("[B") && (bFlag & 1) == 0)
+                                {
                                     map.put("net.minecraft.client.gui.FontRenderer.glyphWidth:[B", fieldInsn.name);
                                     bFlag |= 1;
-                                } else if (fieldInsn.desc.equals("F") && (((bFlag & 8) == 0) | (bFlag & 16) == 0)) {
-                                    if ((bFlag & 8) == 0) {
+                                }
+                                else if (fieldInsn.desc.equals("F") && (((bFlag & 8) == 0) | (bFlag & 16) == 0))
+                                {
+                                    if ((bFlag & 8) == 0)
+                                    {
                                         map.put("net.minecraft.client.gui.FontRenderer.posX:F", fieldInsn.name);
                                         bFlag |= 8;
-                                    } else if ((bFlag & 16) == 0) {
+                                    }
+                                    else if ((bFlag & 16) == 0)
+                                    {
                                         map.put("net.minecraft.client.gui.FontRenderer.posY:F", fieldInsn.name);
                                         bFlag |= 16;
                                     }
                                 }
                             }
-                        } else if (((insn.getOpcode() == Opcodes.INVOKESPECIAL) || insn.getOpcode() == Opcodes.INVOKEVIRTUAL) && ((bFlag & 3) == 1)) {
+                        }
+                        else if (((insn.getOpcode() == Opcodes.INVOKESPECIAL) || insn.getOpcode() == Opcodes.INVOKEVIRTUAL) && ((bFlag & 3) == 1))
+                        {
                             MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                            if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")) && methodInsn.desc.equals("(I)V")) {
+                            if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")) && methodInsn.desc.equals("(I)V"))
+                            {
                                 map.put("net.minecraft.client.gui.FontRenderer.loadGlyphTexture:(I)V", methodInsn.name);
                                 bFlag |= 2;
                             }
                         }
                     }
                 }
-                if ((bFlag & 4) == 0) {
-                    for (i = 0; i < insns.size(); i++) {
+                if ((bFlag & 4) == 0)
+                {
+                    for (i = 0; i < insns.size(); i++)
+                    {
                         insn = insns.get(i);
-                        if (insn.getOpcode() == Opcodes.INVOKESTATIC) {
+                        if (insn.getOpcode() == Opcodes.INVOKESTATIC)
+                        {
                             MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                            if (methodInsn.name.startsWith("gl")) continue L4;
+                            if (methodInsn.name.startsWith("gl"))
+                            {
+                                continue L4;
+                            }
                         }
                     }
                     map.put("net.minecraft.client.gui.FontRenderer.renderCharAtPos:(CZ)F", method.name);
                     bFlag |= 4;
                 }
-            } else if (method.desc.equals("(ICZ)F") && (bFlag & 4) == 0) {
+            }
+            else if (method.desc.equals("(ICZ)F") && (bFlag & 4) == 0)
+            {
                 map.put("net.minecraft.client.gui.FontRenderer.renderCharAtPos:(ICZ)F", method.name);
                 bFlag |= 4;
-            } else if (method.desc.equals("(C)I") && (bFlag & 32) == 0) {
+            }
+            else if (method.desc.equals("(C)I") && (bFlag & 32) == 0)
+            {
                 insns = method.instructions;
-                for (i = 0; i < insns.size(); i++) {
+                for (i = 0; i < insns.size(); i++)
+                {
                     insn = insns.get(i);
-                    switch (insn.getOpcode()) {
+                    switch (insn.getOpcode())
+                    {
                         case Opcodes.SIPUSH:
                             IntInsnNode intInsn = (IntInsnNode) insn;
-                            if (intInsn.operand == 167) {
+                            if (intInsn.operand == 167)
+                            {
                                 map.put("net.minecraft.client.gui.FontRenderer.getCharWidth:(C)I", method.name);
                                 bFlag |= 32;
                             }
                             break;
                         case Opcodes.INVOKESPECIAL:
                             MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                            if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")) && methodInsn.name.equals("getCharWidthFloat") && methodInsn.desc.equals("(C)F")) {
+                            if (methodInsn.owner.equals(map.get("net.minecraft.client.gui.FontRenderer")) && methodInsn.name.equals("getCharWidthFloat") && methodInsn.desc.equals("(C)F"))
+                            {
                                 map.put("net.minecraft.client.gui.FontRenderer.getCharWidth:(C)I", method.name);
                                 bFlag |= 32;
                             }
@@ -298,7 +403,8 @@ public class V1_6_2ClassMapper implements IClassMapper {
         }
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.gui.GuiChat").replace('/', '.'));
-        if (b == null) {
+        if (b == null)
+        {
             throw new IOException("GuiChat.class not found!");
         }
 
@@ -306,15 +412,18 @@ public class V1_6_2ClassMapper implements IClassMapper {
         node = new ClassNode();
         reader.accept(node, 0);
 
-        for (MethodNode method : node.methods) {
-            if (method.desc.equals("(IIF)V")) {
+        for (MethodNode method : node.methods)
+        {
+            if (method.desc.equals("(IIF)V"))
+            {
                 map.put("net.minecraft.client.gui.GuiChat.drawScreen:(IIF)V", method.name);
                 break;
             }
         }
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.gui.GuiIngame").replace('/', '.'));
-        if (b == null) {
+        if (b == null)
+        {
             throw new IOException("GuiIngame.class not found!");
         }
 
@@ -323,18 +432,29 @@ public class V1_6_2ClassMapper implements IClassMapper {
         reader.accept(node, 0);
 
         L5:
-        for (MethodNode method : node.methods) {
-            if (method.desc.equals("(F)V")) {
+        for (MethodNode method : node.methods)
+        {
+            if (method.desc.equals("(F)V"))
+            {
                 insns = method.instructions;
-                for (i = 0; i < insns.size(); i++) {
+                for (i = 0; i < insns.size(); i++)
+                {
                     insn = insns.get(i);
-                    if (insn.getType() == AbstractInsnNode.LDC_INSN) {
+                    if (insn.getType() == AbstractInsnNode.LDC_INSN)
+                    {
                         LdcInsnNode ldcInsn = (LdcInsnNode) insn;
-                        if (ldcInsn.cst instanceof String) {
+                        if (ldcInsn.cst instanceof String)
+                        {
                             String s = (String) ldcInsn.cst;
-                            if (!s.equals("chat")) continue;
+                            if (!s.equals("chat"))
+                            {
+                                continue;
+                            }
                             j = i + 1;
-                            while ((insn = insns.get(++j)).getOpcode() != Opcodes.INVOKEVIRTUAL) ;
+                            while ((insn = insns.get(++j)).getOpcode() != Opcodes.INVOKEVIRTUAL)
+                            {
+                                ;
+                            }
                             MethodInsnNode methodInsn = (MethodInsnNode) insn;
                             map.put("net.minecraft.client.gui.GuiNewChat", methodInsn.owner);
                             break L5;
@@ -346,7 +466,8 @@ public class V1_6_2ClassMapper implements IClassMapper {
         }
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.gui.GuiNewChat").replace('/', '.'));
-        if (b == null) {
+        if (b == null)
+        {
             throw new IOException("GuiNewChat.class not found!");
         }
 
@@ -355,14 +476,19 @@ public class V1_6_2ClassMapper implements IClassMapper {
         reader.accept(node, 0);
 
         L6:
-        for (MethodNode method : node.methods) {
-            if (method.desc.equals("()I")) {
+        for (MethodNode method : node.methods)
+        {
+            if (method.desc.equals("()I"))
+            {
                 insns = method.instructions;
-                for (i = 0; i < insns.size(); i++) {
+                for (i = 0; i < insns.size(); i++)
+                {
                     insn = insns.get(i);
-                    if (insn.getOpcode() == Opcodes.BIPUSH) {
+                    if (insn.getOpcode() == Opcodes.BIPUSH)
+                    {
                         IntInsnNode intInsn = (IntInsnNode) insn;
-                        if (intInsn.operand == 9 && insns.get(i + 1).getOpcode() == Opcodes.IDIV) {
+                        if (intInsn.operand == 9 && insns.get(i + 1).getOpcode() == Opcodes.IDIV)
+                        {
                             map.put("net.minecraft.client.gui.GuiNewChat.getLineCount:()I", method.name);
                             break L6;
                         }
@@ -373,16 +499,25 @@ public class V1_6_2ClassMapper implements IClassMapper {
 
         int index, tmp;
         String className, key;
-        for(Map.Entry<String, String> entry : map.entrySet()) {
+        for (Map.Entry<String, String> entry : map.entrySet())
+        {
             key = entry.getKey().replace('.', '/');
-            if((index = key.indexOf(':')) != -1) {
-                className = key.substring(0, (tmp = key.substring(0, index).lastIndexOf('/') ));
-                if(key.charAt(index + 1) == '(')
+            if ((index = key.indexOf(':')) != -1)
+            {
+                className = key.substring(0, (tmp = key.substring(0, index).lastIndexOf('/')));
+                if (key.charAt(index + 1) == '(')
+                {
                     classMap.getClass(className).addMethod(key.substring(tmp + 1, index), entry.getValue(), key.substring(index + 1));
+                }
                 else
+                {
                     classMap.getClass(className).addField(key.substring(tmp + 1, index), entry.getValue());
-            } else
+                }
+            }
+            else
+            {
                 classMap.addClass(new SimpleClassDetail(key, entry.getValue()));
+            }
         }
 
         return map.size() >= 20;

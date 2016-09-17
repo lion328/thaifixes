@@ -22,56 +22,74 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import com.lion328.thaifixes.coremod.Configuration;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 import java.util.ArrayList;
 
-public class FontRendererPatcher implements IClassPatcher {
+public class FontRendererPatcher implements IClassPatcher
+{
 
     private IClassMap classMap;
 
-    public FontRendererPatcher(IClassMap classMap) {
+    public FontRendererPatcher(IClassMap classMap)
+    {
         this.classMap = classMap;
     }
 
     @Override
-    public String getClassName() {
+    public String getClassName()
+    {
         return classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.');
     }
 
     @Override
-    public byte[] patch(byte[] original) {
+    public byte[] patch(byte[] original)
+    {
         ClassReader r = new ClassReader(original);
         ClassNode n = new ClassNode();
         r.accept(n, 0);
 
-        for (MethodNode mn : n.methods) {
-            if ((mn.access & Opcodes.ACC_PRIVATE) != 0) {
+        for (MethodNode mn : n.methods)
+        {
+            if ((mn.access & Opcodes.ACC_PRIVATE) != 0)
+            {
                 mn.access |= Opcodes.ACC_PROTECTED;
                 mn.access &= ~Opcodes.ACC_PRIVATE;
             }
             InsnList insns = mn.instructions;
-            for (int i = 0; i < insns.size(); i++) {
+            for (int i = 0; i < insns.size(); i++)
+            {
                 AbstractInsnNode insn = insns.get(i);
-                if (insn.getOpcode() == Opcodes.INVOKESPECIAL) {
+                if (insn.getOpcode() == Opcodes.INVOKESPECIAL)
+                {
                     MethodInsnNode methodInsn = (MethodInsnNode) insn;
                     if (methodInsn.owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
+                    {
                         methodInsn.setOpcode(Opcodes.INVOKEVIRTUAL);
+                    }
                 }
             }
         }
 
         ArrayList<FieldNode> allObjectField = new ArrayList<FieldNode>();
-        for (FieldNode fn : n.fields) {
+        for (FieldNode fn : n.fields)
+        {
             if ((fn.access & Opcodes.ACC_STATIC) == 0)
+            {
                 allObjectField.add(fn);
-            if ((fn.access & Opcodes.ACC_PRIVATE) != 0) {
+            }
+            if ((fn.access & Opcodes.ACC_PRIVATE) != 0)
+            {
                 fn.access |= Opcodes.ACC_PROTECTED;
                 fn.access &= ~Opcodes.ACC_PRIVATE;
             }
@@ -81,19 +99,32 @@ public class FontRendererPatcher implements IClassPatcher {
 
         MethodVisitor mv = w.visitMethod(Opcodes.ACC_PRIVATE, "<init>", "()V", null, null);
         mv.visitCode();
-        for (FieldNode fn : allObjectField) {
+        for (FieldNode fn : allObjectField)
+        {
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            if (fn.desc.length() == 1) { // primitives
+            if (fn.desc.length() == 1)
+            { // primitives
                 if (fn.desc.equals("F"))
+                {
                     mv.visitInsn(Opcodes.FCONST_0);
+                }
                 else if (fn.desc.equals("D"))
+                {
                     mv.visitInsn(Opcodes.DCONST_0);
+                }
                 else if (fn.desc.equals("J"))
+                {
                     mv.visitInsn(Opcodes.LCONST_0);
+                }
                 else
+                {
                     mv.visitInsn(Opcodes.ICONST_0);
-            } else
+                }
+            }
+            else
+            {
                 mv.visitInsn(Opcodes.ACONST_NULL);
+            }
             mv.visitFieldInsn(Opcodes.PUTFIELD, classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName(), fn.name, fn.desc);
         }
         mv.visitVarInsn(Opcodes.ALOAD, 0);

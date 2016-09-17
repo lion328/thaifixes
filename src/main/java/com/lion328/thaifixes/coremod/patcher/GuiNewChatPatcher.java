@@ -22,26 +22,27 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import com.lion328.thaifixes.coremod.Configuration;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 
-import java.util.Map;
-
-public class GuiNewChatPatcher implements IClassPatcher {
+public class GuiNewChatPatcher implements IClassPatcher
+{
 
     private IClassMap classMap;
 
-    public GuiNewChatPatcher(IClassMap classMap) {
+    public GuiNewChatPatcher(IClassMap classMap)
+    {
         this.classMap = classMap;
     }
 
     @Override
-    public String getClassName() {
+    public String getClassName()
+    {
         return classMap.getClass("net/minecraft/client/gui/GuiNewChat").getObfuscatedName().replace('/', '.');
     }
 
     @Override
-    public byte[] patch(byte[] original) {
+    public byte[] patch(byte[] original)
+    {
         return original;
     }
 }

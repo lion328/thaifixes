@@ -1,6 +1,7 @@
 package com.lion328.thaifixes;
 
-public interface IFontRenderer {
+public interface IFontRenderer
+{
 
     /**
      * Set FontRendererWrapper object.

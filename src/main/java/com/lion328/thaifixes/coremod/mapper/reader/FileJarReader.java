@@ -28,24 +28,32 @@ import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class FileJarReader implements IJarReader {
+public class FileJarReader implements IJarReader
+{
 
     private JarFile jar;
 
-    public FileJarReader(JarFile jar) {
+    public FileJarReader(JarFile jar)
+    {
         this.jar = jar;
     }
 
     @Override
-    public byte[] getClassBytes(String name) throws IOException {
+    public byte[] getClassBytes(String name) throws IOException
+    {
         name = name.replace('.', '/') + ".class";
         JarEntry entry = jar.getJarEntry(name);
         InputStream in = jar.getInputStream(entry);
         if (entry.isDirectory())
+        {
             return null;
+        }
         int b;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        while ((b = in.read()) != -1) out.write(b);
+        while ((b = in.read()) != -1)
+        {
+            out.write(b);
+        }
         return out.toByteArray();
     }
 }
