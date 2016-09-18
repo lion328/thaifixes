@@ -44,6 +44,6 @@ public class TransformedJarReader implements IJarReader {
         String untransformedName = name;
         if (nameTransformer != null)
             untransformedName = nameTransformer.unmapClassName(name);
-        return classTransformer.transform(untransformedName, name, parent.getClassBytes(name));
+        return classTransformer.transform(untransformedName, name, parent.getClassBytes(nameTransformer.unmapClassName(name)));
     }
 }

@@ -85,7 +85,7 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer {
             addPatcher(new FontRendererPatcher(classMap));
             addPatcher(new GuiNewChatPatcher(classMap));
 
-            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", Loader.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper.class"),classMap));
+            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", Loader.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"),classMap));
         } catch (Exception e) {
             Configuration.LOGGER.catching(e);
         }

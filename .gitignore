@@ -1,8 +1,9 @@
-/*
-!src/
-!src/*
-!build.gradle
-!gradle.properties
-!LICENSE
-!README.md
-!.gitignore
+.gradle/
+.idea/
+build/
+eclipse/
+out/
+run/
+ThaiFixes.iml
+ThaiFixes.ipr
+ThaiFixes.iws

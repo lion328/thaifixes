@@ -2,7 +2,7 @@
     {
         "modid": "thaifixes",
         "name": "ThaiFixes",
-        "description": "ช่วยให้การแสดงผลของภาษาไทยออกมาอย่างถูกต้อง",
+        "description": "Improve Thai characters support in Minecraft.",
         "version": "$version",
         "mcversion": "$mcversion",
         "url": "http://thaifixes.lion328.com/",

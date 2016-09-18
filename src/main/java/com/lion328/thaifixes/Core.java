@@ -44,6 +44,7 @@ public class Core {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         try {
+            com.lion328.thaifixes.coremod.Configuration.generateClassmap();
             IClassMap map = com.lion328.thaifixes.coremod.Configuration.getDefaultClassmap();
             Class<?> mcClass = Class.forName(map.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.'));
             Method getMc = mcClass.getMethod(map.getClass("net/minecraft/client/Minecraft").getMethod("getMinecraft", "()Lnet/minecraft/client/Minecraft;"));
