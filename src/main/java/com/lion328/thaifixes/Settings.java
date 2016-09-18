@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Configuration
+public class Settings
 {
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes");
@@ -45,7 +45,7 @@ public class Configuration
     {
         if (!configFile.exists())
         {
-            InputStream in = Configuration.class.getResourceAsStream("/assets/thaifixes/config/config_default.cfg");
+            InputStream in = Settings.class.getResourceAsStream("/assets/thaifixes/config/config_default.cfg");
             FileOutputStream out = new FileOutputStream(configFile);
             byte[] buffer = new byte[1024];
             int count;

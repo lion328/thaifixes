@@ -46,12 +46,17 @@ public class NameMapperPatcher implements IClassPatcher
     public NameMapperPatcher(String className, InputStream classBytecode, IClassMap classMap) throws IOException
     {
         this(className, new byte[0], classMap);
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int b;
-        while ((b = classBytecode.read()) != -1)
+
+        byte[] buffer = new byte[1024];
+        int i;
+
+        while ((i = classBytecode.read(buffer)) != -1)
         {
-            out.write(b);
+            out.write(buffer, 0, i);
         }
+
         originalBytecode = out.toByteArray();
     }
 

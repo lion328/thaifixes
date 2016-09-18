@@ -1,6 +1,6 @@
 package com.lion328.thaifixes;
 
-public class Constant
+public class ModInformation
 {
 
     public static final String VERSION = "%VERSION%";

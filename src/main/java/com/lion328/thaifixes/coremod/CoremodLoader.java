@@ -22,7 +22,7 @@
 
 package com.lion328.thaifixes.coremod;
 
-import com.lion328.thaifixes.Constant;
+import com.lion328.thaifixes.ModInformation;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.coremod.patcher.FontRendererPatcher;
 import com.lion328.thaifixes.coremod.patcher.GuiNewChatPatcher;
@@ -35,32 +35,38 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-@IFMLLoadingPlugin.MCVersion(Constant.MCVERSION)
-public class Loader implements IFMLLoadingPlugin, IClassTransformer
+@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
+public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer
 {
 
     private static final Map<String, IClassPatcher> patchers = new HashMap<String, IClassPatcher>();
 
     static
     {
-        IClassMap classMap = Configuration.getDefaultClassmap();
+        initializePatchers();
+    }
+
+    public static void addPatcher(IClassPatcher patcher)
+    {
+        patchers.put(patcher.getClassName(), patcher);
+    }
+
+    private static void initializePatchers()
+    {
+        IClassMap classMap = CoremodSettings.getObfuscatedClassmap();
+
         try
         {
             addPatcher(new MinecraftPatcher(classMap));
             addPatcher(new FontRendererPatcher(classMap));
             addPatcher(new GuiNewChatPatcher(classMap));
 
-            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", Loader.class.getResourceAsStream(Configuration.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), classMap));
+            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", CoremodLoader.class.getResourceAsStream(CoremodSettings.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), CoremodSettings.getDefaultClassmap()));
         }
         catch (Exception e)
         {
-            Configuration.LOGGER.catching(e);
+            CoremodSettings.LOGGER.catching(e);
         }
-    }
-
-    public static void addPatcher(IClassPatcher patcher)
-    {
-        patchers.put(patcher.getClassName(), patcher);
     }
 
     @Override
@@ -98,16 +104,18 @@ public class Loader implements IFMLLoadingPlugin, IClassTransformer
     {
         if (patchers.containsKey(untransformedName))
         {
-            Configuration.LOGGER.info("Patching " + transformedName);
+            CoremodSettings.LOGGER.info("Patching " + transformedName);
+
             try
             {
                 return patchers.get(untransformedName).patch(bytes);
             }
             catch (Exception e)
             {
-                Configuration.LOGGER.catching(e);
+                CoremodSettings.LOGGER.catching(e);
             }
         }
+
         return bytes;
     }
 }

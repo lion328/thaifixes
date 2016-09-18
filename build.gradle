@@ -30,7 +30,7 @@ compileJava {
 
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'com.lion328.thaifixes.coremod.Loader'
+        attributes 'FMLCorePlugin': 'com.lion328.thaifixes.coremod.CoremodLoader'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }
@@ -53,7 +53,7 @@ minecraft {
 
     replace "%VERSION%", project.version
     replace "%MCVERSION%", project.minecraft.version
-    replaceIn "Constant.java"
+    replaceIn "ModInformation.java"
 }
 
 dependencies {
