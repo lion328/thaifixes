@@ -24,7 +24,8 @@ package com.lion328.thaifixes.coremod.mapper.reader;
 
 import java.io.IOException;
 
-public interface IJarReader {
+public interface IJarReader
+{
 
     byte[] getClassBytes(String name) throws IOException;
 }

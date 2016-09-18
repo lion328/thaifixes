@@ -22,10 +22,10 @@
 
 package com.lion328.thaifixes;
 
+import com.lion328.thaifixes.coremod.CoremodSettings;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -33,56 +33,80 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Map;
 
-@Mod(name = Constant.NAME, modid = Constant.MODID, version = Constant.VERSION, acceptedMinecraftVersions = Constant.MCVERSION)
-public class Core {
+@Mod(name = ModInformation.NAME, modid = ModInformation.MODID, version = ModInformation.VERSION, acceptedMinecraftVersions = ModInformation.MCVERSION)
+public class ThaiFixes
+{
 
-    public static final Logger LOGGER = Configuration.LOGGER;
+    public static final Logger LOGGER = Settings.LOGGER;
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        try {
-            com.lion328.thaifixes.coremod.Configuration.generateClassmap();
-            IClassMap map = com.lion328.thaifixes.coremod.Configuration.getDefaultClassmap();
+    public void init(FMLInitializationEvent event)
+    {
+        try
+        {
+            IClassMap map = CoremodSettings.getDefaultClassmap();
+
             Class<?> mcClass = Class.forName(map.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.'));
             Method getMc = mcClass.getMethod(map.getClass("net/minecraft/client/Minecraft").getMethod("getMinecraft", "()Lnet/minecraft/client/Minecraft;"));
-            Object mc = getMc.invoke(null);
+
             Field fontRendererObjField = mcClass.getDeclaredField(map.getClass("net/minecraft/client/Minecraft").getField("fontRendererObj"));
             fontRendererObjField.setAccessible(true);
+
+            Object mc = getMc.invoke(null);
             Object fontRenderer = fontRendererObjField.get(mc);
-            if (fontRenderer instanceof FontRendererWrapper) {
-                Field patchedField = FontRendererWrapper.class.getDeclaredField("PATCHED");
-                if (!patchedField.getBoolean(null)) {
+
+            if (fontRenderer instanceof FontRendererWrapper)
+            {
+                if (!FontRendererWrapper.class.getDeclaredField("PATCHED").getBoolean(null))
+                {
                     LOGGER.error("Unpatched FontRendererWrapper, converting to default");
+
                     Class<?> fontRendererClass = Class.forName(map.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.'));
                     Field[] fields = fontRendererClass.getDeclaredFields();
+
                     Constructor<?> constructor = fontRendererClass.getDeclaredConstructor();
                     constructor.setAccessible(true);
-                    Object newFontRenderer = constructor.newInstance();
+
                     Field modifiersField = Field.class.getDeclaredField("modifiers");
                     modifiersField.setAccessible(true);
-                    for (Field field : fields) {
+
+                    Object newFontRenderer = constructor.newInstance();
+
+                    for (Field field : fields)
+                    {
                         field.setAccessible(true);
                         modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
                         field.set(newFontRenderer, field.get(fontRenderer));
                     }
+
                     fontRendererObjField.set(mc, newFontRenderer);
-                } else {
+                }
+                else
+                {
                     LOGGER.info("FontRendererWrapper is successfully patched");
-                    Configuration.loadConfig(new File(FontRendererWrapper.getMinecraftDirectory(), "config/thaifixes.cfg"));
-                    String rendererClass = Configuration.config.getProperty("font.rendererclass", "disable");
-                    if (!rendererClass.equalsIgnoreCase("disable")) {
+
+                    Settings.loadConfig(new File(FontRendererWrapper.getMinecraftDirectory(), "config/thaifixes.cfg"));
+                    String rendererClass = Settings.config.getProperty("font.rendererclass", "disable");
+
+                    if (!rendererClass.equalsIgnoreCase("disable"))
+                    {
                         Class<?> customRendererClass = Class.forName(rendererClass);
                         IFontRenderer customRenderer = (IFontRenderer) customRendererClass.newInstance();
+
                         ((FontRendererWrapper) fontRenderer).addRenderer(customRenderer);
+
                         LOGGER.info("Added " + rendererClass + " as font renderer");
                     }
                 }
-            } else
+            }
+            else
+            {
                 LOGGER.error("Current global FontRenderer object is not FontRendererWrapper (maybe another mod changed)");
-        } catch (Exception e) {
+            }
+        }
+        catch (Exception e)
+        {
             LOGGER.catching(e);
         }
     }

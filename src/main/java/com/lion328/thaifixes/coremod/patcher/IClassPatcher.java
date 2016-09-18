@@ -22,7 +22,8 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-public interface IClassPatcher {
+public interface IClassPatcher
+{
 
     String getClassName();
 

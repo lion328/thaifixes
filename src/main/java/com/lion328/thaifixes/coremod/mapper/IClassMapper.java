@@ -25,9 +25,9 @@ package com.lion328.thaifixes.coremod.mapper;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 
 import java.io.IOException;
-import java.util.Map;
 
-public interface IClassMapper {
+public interface IClassMapper
+{
 
     boolean getMap(IJarReader reader, IClassMap map) throws IOException;
 }

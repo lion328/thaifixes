@@ -22,54 +22,78 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import com.lion328.thaifixes.coremod.Configuration;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
-public class MinecraftPatcher implements IClassPatcher {
+public class MinecraftPatcher implements IClassPatcher
+{
 
     private IClassMap classMap;
 
-    public MinecraftPatcher(IClassMap classMap) {
+    public MinecraftPatcher(IClassMap classMap)
+    {
         this.classMap = classMap;
     }
 
     @Override
-    public String getClassName() {
+    public String getClassName()
+    {
         return classMap.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.');
     }
 
     @Override
-    public byte[] patch(byte[] original) throws Exception {
+    public byte[] patch(byte[] original) throws Exception
+    {
         ClassReader r = new ClassReader(original);
         ClassNode n = new ClassNode();
         r.accept(n, 0);
 
         OUT:
-        for (MethodNode mn : n.methods) {
+        for (MethodNode mn : n.methods)
+        {
             InsnList insns = mn.instructions;
-            for (int i = 0; i < insns.size(); i++) {
+            for (int i = 0; i < insns.size(); i++)
+            {
                 AbstractInsnNode insn = insns.get(i);
-                if (insn.getOpcode() != Opcodes.LDC) continue;
+                if (insn.getOpcode() != Opcodes.LDC)
+                {
+                    continue;
+                }
                 LdcInsnNode ldc = (LdcInsnNode) insn;
-                if (!ldc.cst.equals("textures/font/ascii.png")) continue;
-                for (i--; i < insns.size(); i--) {
-                    if (insns.get(i).getOpcode() != Opcodes.NEW) continue;
+                if (!ldc.cst.equals("textures/font/ascii.png"))
+                {
+                    continue;
+                }
+                for (i--; i < insns.size(); i--)
+                {
+                    if (insns.get(i).getOpcode() != Opcodes.NEW)
+                    {
+                        continue;
+                    }
                     TypeInsnNode type = (TypeInsnNode) insns.get(i);
-                    if (type.desc.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+                    if (type.desc.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
+                    {
                         type.desc = "com/lion328/thaifixes/FontRendererWrapper";
                         break;
                     }
                 }
-                for (; i < insns.size(); i++) {
-                    if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL) continue;
-                    if (((MethodInsnNode) insns.get(i)).owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+                for (; i < insns.size(); i++)
+                {
+                    if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL)
+                    {
+                        continue;
+                    }
+                    if (((MethodInsnNode) insns.get(i)).owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
+                    {
                         MethodInsnNode method = (MethodInsnNode) insns.get(i);
                         method.owner = "com/lion328/thaifixes/FontRendererWrapper";
                         break;

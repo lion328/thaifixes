@@ -22,13 +22,20 @@
 
 package com.lion328.thaifixes.coremod.mapper;
 
-public interface IClassDetail {
+public interface IClassDetail
+{
 
     String getName();
+
     String getObfuscatedName();
+
     String getField(String name);
+
     String getMethod(String name, String desc);
+
     void addField(String name, String obfuscatedName);
+
     void addMethod(String name, String obfuscatedName, String desc);
+
     IClassDetail getSuperclassMap();
 }

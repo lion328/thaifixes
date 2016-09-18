@@ -29,29 +29,37 @@ import com.lion328.thaifixes.coremod.mapper.reader.FileJarReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.jar.JarFile;
 
-public class Main {
+public class Main
+{
 
-    public static void main(String[] args) throws IOException {
-        if (args.length == 3 && args[0].equalsIgnoreCase("generate-classmap")) {
+    public static void main(String[] args) throws IOException
+    {
+        if (args.length == 3 && args[0].equalsIgnoreCase("generate-classmap"))
+        {
             Class<?> c = null;
-            try {
+            try
+            {
                 c = Class.forName(args[1]);
-            } catch (ClassNotFoundException e) {
+            }
+            catch (ClassNotFoundException e)
+            {
                 System.out.println("Class not found");
                 return;
             }
             Object o = null;
-            try {
+            try
+            {
                 o = c.newInstance();
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.out.println("Can't create class instance");
                 return;
             }
-            if (!(o instanceof IClassMapper)) {
+            if (!(o instanceof IClassMapper))
+            {
                 System.out.println("Invalid IClassMapper");
                 return;
             }

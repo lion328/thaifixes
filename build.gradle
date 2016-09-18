@@ -30,17 +30,17 @@ compileJava {
 
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'com.lion328.thaifixes.coremod.Loader'
+        attributes 'FMLCorePlugin': 'com.lion328.thaifixes.coremod.CoremodLoader'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }
 
-version = "4.0-1.9.4"
+version = "4.2-1.10.2"
 group = "com.lion328.thaifixes" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.9.4-12.17.0.1976"
+    version = "1.10.2-12.18.1.2076"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -50,10 +50,10 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20160518"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
+
     replace "%VERSION%", project.version
     replace "%MCVERSION%", project.minecraft.version
-    replaceIn "Constant.java"
+    replaceIn "ModInformation.java"
 }
 
 dependencies {

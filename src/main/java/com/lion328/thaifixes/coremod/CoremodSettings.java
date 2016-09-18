@@ -30,75 +30,166 @@ import com.lion328.thaifixes.coremod.mapper.reader.MinecraftClassLoaderJarReader
 import com.lion328.thaifixes.coremod.mapper.reader.TransformedJarReader;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer;
+import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+import net.minecraftforge.fml.relauncher.FMLInjectionData;
+import net.minecraftforge.fml.relauncher.FMLRelaunchLog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-public class Configuration {
+public class CoremodSettings
+{
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
     public static final String DEFAULT_ORIGINAL_CLASSES_PATH = "/assets/thaifixes/classes/";
-    private static IClassMap defaultClassmap;
+    private static IClassMap obfuscatedClassmap, defaultClassmap;
 
-    public static IClassMap getDefaultClassmap() {
+    static
+    {
+        initializeRemapper();
+    }
+
+    public static IClassMap getObfuscatedClassmap()
+    {
+        if (obfuscatedClassmap == null)
+        {
+            obfuscatedClassmap = generateClassmap(false);
+        }
+
+        return obfuscatedClassmap;
+    }
+
+    public static IClassMap getDefaultClassmap()
+    {
+        if (defaultClassmap == null)
+        {
+            defaultClassmap = generateClassmap();
+        }
+
         return defaultClassmap;
     }
 
-    public static void generateClassmap() {
-        LOGGER.info("Generating class mapping...");
-        defaultClassmap = new SimpleClassMap();
-        if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader) {
+    private static IClassMap generateClassmap()
+    {
+        return generateClassmap(true);
+    }
+
+    private static IClassMap generateClassmap(boolean transfromedReading)
+    {
+        LOGGER.info("Generating class map (transformedReading = " + transfromedReading + ")");
+
+        IClassMap classMap = new SimpleClassMap();
+
+        if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader)
+        {
             LaunchClassLoader cl = (LaunchClassLoader) Thread.currentThread().getContextClassLoader();
+
             boolean deobfuscatedEnvironment;
-            try {
+
+            try
+            {
                 deobfuscatedEnvironment = cl.getClassBytes("net.minecraft.client.gui.FontRenderer") != null;
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 deobfuscatedEnvironment = false;
             }
+
             MinecraftClassLoaderJarReader mcJarReader = new MinecraftClassLoaderJarReader(cl);
             IJarReader reader;
-            if (deobfuscatedEnvironment)
+
+            if (deobfuscatedEnvironment || !transfromedReading)
+            {
                 reader = mcJarReader;
-            else {
+            }
+            else
+            {
                 DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
                 reader = new TransformedJarReader(mcJarReader, deobfTransformer, deobfTransformer);
             }
-            BufferedReader br = new BufferedReader(new InputStreamReader(Configuration.class.getResourceAsStream("/assets/thaifixes/config/classmap/classlist")));
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(CoremodSettings.class.getResourceAsStream("/assets/thaifixes/config/classmap/classlist")));
             String s;
-            try {
+
+            try
+            {
                 boolean valid = false;
-                while ((s = br.readLine()) != null) {
+
+                while ((s = br.readLine()) != null)
+                {
                     if (s.length() == 0)
+                    {
                         continue;
-                    defaultClassmap = new SimpleClassMap();
+                    }
+
+                    classMap = new SimpleClassMap();
+
                     Class<?> clazz = Class.forName(s);
                     Object o = clazz.newInstance();
-                    if (!(o instanceof IClassMapper)) {
+
+                    if (!(o instanceof IClassMapper))
+                    {
                         LOGGER.error(s + " is invalid IClassMapper, skipped");
                         continue;
                     }
+
                     IClassMapper cm = (IClassMapper) o;
-                    if (!cm.getMap(reader, defaultClassmap)) {
+
+                    if (!cm.getMap(reader, classMap))
+                    {
                         LOGGER.error(s + " can't complete mapping, skipped");
-                        defaultClassmap = new SimpleClassMap();
+                        classMap = new SimpleClassMap();
                         continue;
                     }
+
                     valid = true;
                     break;
                 }
+
                 if (!valid)
+                {
                     LOGGER.error("Runtime mapping not working");
-            } catch (Exception e) {
+                }
+            }
+            catch (Exception e)
+            {
                 LOGGER.catching(e);
             }
-        } else
+        }
+        else
+        {
             LOGGER.error("Can't run runtime mapping (Invalid classloader type)");
+        }
+
+        return classMap;
     }
 
-    static {
-        generateClassmap();
+    private static void initializeRemapper()
+    {
+        try
+        {
+            Field mcDirField = FMLRelaunchLog.class.getDeclaredField("minecraftHome");
+            mcDirField.setAccessible(true);
+
+            File mcDir = (File) mcDirField.get(null);
+
+            Method deobfuscationDataName = FMLInjectionData.class.getDeclaredMethod("debfuscationDataName");
+            deobfuscationDataName.setAccessible(true);
+
+            String deobfuscationFileName = (String) deobfuscationDataName.invoke(null);
+
+            FMLDeobfuscatingRemapper.INSTANCE.setup(mcDir, (LaunchClassLoader) Thread.currentThread().getContextClassLoader(), deobfuscationFileName);
+        }
+        catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | NoSuchFieldException e)
+        {
+            CoremodSettings.LOGGER.catching(e);
+        }
     }
 }

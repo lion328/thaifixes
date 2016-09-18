@@ -22,9 +22,9 @@
 
 package com.lion328.thaifixes.renderer;
 
-import com.lion328.thaifixes.Configuration;
 import com.lion328.thaifixes.FontRendererWrapper;
 import com.lion328.thaifixes.IFontRenderer;
+import com.lion328.thaifixes.Settings;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 
@@ -32,48 +32,68 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class MCPXFontRenderer implements IFontRenderer {
+public class MCPXFontRenderer implements IFontRenderer
+{
+
+    public static final String MCPX_TEXTURE_LOCATION_RESOURCE = "thaifixes:textures/font/mcpx.png";
+    public static final String MCPX_TEXTURE_LOCATION_JAR = "/assets/thaifixes/textures/font/mcpx.png";
 
     private FontRendererWrapper wrapper;
     private int[] thaiCharWidth;
-    private String mcpxFontLocation;
 
-    public MCPXFontRenderer() {
+    public MCPXFontRenderer()
+    {
         thaiCharWidth = new int[256];
-        mcpxFontLocation = "thaifixes:textures/font/mcpx.png";
 
         BufferedImage bufferedimage = null;
-        try {
-            bufferedimage = ImageIO.read(this.getClass().getResourceAsStream("/assets/thaifixes/textures/font/mcpx.png"));
-        } catch (IOException e) {
-            Configuration.LOGGER.catching(e);
+        try
+        {
+            bufferedimage = ImageIO.read(this.getClass().getResourceAsStream(MCPX_TEXTURE_LOCATION_JAR));
+        }
+        catch (IOException e)
+        {
+            Settings.LOGGER.catching(e);
         }
 
         int width = bufferedimage.getWidth();
         int height = bufferedimage.getHeight();
         int[] texture = new int[width * height];
-        bufferedimage.getRGB(0, 0, width, height, texture, 0, width);
+
         int xSize = width / 16;
         int ySize = height / 16;
+
         byte space = 1;
         float f = 8.0F / (float) xSize;
         int charPos = 0;
 
-        while (charPos < 256) {
+        bufferedimage.getRGB(0, 0, width, height, texture, 0, width);
+
+        while (charPos < 256)
+        {
             int col = charPos % 16;
             int row = charPos / 16;
             int l1 = xSize - 1;
-            while (true) {
-                if (l1 >= 0) {
+
+            while (true)
+            {
+                if (l1 >= 0)
+                {
                     boolean end = true;
+
                     for (int j2 = 0; j2 < ySize && end; ++j2)
+                    {
                         if ((texture[(col * xSize + l1) + (row * xSize + j2) * width] >> 24 & 0xFF) != 0)
+                        {
                             end = false;
-                    if (end) {
+                        }
+                    }
+                    if (end)
+                    {
                         --l1;
                         continue;
                     }
                 }
+
                 ++l1;
                 thaiCharWidth[charPos] = (int) (0.5D + (double) ((float) l1 * f)) + space;
                 ++charPos;
@@ -83,41 +103,61 @@ public class MCPXFontRenderer implements IFontRenderer {
     }
 
     @Override
-    public void setFontRendererWrapper(FontRendererWrapper wrapper) {
+    public void setFontRendererWrapper(FontRendererWrapper wrapper)
+    {
         this.wrapper = wrapper;
     }
 
     @Override
-    public boolean isSupportedCharacter(char c) {
+    public boolean isSupportedCharacter(char c)
+    {
         return ThaiUtil.isThaiChar(c);
     }
 
     @Override
-    public float renderCharacter(char c, boolean italic) {
+    public float renderCharacter(char c, boolean italic)
+    {
         int offset = c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1;
 
-        float cPosX = wrapper.getX();
+        float posX = wrapper.getX();
+
+        float cPosX = posX;
         float cPosY = wrapper.getY();
 
-        if (ThaiUtil.isSpecialThaiChar(c)) {
+        if (ThaiUtil.isSpecialThaiChar(c))
+        {
             cPosX -= thaiCharWidth[offset];
+
             if (ThaiUtil.isUpperThaiChar(c))
+            {
                 cPosY -= 7.0F;
+            }
             else
+            {
                 cPosY += 2.0F;
+            }
+
             if (ThaiUtil.isVeryLongTailThaiChar(wrapper.getLastCharacterRenderered()))
+            {
                 cPosY -= 1.0F;
+            }
+
             if (ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
+            {
                 cPosY -= 2.25F;
-        } else if (c == ThaiUtil.SARA_UM)
+            }
+        }
+        else if (c == ThaiUtil.SARA_UM)
+        {
             cPosX -= 2.0F;
+        }
 
         float texcoordX = (float) (offset % 16 * 8);
         float texcoordY = (float) (offset / 16 * 8);
         float italicSize = italic ? 1.0F : 0.0F;
         float f3 = (float) thaiCharWidth[offset] - 0.01F;
 
-        wrapper.bindTexture(mcpxFontLocation);
+        wrapper.bindTexture(MCPX_TEXTURE_LOCATION_RESOURCE);
 
         GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
         GL11.glTexCoord2f(texcoordX / 128.0F, texcoordY / 128.0F);
@@ -129,12 +169,18 @@ public class MCPXFontRenderer implements IFontRenderer {
         GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, (texcoordY + 7.99F) / 128.0F);
         GL11.glVertex2f(cPosX + f3 - 1.0F - italicSize, cPosY + 7.99F);
         GL11.glEnd();
-        return ThaiUtil.isSpecialThaiChar(c) ? 0 : (float) thaiCharWidth[offset];
+
+        return ThaiUtil.isSpecialThaiChar(c) ? 0 : (float) thaiCharWidth[offset] - posX + cPosX;
     }
 
     @Override
-    public int getCharacterWidth(char c) {
-        if (ThaiUtil.isSpecialThaiChar(c)) return 0;
+    public int getCharacterWidth(char c)
+    {
+        if (ThaiUtil.isSpecialThaiChar(c))
+        {
+            return 0;
+        }
+
         return thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
     }
 }

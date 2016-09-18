@@ -25,26 +25,34 @@ package com.lion328.thaifixes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
-public class Configuration {
+public class Settings
+{
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes");
 
     public static final int DEFAULT_FONT_HEIGHT = 9;
+    public static final Properties config = new Properties();
     public static int fontHeight = DEFAULT_FONT_HEIGHT;
 
-    public static final Properties config = new Properties();
-
-    public static void loadConfig(File configFile) throws IOException {
-        if (!configFile.exists()) {
-            InputStream in = Configuration.class.getResourceAsStream("/assets/thaifixes/config/config_default.cfg");
+    public static void loadConfig(File configFile) throws IOException
+    {
+        if (!configFile.exists())
+        {
+            InputStream in = Settings.class.getResourceAsStream("/assets/thaifixes/config/config_default.cfg");
             FileOutputStream out = new FileOutputStream(configFile);
             byte[] buffer = new byte[1024];
             int count;
             while ((count = in.read(buffer)) != -1)
+            {
                 out.write(buffer, 0, count);
+            }
             out.close();
         }
         FileInputStream in = new FileInputStream(configFile);
