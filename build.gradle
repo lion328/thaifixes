@@ -35,7 +35,7 @@ jar {
     }
 }
 
-version = "4.1-1.10.2"
+version = "4.2-1.10.2"
 group = "com.lion328.thaifixes" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "thaifixes"
 
