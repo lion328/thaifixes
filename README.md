@@ -1,6 +1,8 @@
 ThaiFixes
 =========
 
+[![Build Status](https://travis-ci.org/lion328/ThaiFixes.svg?branch=master)](https://travis-ci.org/lion328/ThaiFixes)
+
 ช่วยให้การใช้งานของภาษาไทยใน Minecraft ดูดีขึ้น
 
 **เว็บไซต์:** http://thaifixes.lion328.com
