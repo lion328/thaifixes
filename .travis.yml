@@ -11,5 +11,8 @@ before_script:
     - chmod +x gradlew
 
 script:
+    - echo 'Setup environment'
+    - ./gradlew setupCiWorkspace
+    - echo 'Build'
     - ./gradlew build
 
