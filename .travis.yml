@@ -1,0 +1,15 @@
+language: java
+
+jdk:
+    - oraclejdk8
+    - oraclejdk7
+
+git:
+    depth: 3
+
+before_script:
+    - chmod +x gradlew
+
+script:
+    - ./gradlew build
+
