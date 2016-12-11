@@ -5,7 +5,7 @@ ThaiFixes
 
 ช่วยให้การใช้งานของภาษาไทยใน Minecraft ดูดีขึ้น
 
-**เว็บไซต์:** http://thaifixes.lion328.com
+**เว็บไซต์:** http://thaifixes.lion328.com  
 **ผู้จัดทำ:** [lion328](http://lion328.com) (ผู้พัฒนาและผู้ดูแล), [PCXD](http://pcxd.me) (สำหรับรหัสต้นฉบับสำหรับ Minecraft 1.2.4 และคำแนะนำต่างๆ), [secretdataz](https://github.com/secretdataz) (สำหรับรหัสต้นฉบับบางตัวและคำแนะนำต่างๆ)
 
 วิธีการคอมไพล์
