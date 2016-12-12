@@ -4,6 +4,6 @@ build/
 eclipse/
 out/
 run/
-ThaiFixes.iml
-ThaiFixes.ipr
-ThaiFixes.iws
+*.iml
+*.ipr
+*.iws
