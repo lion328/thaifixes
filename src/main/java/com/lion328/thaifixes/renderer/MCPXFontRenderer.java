@@ -26,6 +26,7 @@ import com.lion328.thaifixes.FontRendererWrapper;
 import com.lion328.thaifixes.IFontRenderer;
 import com.lion328.thaifixes.Settings;
 import com.lion328.thaifixes.ThaiUtil;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
@@ -159,16 +160,16 @@ public class MCPXFontRenderer implements IFontRenderer
 
         wrapper.bindTexture(MCPX_TEXTURE_LOCATION_RESOURCE);
 
-        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-        GL11.glTexCoord2f(texcoordX / 128.0F, texcoordY / 128.0F);
-        GL11.glVertex2f(cPosX + italicSize, cPosY);
-        GL11.glTexCoord2f(texcoordX / 128.0F, (texcoordY + 7.99F) / 128.0F);
-        GL11.glVertex2f(cPosX - italicSize, cPosY + 7.99F);
-        GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, texcoordY / 128.0F);
-        GL11.glVertex2f(cPosX + f3 - 1.0F + italicSize, cPosY);
-        GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, (texcoordY + 7.99F) / 128.0F);
-        GL11.glVertex2f(cPosX + f3 - 1.0F - italicSize, cPosY + 7.99F);
-        GL11.glEnd();
+        GlStateManager.glBegin(GL11.GL_TRIANGLE_STRIP);
+        GlStateManager.glTexCoord2f(texcoordX / 128.0F, texcoordY / 128.0F);
+        GlStateManager.glVertex3f(cPosX + italicSize, cPosY, 0.0F);
+        GlStateManager.glTexCoord2f(texcoordX / 128.0F, (texcoordY + 7.99F) / 128.0F);
+        GlStateManager.glVertex3f(cPosX - italicSize, cPosY + 7.99F, 0.0F);
+        GlStateManager.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, texcoordY / 128.0F);
+        GlStateManager.glVertex3f(cPosX + f3 - 1.0F + italicSize, cPosY, 0.0F);
+        GlStateManager.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, (texcoordY + 7.99F) / 128.0F);
+        GlStateManager.glVertex3f(cPosX + f3 - 1.0F - italicSize, cPosY + 7.99F, 0.0F);
+        GlStateManager.glEnd();
 
         return ThaiUtil.isSpecialThaiChar(c) ? 0 : (float) thaiCharWidth[offset] - posX + cPosX;
     }

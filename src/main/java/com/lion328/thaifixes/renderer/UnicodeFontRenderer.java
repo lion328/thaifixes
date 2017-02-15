@@ -3,6 +3,7 @@ package com.lion328.thaifixes.renderer;
 import com.lion328.thaifixes.FontRendererWrapper;
 import com.lion328.thaifixes.IFontRenderer;
 import com.lion328.thaifixes.ThaiUtil;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 public class UnicodeFontRenderer implements IFontRenderer
@@ -50,16 +51,16 @@ public class UnicodeFontRenderer implements IFontRenderer
         float posX = wrapper.getX() - ((charWidth - startTexcoordX) / 2.0F + 0.5F);
         float posY = wrapper.getY() + posYShift;
 
-        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-        GL11.glTexCoord2f(texcoordX / 256.0F, texcoordY / 256.0F);
-        GL11.glVertex3f(posX + skew, posY, 0.0F);
-        GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + heightX2) / 256.0F);
-        GL11.glVertex3f(posX - skew, posY + height, 0.0F);
-        GL11.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, texcoordY / 256.0F);
-        GL11.glVertex3f(posX + texcoordXEnd / 2.0F + skew, posY, 0.0F);
-        GL11.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, (texcoordY + heightX2) / 256.0F);
-        GL11.glVertex3f(posX + texcoordXEnd / 2.0F - skew, posY + height, 0.0F);
-        GL11.glEnd();
+        GlStateManager.glBegin(GL11.GL_TRIANGLE_STRIP);
+        GlStateManager.glTexCoord2f(texcoordX / 256.0F, texcoordY / 256.0F);
+        GlStateManager.glVertex3f(posX + skew, posY, 0.0F);
+        GlStateManager.glTexCoord2f(texcoordX / 256.0F, (texcoordY + heightX2) / 256.0F);
+        GlStateManager.glVertex3f(posX - skew, posY + height, 0.0F);
+        GlStateManager.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, texcoordY / 256.0F);
+        GlStateManager.glVertex3f(posX + texcoordXEnd / 2.0F + skew, posY, 0.0F);
+        GlStateManager.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, (texcoordY + heightX2) / 256.0F);
+        GlStateManager.glVertex3f(posX + texcoordXEnd / 2.0F - skew, posY + height, 0.0F);
+        GlStateManager.glEnd();
         return 0.0F;
     }
 
