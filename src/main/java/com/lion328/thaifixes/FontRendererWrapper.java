@@ -16,7 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FontRendererWrapper extends FontRenderer {
+public class FontRendererWrapper extends FontRenderer
+{
 
     public static final boolean PATCHED = true;
 
@@ -31,17 +32,20 @@ public class FontRendererWrapper extends FontRenderer {
     private static MethodHandle loadGlyphTextureMethodHandle;
     private static MethodHandle getCharWidthFloatMethodHandle;
 
-    public static File getMinecraftDirectory() {
+    public static File getMinecraftDirectory()
+    {
         return Minecraft.getMinecraft().mcDataDir;
     }
 
-    public FontRendererWrapper(GameSettings settings, ResourceLocation asciiTex, TextureManager texMan, boolean unicode) {
+    public FontRendererWrapper(GameSettings settings, ResourceLocation asciiTex, TextureManager texMan, boolean unicode)
+    {
         super(settings, asciiTex, texMan, unicode);
 
         renderEngine = texMan;
     }
 
-    public void addRenderer(IFontRenderer renderer) {
+    public void addRenderer(IFontRenderer renderer)
+    {
         if (renderers.contains(renderer))
         {
             return;
@@ -51,7 +55,8 @@ public class FontRendererWrapper extends FontRenderer {
         renderers.add(renderer);
     }
 
-    public void loadUnicodeTexture(int tex) {
+    public void loadUnicodeTexture(int tex)
+    {
         if (loadGlyphTextureMethodHandle == null)
         {
             ThaiFixes.LOGGER.error("Can't load unicode texture, method not found");
@@ -69,21 +74,27 @@ public class FontRendererWrapper extends FontRenderer {
         }
     }
 
-    public byte getRawUnicodeWidth(char c) {
+    public byte getRawUnicodeWidth(char c)
+    {
         return glyphWidth[c];
     }
 
-    public void bindTexture(String location) {
+    public void bindTexture(String location)
+    {
         if (!resourceLocationPool.containsKey(location))
+        {
             resourceLocationPool.put(location, new ResourceLocation(location));
+        }
         renderEngine.bindTexture(resourceLocationPool.get(location));
     }
 
-    public float getX() {
+    public float getX()
+    {
         return posX;
     }
 
-    public float getY() {
+    public float getY()
+    {
         return posY;
     }
 
@@ -102,11 +113,11 @@ public class FontRendererWrapper extends FontRenderer {
     {
         IFontRenderer renderer = getCharacterAvailableRenderer(c);
 
-        float ret = 0.0F;
+        float ret;
 
         if (renderer == null)
         {
-            super.renderUnicodeChar(c, italic);
+            ret = super.renderUnicodeChar(c, italic);
         }
         else
         {
@@ -119,7 +130,8 @@ public class FontRendererWrapper extends FontRenderer {
     }
 
     @Override
-    public int getCharWidth(char c) {
+    public int getCharWidth(char c)
+    {
         IFontRenderer renderer = getCharacterAvailableRenderer(c);
 
         if (renderer != null)
@@ -130,7 +142,8 @@ public class FontRendererWrapper extends FontRenderer {
         return super.getCharWidth(c);
     }
 
-    public float getCharacterWidthFloat(char c) {
+    public float getCharWidthFloat(char c)
+    {
         IFontRenderer renderer = getCharacterAvailableRenderer(c);
 
         if (renderer != null)
@@ -141,7 +154,8 @@ public class FontRendererWrapper extends FontRenderer {
         return 0;
     }
 
-    public char getLastCharacterRenderered() {
+    public char getLastCharacterRenderered()
+    {
         return lastChar;
     }
 
