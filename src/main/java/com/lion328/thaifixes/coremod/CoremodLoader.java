@@ -23,12 +23,8 @@
 package com.lion328.thaifixes.coremod;
 
 import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.coremod.mapper.IClassMap;
-import com.lion328.thaifixes.coremod.patcher.FontRendererPatcher;
-import com.lion328.thaifixes.coremod.patcher.GuiNewChatPatcher;
 import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
 import com.lion328.thaifixes.coremod.patcher.MinecraftPatcher;
-import com.lion328.thaifixes.coremod.patcher.NameMapperPatcher;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
@@ -53,20 +49,7 @@ public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer
 
     private static void initializePatchers()
     {
-        IClassMap classMap = CoremodSettings.getObfuscatedClassmap();
-
-        try
-        {
-            addPatcher(new MinecraftPatcher(classMap));
-            /*addPatcher(new FontRendererPatcher(classMap));
-            addPatcher(new GuiNewChatPatcher(classMap));
-
-            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", CoremodLoader.class.getResourceAsStream(CoremodSettings.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), CoremodSettings.getDefaultClassmap()));*/
-        }
-        catch (Exception e)
-        {
-            CoremodSettings.LOGGER.catching(e);
-        }
+        addPatcher(new MinecraftPatcher());
     }
 
     @Override
@@ -102,13 +85,13 @@ public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer
     @Override
     public byte[] transform(String untransformedName, String transformedName, byte[] bytes)
     {
-        if (patchers.containsKey(untransformedName))
+        if (patchers.containsKey(transformedName))
         {
             CoremodSettings.LOGGER.info("Patching " + transformedName);
 
             try
             {
-                return patchers.get(untransformedName).patch(bytes);
+                return patchers.get(transformedName).patch(bytes);
             }
             catch (Exception e)
             {

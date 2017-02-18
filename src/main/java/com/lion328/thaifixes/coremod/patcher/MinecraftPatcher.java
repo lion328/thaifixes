@@ -22,7 +22,6 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -37,17 +36,10 @@ import org.objectweb.asm.tree.TypeInsnNode;
 public class MinecraftPatcher implements IClassPatcher
 {
 
-    private IClassMap classMap;
-
-    public MinecraftPatcher(IClassMap classMap)
-    {
-        this.classMap = classMap;
-    }
-
     @Override
     public String getClassName()
     {
-        return classMap.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.');
+        return "net.minecraft.client.Minecraft";
     }
 
     @Override
@@ -80,7 +72,7 @@ public class MinecraftPatcher implements IClassPatcher
                         continue;
                     }
                     TypeInsnNode type = (TypeInsnNode) insns.get(i);
-                    if (type.desc.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
+                    if (type.desc.equals("net/minecraft/client/gui/FontRenderer"))
                     {
                         type.desc = "com/lion328/thaifixes/FontRendererWrapper";
                         break;
@@ -92,7 +84,7 @@ public class MinecraftPatcher implements IClassPatcher
                     {
                         continue;
                     }
-                    if (((MethodInsnNode) insns.get(i)).owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
+                    if (((MethodInsnNode) insns.get(i)).owner.equals("net/minecraft/client/gui/FontRenderer"))
                     {
                         MethodInsnNode method = (MethodInsnNode) insns.get(i);
                         method.owner = "com/lion328/thaifixes/FontRendererWrapper";

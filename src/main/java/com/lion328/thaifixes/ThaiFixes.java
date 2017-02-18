@@ -22,20 +22,12 @@
 
 package com.lion328.thaifixes;
 
-import com.lion328.thaifixes.coremod.CoremodSettings;
-import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 @Mod(name = ModInformation.NAME, modid = ModInformation.MODID, version = ModInformation.VERSION, acceptedMinecraftVersions = ModInformation.MCVERSION)
 public class ThaiFixes
@@ -50,36 +42,8 @@ public class ThaiFixes
         {
             Minecraft mc = Minecraft.getMinecraft();
 
-            mc.fontRendererObj = new FontRendererWrapper(mc.gameSettings, new ResourceLocation("textures/font/ascii.png"), mc.renderEngine, false);
-            mc.fontRendererObj.onResourceManagerReload(mc.getResourceManager());
-
             if (mc.fontRendererObj instanceof FontRendererWrapper)
             {
-                /*if (!FontRendererWrapper.class.getDeclaredField("PATCHED").getBoolean(null))
-                {
-                    LOGGER.error("Unpatched FontRendererWrapper, converting to default");
-
-                    Class<?> fontRendererClass = Class.forName(map.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.'));
-                    Field[] fields = fontRendererClass.getDeclaredFields();
-
-                    Constructor<?> constructor = fontRendererClass.getDeclaredConstructor();
-                    constructor.setAccessible(true);
-
-                    Field modifiersField = Field.class.getDeclaredField("modifiers");
-                    modifiersField.setAccessible(true);
-
-                    Object newFontRenderer = constructor.newInstance();
-
-                    for (Field field : fields)
-                    {
-                        field.setAccessible(true);
-                        modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
-                        field.set(newFontRenderer, field.get(fontRenderer));
-                    }
-
-                    fontRendererObjField.set(mc, newFontRenderer);
-                }
-                else*/
                 {
                     LOGGER.info("FontRendererWrapper is successfully patched");
 
@@ -94,6 +58,10 @@ public class ThaiFixes
                         ((FontRendererWrapper) mc.fontRendererObj).addRenderer(customRenderer);
 
                         LOGGER.info("Added " + rendererClass + " as font renderer");
+                    }
+                    else
+                    {
+                        LOGGER.info("ThaiFixes is disabled");
                     }
                 }
             }
