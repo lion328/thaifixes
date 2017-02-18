@@ -36,6 +36,8 @@ import org.objectweb.asm.tree.TypeInsnNode;
 public class MinecraftPatcher implements IClassPatcher
 {
 
+    public static final String WRAPPER_CLASS = "com/lion328/thaifixes/FontRendererWrapper";
+
     @Override
     public String getClassName()
     {
@@ -53,50 +55,48 @@ public class MinecraftPatcher implements IClassPatcher
         for (MethodNode mn : n.methods)
         {
             InsnList insns = mn.instructions;
+
             for (int i = 0; i < insns.size(); i++)
             {
                 AbstractInsnNode insn = insns.get(i);
+
                 if (insn.getOpcode() != Opcodes.LDC)
                 {
                     continue;
                 }
+
                 LdcInsnNode ldc = (LdcInsnNode) insn;
+
                 if (!ldc.cst.equals("textures/font/ascii.png"))
                 {
                     continue;
                 }
-                for (i--; i < insns.size(); i--)
+
+                if (insns.get(i -= 6).getOpcode() != Opcodes.NEW)
                 {
-                    if (insns.get(i).getOpcode() != Opcodes.NEW)
-                    {
-                        continue;
-                    }
-                    TypeInsnNode type = (TypeInsnNode) insns.get(i);
-                    if (type.desc.equals("net/minecraft/client/gui/FontRenderer"))
-                    {
-                        type.desc = "com/lion328/thaifixes/FontRendererWrapper";
-                        break;
-                    }
+                    continue OUT;
                 }
-                for (; i < insns.size(); i++)
+
+                TypeInsnNode type = (TypeInsnNode) insns.get(i);
+
+                type.desc = WRAPPER_CLASS;
+
+                if (insns.get(i += (6 + 5)).getOpcode() != Opcodes.INVOKESPECIAL)
                 {
-                    if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL)
-                    {
-                        continue;
-                    }
-                    if (((MethodInsnNode) insns.get(i)).owner.equals("net/minecraft/client/gui/FontRenderer"))
-                    {
-                        MethodInsnNode method = (MethodInsnNode) insns.get(i);
-                        method.owner = "com/lion328/thaifixes/FontRendererWrapper";
-                        break;
-                    }
+                    continue OUT;
                 }
+
+                MethodInsnNode method = (MethodInsnNode) insns.get(i);
+
+                method.owner = WRAPPER_CLASS;
+
                 break OUT;
             }
         }
 
         ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         n.accept(w);
+
         return w.toByteArray();
     }
 }
