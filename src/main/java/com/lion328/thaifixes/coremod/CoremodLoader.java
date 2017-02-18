@@ -58,10 +58,10 @@ public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer
         try
         {
             addPatcher(new MinecraftPatcher(classMap));
-            addPatcher(new FontRendererPatcher(classMap));
+            /*addPatcher(new FontRendererPatcher(classMap));
             addPatcher(new GuiNewChatPatcher(classMap));
 
-            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", CoremodLoader.class.getResourceAsStream(CoremodSettings.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), CoremodSettings.getDefaultClassmap()));
+            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", CoremodLoader.class.getResourceAsStream(CoremodSettings.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), CoremodSettings.getDefaultClassmap()));*/
         }
         catch (Exception e)
         {

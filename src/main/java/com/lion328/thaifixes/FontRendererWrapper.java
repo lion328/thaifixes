@@ -121,7 +121,7 @@ public class FontRendererWrapper extends FontRenderer
         }
         else
         {
-            ret = renderer.getCharacterWidth(c);
+            ret = renderer.renderCharacter(c, italic);
         }
 
         lastChar = c;
@@ -151,7 +151,19 @@ public class FontRendererWrapper extends FontRenderer
             return renderer.getCharacterWidth(c);
         }
 
-        return 0;
+        if (getCharWidthFloatMethodHandle != null)
+        {
+            try
+            {
+                return (Float) getCharWidthFloatMethodHandle.invokeExact(this, c);
+            }
+            catch (Throwable throwable)
+            {
+                ThaiFixes.LOGGER.catching(throwable);
+            }
+        }
+
+        return getCharWidth(c);
     }
 
     public char getLastCharacterRenderered()
@@ -178,7 +190,7 @@ public class FontRendererWrapper extends FontRenderer
 
         try
         {
-            Method method = FontRenderer.class.getMethod("loadGlyphTexture");
+            Method method = FontRenderer.class.getDeclaredMethod("loadGlyphTexture", int.class);
             method.setAccessible(true);
 
             loadGlyphTextureMethodHandle = lookup.unreflect(method);
