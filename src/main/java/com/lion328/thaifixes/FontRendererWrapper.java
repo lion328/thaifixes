@@ -9,7 +9,6 @@ import net.minecraft.util.ResourceLocation;
 import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -200,7 +199,10 @@ public class FontRendererWrapper extends FontRenderer
 
         try
         {
-            getCharWidthFloatMethodHandle = lookup.findVirtual(FontRenderer.class, "getCharWidthFloat", MethodType.methodType(float.class, char.class));
+            Method method = FontRenderer.class.getDeclaredMethod("getCharWidthFloat", char.class);
+            method.setAccessible(true);
+
+            getCharWidthFloatMethodHandle = lookup.unreflect(method);
         }
         catch (NoSuchMethodException ignore)
         {
