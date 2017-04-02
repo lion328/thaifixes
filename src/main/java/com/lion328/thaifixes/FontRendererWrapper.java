@@ -22,6 +22,7 @@
 
 package com.lion328.thaifixes;
 
+import com.lion328.thaifixes.renderer.IFontRenderer;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
@@ -50,6 +51,11 @@ public class FontRendererWrapper extends FontRenderer
     }
 
     public void addRenderer(IFontRenderer renderer)
+    {
+
+    }
+
+    public void removeRenderer(IFontRenderer renderer)
     {
 
     }
@@ -148,6 +154,11 @@ public class FontRendererWrapper extends FontRenderer {
         if (renderers.contains(renderer)) return;
         renderer.setFontRendererWrapper(this);
         renderers.add(renderer);
+    }
+
+    public void removeRenderer(IFontRenderer renderer) {
+    	renderers.remove(renderer);
+    	renderer.setFontRendererWrapper(null);
     }
 
     public void loadUnicodeTexture(int tex) {
