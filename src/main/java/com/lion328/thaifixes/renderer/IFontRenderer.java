@@ -1,4 +1,6 @@
-package com.lion328.thaifixes;
+package com.lion328.thaifixes.renderer;
+
+import com.lion328.thaifixes.FontRendererWrapper;
 
 public interface IFontRenderer
 {

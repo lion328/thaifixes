@@ -1,0 +1,5 @@
+#PARSE_ESCAPES
+
+thaifixes.config.title=การตั้งค่า ThaiFixes
+thaifixes.config.fontStyle=รูปแบบฟอนต์
+thaifixes.config.fontStyle.desc=เปลี่ยนฟอนต์ภาษาไทย\nUnicode: ฟอนต์ Unicode ปกติ\nMCPX: ฟอนต์ของ ThaiFixes\nDisable: ปิดการใช้งาน ThaiFixes
