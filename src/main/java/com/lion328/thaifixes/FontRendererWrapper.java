@@ -130,6 +130,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.lion328.thaifixes.renderer.IFontRenderer;
+
 public class FontRendererWrapper extends FontRenderer {
 
     public static final boolean PATCHED = true;
@@ -155,18 +157,18 @@ public class FontRendererWrapper extends FontRenderer {
         renderer.setFontRendererWrapper(this);
         renderers.add(renderer);
     }
-
+    
     public void removeRenderer(IFontRenderer renderer) {
     	renderers.remove(renderer);
     	renderer.setFontRendererWrapper(null);
     }
 
     public void loadUnicodeTexture(int tex) {
-        loadGlyphTexture(tex);
+        super.loadGlyphTexture(tex);
     }
 
     public byte getRawUnicodeWidth(char c) {
-        return glyphWidth[c];
+        return super.glyphWidth[c];
     }
 
     public void bindTexture(String location) {
@@ -180,11 +182,11 @@ public class FontRendererWrapper extends FontRenderer {
     }
 
     public float getX() {
-        return posX;
+        return super.posX;
     }
 
     public float getY() {
-        return posY;
+        return super.posY;
     }
 
     @Override
