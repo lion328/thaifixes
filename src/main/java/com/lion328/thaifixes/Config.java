@@ -36,6 +36,16 @@ public class Config
         return fontStyle;
     }
 
+    public static int getFontHeight()
+    {
+        return 16;
+    }
+
+    public static int getChatLineTextYOffset()
+    {
+        return 11;
+    }
+
     public static void syncConfig()
     {
         fontStyle = FontStyle.fromString(configuration.getString("fontStyle", Configuration.CATEGORY_GENERAL, "Unicode",
