@@ -40,7 +40,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 @Mod(name = ModInformation.NAME, modid = ModInformation.MODID, version = ModInformation.VERSION,
-        acceptedMinecraftVersions = ModInformation.MCVERSION, guiFactory = "com.lion328.thaifixes.gui.ThaiFixesGuiFactory")
+        acceptedMinecraftVersions = ModInformation.MCVERSION, guiFactory = "com.lion328.thaifixes.gui.ThaiFixesGuiFactory",
+        clientSideOnly = true)
 public class ThaiFixes
 {
 
