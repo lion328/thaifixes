@@ -141,7 +141,7 @@ public class MCPXFontRenderer implements IFontRenderer
                 cPosY -= 1.0F;
             }
 
-            if (ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
+            if (ThaiUtil.isUpperThaiChar(wrapper.getLastCharacterRenderered()))
             {
                 cPosY -= 2.25F;
             }
