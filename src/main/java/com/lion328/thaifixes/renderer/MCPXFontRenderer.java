@@ -180,6 +180,13 @@ public class MCPXFontRenderer implements IFontRenderer
             return 0;
         }
 
-        return thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
+        int ret = thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
+
+        if (c == ThaiUtil.SARA_UM)
+        {
+            return ret - 2;
+        }
+
+        return ret;
     }
 }
