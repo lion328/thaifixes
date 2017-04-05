@@ -105,7 +105,7 @@ public class FontRendererWrapper extends FontRenderer
         return 0;
     }
 
-    public char getLastCharacterRenderered()
+    public char getLastCharacterRendered()
     {
         return 0;
     }
@@ -231,7 +231,7 @@ public class FontRendererWrapper extends FontRenderer {
         return super.getCharWidthFloat(c);
     }
 
-    public char getLastCharacterRenderered() {
+    public char getLastCharacterRendered() {
         return lastChar;
     }
 }
