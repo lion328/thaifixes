@@ -38,7 +38,7 @@ public class UnicodeFontRenderer implements IFontRenderer
 
         float heightX2 = height * 2;
 
-        byte rawWidth = wrapper.getRawUnicodeWidth(c);
+        int rawWidth = wrapper.getRawUnicodeWidth(c) & 0xFF;
 
         float startTexcoordX = (float) (rawWidth >>> 4);
         float charWidth = (float) ((rawWidth & 15) + 1);
