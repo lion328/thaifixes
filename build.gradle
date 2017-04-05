@@ -28,15 +28,15 @@ jar {
     }
 }
 
-version = "4.2-1.10.2"
+version = "4.5-1.11.2"
 group = "com.lion328.thaifixes"
 archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.11-13.19.1.2188"
+    version = "1.11.2-13.20.0.2228"
     runDir = "run"
 
-    mappings = "snapshot_20161111"
+    mappings = "snapshot_20161220"
 
     replace "%VERSION%", project.version
     replace "%MCVERSION%", project.minecraft.version

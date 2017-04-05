@@ -2,7 +2,6 @@ package com.lion328.thaifixes.renderer;
 
 import com.lion328.thaifixes.FontRendererWrapper;
 import com.lion328.thaifixes.GLFunctions;
-import com.lion328.thaifixes.IFontRenderer;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 

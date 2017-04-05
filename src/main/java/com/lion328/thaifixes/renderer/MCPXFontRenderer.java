@@ -24,8 +24,7 @@ package com.lion328.thaifixes.renderer;
 
 import com.lion328.thaifixes.FontRendererWrapper;
 import com.lion328.thaifixes.GLFunctions;
-import com.lion328.thaifixes.IFontRenderer;
-import com.lion328.thaifixes.Settings;
+import com.lion328.thaifixes.ThaiFixes;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 
@@ -53,7 +52,7 @@ public class MCPXFontRenderer implements IFontRenderer
         }
         catch (IOException e)
         {
-            Settings.LOGGER.catching(e);
+            ThaiFixes.getLogger().catching(e);
         }
 
         int width = bufferedimage.getWidth();
@@ -143,7 +142,7 @@ public class MCPXFontRenderer implements IFontRenderer
                 cPosY -= 1.0F;
             }
 
-            if (ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
+            if (ThaiUtil.isUpperThaiChar(wrapper.getLastCharacterRenderered()))
             {
                 cPosY -= 2.25F;
             }
@@ -182,6 +181,13 @@ public class MCPXFontRenderer implements IFontRenderer
             return 0;
         }
 
-        return thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
+        int ret = thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
+
+        if (c == ThaiUtil.SARA_UM)
+        {
+            return ret - 2;
+        }
+
+        return ret;
     }
 }
