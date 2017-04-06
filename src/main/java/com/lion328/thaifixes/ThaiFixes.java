@@ -22,6 +22,7 @@
 
 package com.lion328.thaifixes;
 
+import com.lion328.thaifixes.config.ThaiFixesConfiguration;
 import com.lion328.thaifixes.coremod.CoremodSettings;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.renderer.IFontRenderer;
@@ -40,8 +41,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 @Mod(name = ModInformation.NAME, modid = ModInformation.MODID, version = ModInformation.VERSION,
-        acceptedMinecraftVersions = ModInformation.MCVERSION, guiFactory = "com.lion328.thaifixes.gui.ThaiFixesGuiFactory",
-        clientSideOnly = true)
+        acceptedMinecraftVersions = ModInformation.MCVERSION, guiFactory = "com.lion328.thaifixes.config.gui.ThaiFixesGuiFactory")
 public class ThaiFixes
 {
 
@@ -54,8 +54,8 @@ public class ThaiFixes
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        Config.init(event.getSuggestedConfigurationFile());
-        Config.syncConfig();
+        ThaiFixesConfiguration.init(event.getSuggestedConfigurationFile());
+        ThaiFixesConfiguration.syncConfig();
     }
 
     @Mod.EventHandler
@@ -127,7 +127,7 @@ public class ThaiFixes
     {
         if (event.getModID().equals(ModInformation.MODID))
         {
-            Config.syncConfig();
+            ThaiFixesConfiguration.syncConfig();
 
             try
             {
@@ -147,7 +147,7 @@ public class ThaiFixes
             return;
         }
 
-        FontStyle fontStyle = Config.getFontStyle();
+        FontStyle fontStyle = ThaiFixesConfiguration.getFontStyle();
 
         if (currentRenderer != null)
         {
