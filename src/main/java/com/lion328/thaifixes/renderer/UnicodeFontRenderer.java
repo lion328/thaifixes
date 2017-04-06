@@ -1,6 +1,7 @@
 package com.lion328.thaifixes.renderer;
 
 import com.lion328.thaifixes.FontRendererWrapper;
+import com.lion328.thaifixes.GLFunctions;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 
@@ -37,7 +38,7 @@ public class UnicodeFontRenderer implements IFontRenderer
 
         float heightX2 = height * 2;
 
-        byte rawWidth = wrapper.getRawUnicodeWidth(c);
+        int rawWidth = wrapper.getRawUnicodeWidth(c) & 0xFF;
 
         float startTexcoordX = (float) (rawWidth >>> 4);
         float charWidth = (float) ((rawWidth & 15) + 1);
@@ -49,16 +50,16 @@ public class UnicodeFontRenderer implements IFontRenderer
         float posX = wrapper.getX() - ((charWidth - startTexcoordX) / 2.0F + 0.5F);
         float posY = wrapper.getY() + posYShift;
 
-        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-        GL11.glTexCoord2f(texcoordX / 256.0F, texcoordY / 256.0F);
-        GL11.glVertex3f(posX + skew, posY, 0.0F);
-        GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + heightX2) / 256.0F);
-        GL11.glVertex3f(posX - skew, posY + height, 0.0F);
-        GL11.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, texcoordY / 256.0F);
-        GL11.glVertex3f(posX + texcoordXEnd / 2.0F + skew, posY, 0.0F);
-        GL11.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, (texcoordY + heightX2) / 256.0F);
-        GL11.glVertex3f(posX + texcoordXEnd / 2.0F - skew, posY + height, 0.0F);
-        GL11.glEnd();
+        GLFunctions.begin(GL11.GL_TRIANGLE_STRIP);
+        GLFunctions.texCoord(texcoordX / 256.0F, texcoordY / 256.0F);
+        GLFunctions.vertex(posX + skew, posY, 0.0F);
+        GLFunctions.texCoord(texcoordX / 256.0F, (texcoordY + heightX2) / 256.0F);
+        GLFunctions.vertex(posX - skew, posY + height, 0.0F);
+        GLFunctions.texCoord((texcoordX + texcoordXEnd) / 256.0F, texcoordY / 256.0F);
+        GLFunctions.vertex(posX + texcoordXEnd / 2.0F + skew, posY, 0.0F);
+        GLFunctions.texCoord((texcoordX + texcoordXEnd) / 256.0F, (texcoordY + heightX2) / 256.0F);
+        GLFunctions.vertex(posX + texcoordXEnd / 2.0F - skew, posY + height, 0.0F);
+        GLFunctions.end();
         return 0.0F;
     }
 
