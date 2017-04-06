@@ -1,7 +1,29 @@
+/*
+ * Copyright (c) 2017 Waritnan Sookbuntherng
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.lion328.thaifixes.renderer;
 
 import com.lion328.thaifixes.FontRendererWrapper;
-import com.lion328.thaifixes.IFontRenderer;
+import com.lion328.thaifixes.GLFunctions;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 
@@ -38,7 +60,7 @@ public class UnicodeFontRenderer implements IFontRenderer
 
         float heightX2 = height * 2;
 
-        byte rawWidth = wrapper.getRawUnicodeWidth(c);
+        int rawWidth = wrapper.getRawUnicodeWidth(c) & 0xFF;
 
         float startTexcoordX = (float) (rawWidth >>> 4);
         float charWidth = (float) ((rawWidth & 15) + 1);
@@ -50,16 +72,16 @@ public class UnicodeFontRenderer implements IFontRenderer
         float posX = wrapper.getX() - ((charWidth - startTexcoordX) / 2.0F + 0.5F);
         float posY = wrapper.getY() + posYShift;
 
-        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-        GL11.glTexCoord2f(texcoordX / 256.0F, texcoordY / 256.0F);
-        GL11.glVertex3f(posX + skew, posY, 0.0F);
-        GL11.glTexCoord2f(texcoordX / 256.0F, (texcoordY + heightX2) / 256.0F);
-        GL11.glVertex3f(posX - skew, posY + height, 0.0F);
-        GL11.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, texcoordY / 256.0F);
-        GL11.glVertex3f(posX + texcoordXEnd / 2.0F + skew, posY, 0.0F);
-        GL11.glTexCoord2f((texcoordX + texcoordXEnd) / 256.0F, (texcoordY + heightX2) / 256.0F);
-        GL11.glVertex3f(posX + texcoordXEnd / 2.0F - skew, posY + height, 0.0F);
-        GL11.glEnd();
+        GLFunctions.begin(GL11.GL_TRIANGLE_STRIP);
+        GLFunctions.texCoord(texcoordX / 256.0F, texcoordY / 256.0F);
+        GLFunctions.vertex(posX + skew, posY, 0.0F);
+        GLFunctions.texCoord(texcoordX / 256.0F, (texcoordY + heightX2) / 256.0F);
+        GLFunctions.vertex(posX - skew, posY + height, 0.0F);
+        GLFunctions.texCoord((texcoordX + texcoordXEnd) / 256.0F, texcoordY / 256.0F);
+        GLFunctions.vertex(posX + texcoordXEnd / 2.0F + skew, posY, 0.0F);
+        GLFunctions.texCoord((texcoordX + texcoordXEnd) / 256.0F, (texcoordY + heightX2) / 256.0F);
+        GLFunctions.vertex(posX + texcoordXEnd / 2.0F - skew, posY + height, 0.0F);
+        GLFunctions.end();
         return 0.0F;
     }
 

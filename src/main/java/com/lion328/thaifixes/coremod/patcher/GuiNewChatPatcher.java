@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Waritnan Sookbuntherng
+ * Copyright (c) 2017 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,16 @@
 package com.lion328.thaifixes.coremod.patcher;
 
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public class GuiNewChatPatcher implements IClassPatcher
 {
@@ -34,6 +44,11 @@ public class GuiNewChatPatcher implements IClassPatcher
         this.classMap = classMap;
     }
 
+    public static MethodInsnNode getInjectedIntMethod(String methodName)
+    {
+        return new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/InjectedConstants", methodName, "()I", false);
+    }
+
     @Override
     public String getClassName()
     {
@@ -43,6 +58,111 @@ public class GuiNewChatPatcher implements IClassPatcher
     @Override
     public byte[] patch(byte[] original)
     {
-        return original;
+        ClassReader r = new ClassReader(original);
+        ClassNode n = new ClassNode();
+        r.accept(n, 0);
+
+        for (MethodNode mn : n.methods)
+        {
+            InsnList insns = mn.instructions;
+
+            for (int i = 0; i < insns.size(); i++)
+            {
+                AbstractInsnNode insn = insns.get(i);
+
+                if (replaceFontHeight(insns, insn))
+                {
+                    continue;
+                }
+
+                if (replaceChatLineHeight(insns, insn))
+                {
+                    continue;
+                }
+
+                replaceTextYOffset(insns, insn);
+            }
+        }
+
+        ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        n.accept(w);
+
+        return w.toByteArray();
+    }
+
+    private MethodInsnNode getConfigFontHeightMethod()
+    {
+        return getInjectedIntMethod("getFontHeight");
+    }
+
+    private boolean replaceFontHeight(InsnList insns, AbstractInsnNode insn)
+    {
+        if (insn.getOpcode() != Opcodes.GETFIELD)
+        {
+            return false;
+        }
+
+        FieldInsnNode fieldInsn = (FieldInsnNode) insn;
+
+        if (!fieldInsn.owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
+        {
+            return false;
+        }
+
+        if (!fieldInsn.desc.equals("I"))
+        {
+            return false;
+        }
+
+        insns.insert(insn, getConfigFontHeightMethod());
+
+        int i = insns.indexOf(insn) - 3;
+
+        insns.remove(insns.get(i)); // ALOAD 0
+        insns.remove(insns.get(i)); // GETFIELD GuiNewChat.mc
+        insns.remove(insns.get(i)); // GETFIELD Minecraft.fontRendererObj
+        insns.remove(insns.get(i)); // GETFIELD FontRenderer.FONT_HEIGHT
+
+        return true;
+    }
+
+    private boolean replaceChatLineHeight(InsnList insns, AbstractInsnNode insn)
+    {
+        if (insn.getOpcode() != Opcodes.BIPUSH)
+        {
+            return false;
+        }
+
+        IntInsnNode intInsn = (IntInsnNode) insn;
+
+        if (intInsn.operand != 9)
+        {
+            return false;
+        }
+
+        insns.insert(insn, getConfigFontHeightMethod());
+        insns.remove(insn); // BIPUSH 9
+
+        return true;
+    }
+
+    private boolean replaceTextYOffset(InsnList insns, AbstractInsnNode insn)
+    {
+        if (insn.getOpcode() != Opcodes.BIPUSH)
+        {
+            return false;
+        }
+
+        IntInsnNode intInsn = (IntInsnNode) insn;
+
+        if (intInsn.operand != 8)
+        {
+            return false;
+        }
+
+        insns.insert(insn, getInjectedIntMethod("getChatLineTextYOffset"));
+        insns.remove(insn); // BIPUSH 8
+
+        return true;
     }
 }

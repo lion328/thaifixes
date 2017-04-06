@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Waritnan Sookbuntherng
+ * Copyright (c) 2017 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 package com.lion328.thaifixes;
 
+import com.lion328.thaifixes.renderer.IFontRenderer;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
@@ -50,6 +51,11 @@ public class FontRendererWrapper extends FontRenderer
     }
 
     public void addRenderer(IFontRenderer renderer)
+    {
+
+    }
+
+    public void removeRenderer(IFontRenderer renderer)
     {
 
     }
@@ -99,7 +105,7 @@ public class FontRendererWrapper extends FontRenderer
         return 0;
     }
 
-    public char getLastCharacterRenderered()
+    public char getLastCharacterRendered()
     {
         return 0;
     }
@@ -123,6 +129,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.lion328.thaifixes.renderer.IFontRenderer;
 
 public class FontRendererWrapper extends FontRenderer {
 
@@ -149,13 +157,18 @@ public class FontRendererWrapper extends FontRenderer {
         renderer.setFontRendererWrapper(this);
         renderers.add(renderer);
     }
+    
+    public void removeRenderer(IFontRenderer renderer) {
+    	renderers.remove(renderer);
+    	renderer.setFontRendererWrapper(null);
+    }
 
     public void loadUnicodeTexture(int tex) {
-        loadGlyphTexture(tex);
+        super.loadGlyphTexture(tex);
     }
 
     public byte getRawUnicodeWidth(char c) {
-        return glyphWidth[c];
+        return super.glyphWidth[c];
     }
 
     public void bindTexture(String location) {
@@ -169,11 +182,11 @@ public class FontRendererWrapper extends FontRenderer {
     }
 
     public float getX() {
-        return posX;
+        return super.posX;
     }
 
     public float getY() {
-        return posY;
+        return super.posY;
     }
 
     @Override
@@ -211,6 +224,13 @@ public class FontRendererWrapper extends FontRenderer {
         return super.getCharWidth(c);
     }
 
+    @Override
+    public void renderStringAtPos(String text, boolean shadow) {
+        lastChar = 0;
+        super.renderStringAtPos(text, shadow);
+        lastChar = 0;
+    }
+
     public float getCharWidthFloat(char c) {
         for (IFontRenderer renderer : renderers)
             if (renderer.isSupportedCharacter(c))
@@ -218,9 +238,9 @@ public class FontRendererWrapper extends FontRenderer {
         return super.getCharWidthFloat(c);
     }
 
-    public char getLastCharacterRenderered() {
+    public char getLastCharacterRendered() {
         return lastChar;
     }
 }
 
- */
+*/

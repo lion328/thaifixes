@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Waritnan Sookbuntherng
+ * Copyright (c) 2017 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,8 @@
 package com.lion328.thaifixes.renderer;
 
 import com.lion328.thaifixes.FontRendererWrapper;
-import com.lion328.thaifixes.IFontRenderer;
-import com.lion328.thaifixes.Settings;
+import com.lion328.thaifixes.GLFunctions;
+import com.lion328.thaifixes.ThaiFixes;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 
@@ -52,7 +52,7 @@ public class MCPXFontRenderer implements IFontRenderer
         }
         catch (IOException e)
         {
-            Settings.LOGGER.catching(e);
+            ThaiFixes.getLogger().catching(e);
         }
 
         int width = bufferedimage.getWidth();
@@ -137,12 +137,12 @@ public class MCPXFontRenderer implements IFontRenderer
                 cPosY += 2.0F;
             }
 
-            if (ThaiUtil.isVeryLongTailThaiChar(wrapper.getLastCharacterRenderered()))
+            if (ThaiUtil.isVeryLongTailThaiChar(wrapper.getLastCharacterRendered()))
             {
                 cPosY -= 1.0F;
             }
 
-            if (ThaiUtil.isSpecialThaiChar(wrapper.getLastCharacterRenderered()))
+            if (ThaiUtil.isUpperThaiChar(wrapper.getLastCharacterRendered()))
             {
                 cPosY -= 2.25F;
             }
@@ -159,16 +159,16 @@ public class MCPXFontRenderer implements IFontRenderer
 
         wrapper.bindTexture(MCPX_TEXTURE_LOCATION_RESOURCE);
 
-        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-        GL11.glTexCoord2f(texcoordX / 128.0F, texcoordY / 128.0F);
-        GL11.glVertex2f(cPosX + italicSize, cPosY);
-        GL11.glTexCoord2f(texcoordX / 128.0F, (texcoordY + 7.99F) / 128.0F);
-        GL11.glVertex2f(cPosX - italicSize, cPosY + 7.99F);
-        GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, texcoordY / 128.0F);
-        GL11.glVertex2f(cPosX + f3 - 1.0F + italicSize, cPosY);
-        GL11.glTexCoord2f((texcoordX + f3 - 1.0F) / 128.0F, (texcoordY + 7.99F) / 128.0F);
-        GL11.glVertex2f(cPosX + f3 - 1.0F - italicSize, cPosY + 7.99F);
-        GL11.glEnd();
+        GLFunctions.begin(GL11.GL_TRIANGLE_STRIP);
+        GLFunctions.texCoord(texcoordX / 128.0F, texcoordY / 128.0F);
+        GLFunctions.vertex(cPosX + italicSize, cPosY);
+        GLFunctions.texCoord(texcoordX / 128.0F, (texcoordY + 7.99F) / 128.0F);
+        GLFunctions.vertex(cPosX - italicSize, cPosY + 7.99F);
+        GLFunctions.texCoord((texcoordX + f3 - 1.0F) / 128.0F, texcoordY / 128.0F);
+        GLFunctions.vertex(cPosX + f3 - 1.0F + italicSize, cPosY);
+        GLFunctions.texCoord((texcoordX + f3 - 1.0F) / 128.0F, (texcoordY + 7.99F) / 128.0F);
+        GLFunctions.vertex(cPosX + f3 - 1.0F - italicSize, cPosY + 7.99F);
+        GLFunctions.end();
 
         return ThaiUtil.isSpecialThaiChar(c) ? 0 : (float) thaiCharWidth[offset] - posX + cPosX;
     }
@@ -181,6 +181,13 @@ public class MCPXFontRenderer implements IFontRenderer
             return 0;
         }
 
-        return thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
+        int ret = thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
+
+        if (c == ThaiUtil.SARA_UM)
+        {
+            return ret - 2;
+        }
+
+        return ret;
     }
 }

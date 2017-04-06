@@ -20,12 +20,30 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod.mapper;
+package com.lion328.thaifixes;
 
-public interface IClassMap
+import com.lion328.thaifixes.config.ThaiFixesConfiguration;
+
+public class InjectedConstants
 {
 
-    IClassDetail getClass(String name);
+    public static int getFontHeight()
+    {
+        return ThaiFixesConfiguration.isMCPXChatResizeEnable() ? 16 : 9;
+    }
 
-    IClassDetail addClass(IClassDetail classDetail);
+    public static int getChatLineTextYOffset()
+    {
+        return ThaiFixesConfiguration.isMCPXChatResizeEnable() ? 11 : 8;
+    }
+
+    public static int getChatTextFieldHeight()
+    {
+        return ThaiFixesConfiguration.isMCPXChatResizeEnable() ? 13 : 12;
+    }
+
+    public static int getChatTextFieldBoxHeight()
+    {
+        return ThaiFixesConfiguration.isMCPXChatResizeEnable() ? 18 : 14;
+    }
 }

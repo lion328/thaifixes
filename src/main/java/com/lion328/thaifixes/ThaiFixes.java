@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Waritnan Sookbuntherng
+ * Copyright (c) 2017 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,27 +22,47 @@
 
 package com.lion328.thaifixes;
 
+import com.lion328.thaifixes.config.ThaiFixesConfiguration;
 import com.lion328.thaifixes.coremod.CoremodSettings;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
+import com.lion328.thaifixes.renderer.IFontRenderer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-@Mod(name = ModInformation.NAME, modid = ModInformation.MODID, version = ModInformation.VERSION, acceptedMinecraftVersions = ModInformation.MCVERSION)
+@Mod(name = ModInformation.NAME, modid = ModInformation.MODID, version = ModInformation.VERSION,
+        acceptedMinecraftVersions = ModInformation.MCVERSION, guiFactory = "com.lion328.thaifixes.config.gui.ThaiFixesGuiFactory")
 public class ThaiFixes
 {
 
-    public static final Logger LOGGER = Settings.LOGGER;
+    private static Logger logger;
+
+    private FontRendererWrapper fontRendererWrapper;
+    private IFontRenderer currentRenderer;
+    private boolean disabled;
+
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event)
+    {
+        ThaiFixesConfiguration.init(event.getSuggestedConfigurationFile());
+        ThaiFixesConfiguration.syncConfig();
+    }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
+        MinecraftForge.EVENT_BUS.register(this);
+
         try
         {
             IClassMap map = CoremodSettings.getDefaultClassmap();
@@ -56,58 +76,104 @@ public class ThaiFixes
             Object mc = getMc.invoke(null);
             Object fontRenderer = fontRendererObjField.get(mc);
 
-            if (fontRenderer instanceof FontRendererWrapper)
+            if (!(fontRenderer instanceof FontRendererWrapper))
             {
-                if (!FontRendererWrapper.class.getDeclaredField("PATCHED").getBoolean(null))
-                {
-                    LOGGER.error("Unpatched FontRendererWrapper, converting to default");
+                getLogger().error("Current global FontRenderer object is not FontRendererWrapper (maybe another mod changed)");
 
-                    Class<?> fontRendererClass = Class.forName(map.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.'));
-                    Field[] fields = fontRendererClass.getDeclaredFields();
-
-                    Constructor<?> constructor = fontRendererClass.getDeclaredConstructor();
-                    constructor.setAccessible(true);
-
-                    Field modifiersField = Field.class.getDeclaredField("modifiers");
-                    modifiersField.setAccessible(true);
-
-                    Object newFontRenderer = constructor.newInstance();
-
-                    for (Field field : fields)
-                    {
-                        field.setAccessible(true);
-                        modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
-                        field.set(newFontRenderer, field.get(fontRenderer));
-                    }
-
-                    fontRendererObjField.set(mc, newFontRenderer);
-                }
-                else
-                {
-                    LOGGER.info("FontRendererWrapper is successfully patched");
-
-                    Settings.loadConfig(new File(FontRendererWrapper.getMinecraftDirectory(), "config/thaifixes.cfg"));
-                    String rendererClass = Settings.config.getProperty("font.rendererclass", "disable");
-
-                    if (!rendererClass.equalsIgnoreCase("disable"))
-                    {
-                        Class<?> customRendererClass = Class.forName(rendererClass);
-                        IFontRenderer customRenderer = (IFontRenderer) customRendererClass.newInstance();
-
-                        ((FontRendererWrapper) fontRenderer).addRenderer(customRenderer);
-
-                        LOGGER.info("Added " + rendererClass + " as font renderer");
-                    }
-                }
+                return;
             }
-            else
+
+            if (!FontRendererWrapper.class.getDeclaredField("PATCHED").getBoolean(null))
             {
-                LOGGER.error("Current global FontRenderer object is not FontRendererWrapper (maybe another mod changed)");
+                getLogger().error("Unpatched FontRendererWrapper, converting to default");
+
+                Class<?> fontRendererClass = Class.forName(map.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.'));
+                Field[] fields = fontRendererClass.getDeclaredFields();
+
+                Constructor<?> constructor = fontRendererClass.getDeclaredConstructor();
+                constructor.setAccessible(true);
+
+                Field modifiersField = Field.class.getDeclaredField("modifiers");
+                modifiersField.setAccessible(true);
+
+                Object newFontRenderer = constructor.newInstance();
+
+                for (Field field : fields)
+                {
+                    field.setAccessible(true);
+                    modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
+                    field.set(newFontRenderer, field.get(fontRenderer));
+                }
+
+                fontRendererObjField.set(mc, newFontRenderer);
+
+                return;
             }
+
+            getLogger().info("FontRendererWrapper is successfully patched");
+
+            fontRendererWrapper = (FontRendererWrapper) fontRenderer;
+
+            reloadRenderer();
         }
         catch (Exception e)
         {
-            LOGGER.catching(e);
+            getLogger().catching(e);
         }
+    }
+
+    @SubscribeEvent
+    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
+    {
+        if (event.getModID().equals(ModInformation.MODID))
+        {
+            ThaiFixesConfiguration.syncConfig();
+
+            try
+            {
+                reloadRenderer();
+            }
+            catch (InstantiationException | IllegalAccessException e)
+            {
+                getLogger().catching(e);
+            }
+        }
+    }
+
+    public void reloadRenderer() throws InstantiationException, IllegalAccessException
+    {
+        if (fontRendererWrapper == null)
+        {
+            return;
+        }
+
+        FontStyle fontStyle = ThaiFixesConfiguration.getFontStyle();
+
+        if (currentRenderer != null)
+        {
+            fontRendererWrapper.removeRenderer(currentRenderer);
+        }
+
+        if (!disabled && fontStyle != FontStyle.DISABLE)
+        {
+            currentRenderer = fontStyle.newInstance();
+            fontRendererWrapper.addRenderer(currentRenderer);
+
+            getLogger().info("Using " + fontStyle.getRendererClass().toString() + " as font renderer");
+        }
+        else
+        {
+            getLogger().info("ThaiFixes is disabled");
+        }
+    }
+
+    public static Logger getLogger()
+    {
+        if (logger == null)
+        {
+            logger = LogManager.getLogger("ThaiFixes");
+        }
+
+        return logger;
     }
 }

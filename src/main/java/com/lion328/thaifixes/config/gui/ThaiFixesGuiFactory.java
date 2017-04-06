@@ -20,12 +20,40 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod.mapper;
+package com.lion328.thaifixes.config.gui;
 
-public interface IClassMap
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.fml.client.IModGuiFactory;
+
+import javax.annotation.Nullable;
+import java.util.Set;
+
+public class ThaiFixesGuiFactory implements IModGuiFactory
 {
 
-    IClassDetail getClass(String name);
+    @Override
+    public void initialize(Minecraft minecraftInstance)
+    {
 
-    IClassDetail addClass(IClassDetail classDetail);
+    }
+
+    @Override
+    public Class<? extends GuiScreen> mainConfigGuiClass()
+    {
+        return GuiThaiFixesConfig.class;
+    }
+
+    @Override
+    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
+    {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element)
+    {
+        return null;
+    }
 }

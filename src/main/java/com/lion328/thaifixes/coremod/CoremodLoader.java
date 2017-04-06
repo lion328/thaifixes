@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Waritnan Sookbuntherng
+ * Copyright (c) 2017 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ package com.lion328.thaifixes.coremod;
 import com.lion328.thaifixes.ModInformation;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.coremod.patcher.FontRendererPatcher;
+import com.lion328.thaifixes.coremod.patcher.GuiChatPatcher;
 import com.lion328.thaifixes.coremod.patcher.GuiNewChatPatcher;
 import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
 import com.lion328.thaifixes.coremod.patcher.MinecraftPatcher;
@@ -60,6 +61,7 @@ public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer
             addPatcher(new MinecraftPatcher(classMap));
             addPatcher(new FontRendererPatcher(classMap));
             addPatcher(new GuiNewChatPatcher(classMap));
+            addPatcher(new GuiChatPatcher(classMap));
 
             addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", CoremodLoader.class.getResourceAsStream(CoremodSettings.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), CoremodSettings.getDefaultClassmap()));
         }

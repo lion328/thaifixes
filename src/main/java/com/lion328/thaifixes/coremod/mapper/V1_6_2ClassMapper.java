@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Waritnan Sookbuntherng
+ * Copyright (c) 2017 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -272,7 +272,7 @@ public class V1_6_2ClassMapper implements IClassMapper
         L4:
         for (MethodNode method : node.methods)
         {
-            if (bFlag == 127)
+            if (bFlag == 255)
             {
                 break;
             }
@@ -400,6 +400,11 @@ public class V1_6_2ClassMapper implements IClassMapper
                     }
                 }
             }
+            else if (method.desc.equals("(Ljava/lang/String;Z)V") && (bFlag & 128) == 0)
+            {
+                map.put("net.minecraft.client.gui.FontRenderer.renderStringAtPos:(Ljava/lang/String;Z)V", method.name);
+                bFlag |= 128;
+            }
         }
 
         b = jarReader.getClassBytes(map.get("net.minecraft.client.gui.GuiChat").replace('/', '.'));
@@ -520,6 +525,6 @@ public class V1_6_2ClassMapper implements IClassMapper
             }
         }
 
-        return map.size() >= 20;
+        return map.size() >= 21;
     }
 }
