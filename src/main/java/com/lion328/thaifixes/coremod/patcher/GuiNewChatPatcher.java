@@ -85,9 +85,14 @@ public class GuiNewChatPatcher implements IClassPatcher
         return w.toByteArray();
     }
 
+    public static MethodInsnNode getInjectedIntMethod(String methodName)
+    {
+        return new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/InjectedConstants", methodName, "()I", false);
+    }
+
     private MethodInsnNode getConfigFontHeightMethod()
     {
-        return new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/Config", "getFontHeight", "()I", false);
+        return getInjectedIntMethod("getFontHeight");
     }
 
     private boolean replaceFontHeight(InsnList insns, AbstractInsnNode insn)
@@ -155,7 +160,7 @@ public class GuiNewChatPatcher implements IClassPatcher
             return false;
         }
 
-        insns.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/Config", "getChatLineTextYOffset", "()I", false));
+        insns.insert(insn, getInjectedIntMethod("getChatLineTextYOffset"));
         insns.remove(insn); // BIPUSH 8
 
         return true;

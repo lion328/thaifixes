@@ -3,3 +3,7 @@
 thaifixes.config.title=การตั้งค่า ThaiFixes
 thaifixes.config.fontStyle=รูปแบบฟอนต์
 thaifixes.config.fontStyle.desc=เปลี่ยนฟอนต์ภาษาไทย\nUnicode: ฟอนต์ Unicode ปกติ\nMCPX: ฟอนต์ของ ThaiFixes\nDisable: ปิดการใช้งาน ThaiFixes
+thaifixes.config.mcpx=รูปแบบฟอนต์ MCPX
+thaifixes.config.mcpx.title=การตั้งค่า ThaiFixes - รูปแบบฟอนต์ MCPX
+thaifixes.config.mcpx.enableChatResize=ปรับขนาดกล่องแชท (MCPX)
+thaifixes.config.mcpx.enableChatResize.desc=เมื่อปรับเป็น true กล่องแชทในเกมจะเปลี่ยนขนาด

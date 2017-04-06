@@ -1,20 +1,22 @@
-package com.lion328.thaifixes;
+package com.lion328.thaifixes.config;
 
+import com.lion328.thaifixes.FontStyle;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 
-public class Config
+public class ThaiFixesConfiguration
 {
 
-    public static final FontStyle DEFAULT_FONT_STYLE = FontStyle.UNICODE;
+    public static final String CATEGORY_MCPX = "mcpx";
 
     private static Configuration configuration;
 
     private static String[] avaliableFontStyle;
 
     private static FontStyle fontStyle;
+    private static boolean enableMCPXChatResize;
 
     static
     {
@@ -36,14 +38,9 @@ public class Config
         return fontStyle;
     }
 
-    public static int getFontHeight()
+    public static boolean isMCPXChatResizeEnable()
     {
-        return 16;
-    }
-
-    public static int getChatLineTextYOffset()
-    {
-        return 11;
+        return fontStyle == FontStyle.MCPX && enableMCPXChatResize;
     }
 
     public static void syncConfig()
@@ -51,6 +48,10 @@ public class Config
         fontStyle = FontStyle.fromString(configuration.getString("fontStyle", Configuration.CATEGORY_GENERAL, "Unicode",
                 I18n.format("thaifixes.config.fontStyle.desc"),
                 avaliableFontStyle, "thaifixes.config.fontStyle"));
+
+        enableMCPXChatResize = configuration.getBoolean("enableChatResize", CATEGORY_MCPX, true,
+                I18n.format("thaifixes.config.mcpx.enableChatResize.desc"),
+                "thaifixes.config.mcpx.enableChatResize");
 
         if (configuration.hasChanged())
         {

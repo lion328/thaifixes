@@ -1,4 +1,4 @@
-package com.lion328.thaifixes.gui;
+package com.lion328.thaifixes.config.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
