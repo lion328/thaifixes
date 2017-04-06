@@ -95,7 +95,7 @@ public class CoremodSettings
 
             try
             {
-                deobfuscatedEnvironment = cl.getClassBytes("net.minecraft.client.config.FontRenderer") != null;
+                deobfuscatedEnvironment = cl.getClassBytes("net.minecraft.client.gui.FontRenderer") != null;
             }
             catch (IOException e)
             {
