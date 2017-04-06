@@ -105,7 +105,7 @@ public class FontRendererWrapper extends FontRenderer
         return 0;
     }
 
-    public char getLastCharacterRenderered()
+    public char getLastCharacterRendered()
     {
         return 0;
     }
@@ -224,6 +224,13 @@ public class FontRendererWrapper extends FontRenderer {
         return super.getCharWidth(c);
     }
 
+    @Override
+    public void renderStringAtPos(String text, boolean shadow) {
+        lastChar = 0;
+        super.renderStringAtPos(text, shadow);
+        lastChar = 0;
+    }
+
     public float getCharWidthFloat(char c) {
         for (IFontRenderer renderer : renderers)
             if (renderer.isSupportedCharacter(c))
@@ -231,7 +238,7 @@ public class FontRendererWrapper extends FontRenderer {
         return super.getCharWidthFloat(c);
     }
 
-    public char getLastCharacterRenderered() {
+    public char getLastCharacterRendered() {
         return lastChar;
     }
 }
