@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Waritnan Sookbuntherng
+ * Copyright (c) 2017 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,11 @@ public class GuiNewChatPatcher implements IClassPatcher
         this.classMap = classMap;
     }
 
+    public static MethodInsnNode getInjectedIntMethod(String methodName)
+    {
+        return new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/InjectedConstants", methodName, "()I", false);
+    }
+
     @Override
     public String getClassName()
     {
@@ -83,11 +88,6 @@ public class GuiNewChatPatcher implements IClassPatcher
         n.accept(w);
 
         return w.toByteArray();
-    }
-
-    public static MethodInsnNode getInjectedIntMethod(String methodName)
-    {
-        return new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/InjectedConstants", methodName, "()I", false);
     }
 
     private MethodInsnNode getConfigFontHeightMethod()
