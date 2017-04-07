@@ -25,13 +25,13 @@ package com.lion328.thaifixes;
 public class ThaiUtil
 {
 
-    public static final char THAI_CHAR_RANGE_MIN = 3585;
-    public static final char THAI_CHAR_RANGE_MAX = 3675;
-    public static final String LOWER_CHARS = "ฺุู";
-    public static final String SPECIAL_UPPER_CHARS = "่้๊๋";
-    public static final String UPPER_CHARS = "ัิีึื็์ํ๎" + SPECIAL_UPPER_CHARS;
-    public static final String LONG_TAIL_CHARS = "ปฟฝฬ";
-    public static final char SARA_UM = 'ำ';
+    public static final char THAI_CHAR_RANGE_MIN = '\u0E01';
+    public static final char THAI_CHAR_RANGE_MAX = '\u0E5B';
+    public static final String LOWER_CHARS = "\u0E38\u0E39\u0E3A";
+    public static final String SPECIAL_UPPER_CHARS = "\u0E48\u0E49\u0E4A\u0E4B";
+    public static final String UPPER_CHARS = "\u0E31\u0E34\u0E35\u0E36\u0E37\u0E47\u0E4C\u0E4D\u0E4E" + SPECIAL_UPPER_CHARS;
+    public static final String LONG_TAIL_CHARS = "\u0E1B\u0E1F\u0E1D\u0E2C";
+    public static final char SARA_UM = '\u0E33';
 
     public static boolean isThaiChar(char c)
     {
