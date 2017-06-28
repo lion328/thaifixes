@@ -26,7 +26,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 
 public class ThaiFixesGuiFactory implements IModGuiFactory
@@ -39,20 +38,19 @@ public class ThaiFixesGuiFactory implements IModGuiFactory
     }
 
     @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass()
+    public boolean hasConfigGui()
     {
-        return GuiThaiFixesConfig.class;
+        return true;
+    }
+
+    @Override
+    public GuiScreen createConfigGui(GuiScreen guiScreen)
+    {
+        return new GuiThaiFixesConfig(guiScreen);
     }
 
     @Override
     public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
-    {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element)
     {
         return null;
     }
