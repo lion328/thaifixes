@@ -175,7 +175,7 @@ public class CoremodSettings
     {
         try
         {
-            Field mcDirField = FMLRelaunchLog.class.getDeclaredField("minecraftHome");
+            Field mcDirField = FMLInjectionData.class.getDeclaredField("minecraftHome");
             mcDirField.setAccessible(true);
 
             File mcDir = (File) mcDirField.get(null);
