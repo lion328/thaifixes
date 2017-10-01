@@ -16,8 +16,8 @@ apply plugin: 'java'
 
 compileJava {
     options.encoding = 'UTF-8'
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
 
 jar {
@@ -27,12 +27,12 @@ jar {
     }
 }
 
-version = "4.6-1.12"
+version = "4.7-1.12.1"
 group = "com.lion328.thaifixes"
 archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.12-14.21.0.2382"
+    version = "1.12.1-14.22.1.2478"
     runDir = "run"
 
     mappings = "snapshot_20170624"
