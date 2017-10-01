@@ -27,12 +27,12 @@ jar {
     }
 }
 
-version = "4.7-1.12.1"
+version = "4.8-1.12.2"
 group = "com.lion328.thaifixes"
 archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.12.1-14.22.1.2478"
+    version = "1.12.2-14.23.0.2491"
     runDir = "run"
 
     mappings = "snapshot_20170624"
