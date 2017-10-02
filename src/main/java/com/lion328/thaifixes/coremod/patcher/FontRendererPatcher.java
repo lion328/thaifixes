@@ -104,21 +104,20 @@ public class FontRendererPatcher implements IClassPatcher
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             if (fn.desc.length() == 1)
             { // primitives
-                if (fn.desc.equals("F"))
+                switch (fn.desc)
                 {
-                    mv.visitInsn(Opcodes.FCONST_0);
-                }
-                else if (fn.desc.equals("D"))
-                {
-                    mv.visitInsn(Opcodes.DCONST_0);
-                }
-                else if (fn.desc.equals("J"))
-                {
-                    mv.visitInsn(Opcodes.LCONST_0);
-                }
-                else
-                {
-                    mv.visitInsn(Opcodes.ICONST_0);
+                    case "F":
+                        mv.visitInsn(Opcodes.FCONST_0);
+                        break;
+                    case "D":
+                        mv.visitInsn(Opcodes.DCONST_0);
+                        break;
+                    case "J":
+                        mv.visitInsn(Opcodes.LCONST_0);
+                        break;
+                    default:
+                        mv.visitInsn(Opcodes.ICONST_0);
+                        break;
                 }
             }
             else
