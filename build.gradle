@@ -1,18 +1,38 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenLocal()
+        mavenCentral()
         maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
+            name = "forge"
             url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:' + project.forgeGradleVersion
+        classpath 'org.spongepowered:mixingradle:0.5-SNAPSHOT'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
+apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
+
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
 
 compileJava {
     options.encoding = 'UTF-8'
@@ -20,39 +40,40 @@ compileJava {
     targetCompatibility = 1.8
 }
 
-jar {
-    manifest {
-        attributes 'FMLCorePlugin': 'com.lion328.thaifixes.coremod.CoremodLoader'
-        attributes 'FMLCorePluginContainsFMLMod': 'true'
-    }
-}
-
-version = "4.8-1.12.2"
+version = project.version
 group = "com.lion328.thaifixes"
 archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.12.2-14.23.0.2491"
+    version = project.mcVersion
+    mappings = project.mcMappings
+    
     runDir = "run"
-
-    mappings = "snapshot_20170624"
-
-    replace "%VERSION%", project.version
-    replace "%MCVERSION%", project.minecraft.version
-    replaceIn "ModInformation.java"
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+sourceSets {
+    main {
+        ext.refMap = "mixins.thaifixes.refmap.json"
     }
+}
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+mixin {
+    defaultObfuscationEnv notch
+}
+
+litemod {
+    json {
+        name = "thaifixes"
+        displayName = "ThaiFixes"
+        author = "lion328"
+        version = project.version
+        revision = getGitHash()
+        mcversion = project.targetVersion
+        description = "Improve Thai characters support in Minecraft"
+        mixinConfigs += "mixins.thaifixes.json"
     }
+}
+
+jar {
+    from litemod.outputs
 }
