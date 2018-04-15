@@ -26,6 +26,8 @@ import com.lion328.thaifixes.renderer.IFontRenderer;
 import com.lion328.thaifixes.renderer.MCPXFontRenderer;
 import com.lion328.thaifixes.renderer.UnicodeFontRenderer;
 
+import java.lang.reflect.InvocationTargetException;
+
 public enum FontStyle
 {
 
@@ -73,14 +75,14 @@ public enum FontStyle
         return clazz;
     }
 
-    public IFontRenderer newInstance() throws IllegalAccessException, InstantiationException
+    public IFontRenderer newInstance() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
     {
         if (clazz == null)
         {
             return null;
         }
 
-        return clazz.newInstance();
+        return clazz.getDeclaredConstructor().newInstance();
     }
 
     public String toString()
