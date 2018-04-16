@@ -90,4 +90,14 @@ public class UnicodeFontRenderer implements IFontRenderer
     {
         return 0;
     }
+
+    public static class Factory implements IFontRendererFactory
+    {
+
+        @Override
+        public IFontRenderer createRenderer()
+        {
+            return new UnicodeFontRenderer();
+        }
+    }
 }

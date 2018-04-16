@@ -23,25 +23,24 @@
 package com.lion328.thaifixes;
 
 import com.lion328.thaifixes.renderer.IFontRenderer;
+import com.lion328.thaifixes.renderer.IFontRendererFactory;
 import com.lion328.thaifixes.renderer.MCPXFontRenderer;
 import com.lion328.thaifixes.renderer.UnicodeFontRenderer;
-
-import java.lang.reflect.InvocationTargetException;
 
 public enum FontStyle
 {
 
-    UNICODE("Unicode", UnicodeFontRenderer.class),
-    MCPX("MCPX", MCPXFontRenderer.class),
+    UNICODE("Unicode", new UnicodeFontRenderer.Factory()),
+    MCPX("MCPX", new MCPXFontRenderer.Factory()),
     DISABLE("Disable", null);
 
-    private final Class<? extends IFontRenderer> clazz;
+    private final IFontRendererFactory factory;
     private final String name;
 
-    FontStyle(String name, Class<? extends IFontRenderer> clazz)
+    FontStyle(String name, IFontRendererFactory factory)
     {
         this.name = name;
-        this.clazz = clazz;
+        this.factory = factory;
     }
 
     public static FontStyle fromString(String s)
@@ -70,19 +69,14 @@ public enum FontStyle
         return ret;
     }
 
-    public Class<? extends IFontRenderer> getRendererClass()
+    public IFontRenderer newInstance()
     {
-        return clazz;
-    }
-
-    public IFontRenderer newInstance() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
-    {
-        if (clazz == null)
+        if (factory == null)
         {
             return null;
         }
 
-        return clazz.getDeclaredConstructor().newInstance();
+        return factory.createRenderer();
     }
 
     public String toString()

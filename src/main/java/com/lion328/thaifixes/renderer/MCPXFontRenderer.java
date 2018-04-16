@@ -190,4 +190,14 @@ public class MCPXFontRenderer implements IFontRenderer
 
         return ret;
     }
+
+    public static class Factory implements IFontRendererFactory
+    {
+
+        @Override
+        public IFontRenderer createRenderer()
+        {
+            return new MCPXFontRenderer();
+        }
+    }
 }
