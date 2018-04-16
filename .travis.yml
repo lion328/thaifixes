@@ -4,14 +4,10 @@ jdk:
     - oraclejdk8
 
 git:
-    depth: 3
+    depth: 1
 
-before_script:
-    - chmod +x gradlew
+install:
+    - gradle setupCiWorkspace
 
 script:
-    - echo 'Setup environment'
-    - ./gradlew setupCiWorkspace
-    - echo 'Build'
-    - ./gradlew build
-
+    - gradle build
