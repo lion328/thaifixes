@@ -12,22 +12,29 @@ public abstract class FontRendererWrapper
 
     public void setRenderer(IFontRenderer renderer)
     {
+        if (renderer == null)
+        {
+            removeRenderer();
+            return;
+        }
+
+        renderer.setFontRendererWrapper(this);
         this.renderer = renderer;
+    }
+
+    public IFontRenderer getRenderer()
+    {
+        return renderer;
     }
 
     public void removeRenderer()
     {
-        this.renderer = null;
-    }
-
-    public int getCharWidth(char c)
-    {
-        if (renderer.isSupportedCharacter(c))
+        if (renderer != null)
         {
-            renderer.getCharacterWidth(c);
+            renderer.setFontRendererWrapper(null);
         }
 
-        return getDefaultCharacterWidth(c);
+        this.renderer = null;
     }
 
     public abstract float getX();
@@ -41,6 +48,4 @@ public abstract class FontRendererWrapper
     public abstract void loadUnicodeTexture(int i);
 
     public abstract int getRawUnicodeWidth(char c);
-
-    public abstract int getDefaultCharacterWidth(char c);
 }
