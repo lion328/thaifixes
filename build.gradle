@@ -25,15 +25,6 @@ apply plugin: 'net.minecraftforge.gradle.liteloader'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
-def getGitHash = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
 compileJava {
     options.encoding = 'UTF-8'
     sourceCompatibility = 1.8
@@ -67,7 +58,7 @@ litemod {
         displayName = "ThaiFixes"
         author = "lion328"
         version = project.version
-        revision = getGitHash()
+        revision = ant.antProject.properties['build.number']
         mcversion = project.targetVersion
         description = "Improve Thai characters support in Minecraft"
         mixinConfigs += "mixins.thaifixes.json"
