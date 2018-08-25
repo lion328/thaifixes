@@ -1,70 +1,50 @@
 buildscript {
     repositories {
-        mavenLocal()
-        mavenCentral()
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = 'sponge'
-            url = 'http://repo.spongepowered.org/maven'
-        }
+        jcenter()
+        maven { url 'https://www.dimdev.org/maven/' }
+        maven { url = 'http://repo.spongepowered.org/maven' }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:' + project.forgeGradleVersion
-        classpath 'org.spongepowered:mixingradle:0.5-SNAPSHOT'
+        classpath 'org.dimdev:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'net.minecraftforge.gradle.tweaker-client'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
-compileJava {
-    options.encoding = 'UTF-8'
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+group 'com.lion328.thaifixes'
+version '5.0'
+archivesBaseName = 'thaifixes'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://www.dimdev.org/maven/' }
 }
 
-version = project.version
-group = "com.lion328.thaifixes"
-archivesBaseName = "thaifixes"
+dependencies {
+    implementation 'org.dimdev:rift:1.0.3-45:dev'
+}
 
 minecraft {
-    version = project.mcVersion
-    mappings = project.mcMappings
-    
-    runDir = "run"
+    version = '1.13'
+    mappings = 'snapshot_5'
+    runDir = 'run'
+    tweakClass = 'org.dimdev.riftloader.launch.RiftLoaderClientTweaker'
 }
 
 sourceSets {
     main {
-        ext.refMap = "mixins.thaifixes.refmap.json"
+        ext.refMap = 'mixins.thaifixes.refmap.json'
     }
 }
 
 mixin {
     defaultObfuscationEnv notch
-}
-
-litemod {
-    json {
-        name = "thaifixes"
-        displayName = "ThaiFixes"
-        author = "lion328"
-        version = project.version
-        revision = ant.antProject.properties['build.number']
-        mcversion = project.targetVersion
-        description = "Improve Thai characters support in Minecraft"
-        mixinConfigs += "mixins.thaifixes.json"
-    }
-}
-
-jar {
-    from litemod.outputs
 }

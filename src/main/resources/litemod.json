@@ -1,8 +1,0 @@
-{
-  "name": "thaifixes",
-  "version": "0.0",
-  "mcversion": "1.12.r2",
-  "mixinConfigs": [
-    "mixins.thaifixes.json"
-  ]
-}

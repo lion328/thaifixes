@@ -1,0 +1,10 @@
+{
+  "id": "thaifixes",
+  "name": "ThaiFixes",
+  "authors": [
+    "lion328"
+  ],
+  "listeners": [
+    "com.lion328.thaifixes.ThaiFixes"
+  ]
+}
