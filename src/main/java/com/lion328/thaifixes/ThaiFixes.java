@@ -14,6 +14,15 @@ public class ThaiFixes implements InitializationListener
     public void onInitialization()
     {
         Mixins.addConfiguration("mixins.thaifixes.json");
+
+        try
+        {
+            HangingThaiCharacterTexturedGlyph.initialize();
+        }
+        catch (NoSuchFieldException | IllegalAccessException e)
+        {
+            getLogger().error("Failed to initialize HangingThaiCharacterTexturedGlyph clone methods", e);
+        }
     }
 
     public static Logger getLogger()
