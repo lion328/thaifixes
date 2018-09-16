@@ -1,58 +1,50 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url = "http://files.minecraftforge.net/maven"
-        }
+        maven { url 'https://www.dimdev.org/maven/' }
+        maven { url = 'http://repo.spongepowered.org/maven' }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.dimdev:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
+apply plugin: 'net.minecraftforge.gradle.tweaker-client'
+apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
-compileJava {
-    options.encoding = 'UTF-8'
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+group 'com.lion328.thaifixes'
+version '5.0'
+archivesBaseName = 'thaifixes'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://www.dimdev.org/maven/' }
 }
 
-jar {
-    manifest {
-        attributes 'FMLCorePlugin': 'com.lion328.thaifixes.coremod.CoremodLoader'
-        attributes 'FMLCorePluginContainsFMLMod': 'true'
-    }
+dependencies {
+    implementation 'org.dimdev:rift:1.0.3-45:dev'
 }
-
-version = "4.8-1.12.2"
-group = "com.lion328.thaifixes"
-archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.12.2-14.23.0.2491"
-    runDir = "run"
-
-    mappings = "snapshot_20170624"
-
-    replace "%VERSION%", project.version
-    replace "%MCVERSION%", project.minecraft.version
-    replaceIn "ModInformation.java"
+    version = '1.13'
+    mappings = 'snapshot_5'
+    runDir = 'run'
+    tweakClass = 'org.dimdev.riftloader.launch.RiftLoaderClientTweaker'
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+sourceSets {
+    main {
+        ext.refMap = 'mixins.thaifixes.refmap.json'
     }
+}
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+mixin {
+    defaultObfuscationEnv notch
 }
