@@ -28,6 +28,7 @@ import com.lion328.thaifixes.coremod.mapper.SimpleClassMap;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.MinecraftClassLoaderJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.TransformedJarReader;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
@@ -49,6 +50,8 @@ public class CoremodSettings
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
     public static final String DEFAULT_ORIGINAL_CLASSES_PATH = "/assets/thaifixes/classes/";
+    public static final String BLACKBOARD_DEOBFENV_KEY = "fml.deobfuscatedEnvironment";
+
     private static IClassMap obfuscatedClassmap, defaultClassmap;
 
     static
@@ -111,7 +114,21 @@ public class CoremodSettings
             }
             else
             {
+                // HACK! We will rewrite the mod in 1.13 anyway.
+                boolean isKeyNull = Launch.blackboard.get(BLACKBOARD_DEOBFENV_KEY) == null;
+
+                if (isKeyNull)
+                {
+                    Launch.blackboard.put(BLACKBOARD_DEOBFENV_KEY, false);
+                }
+
                 DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
+
+                if (isKeyNull)
+                {
+                    Launch.blackboard.remove(BLACKBOARD_DEOBFENV_KEY);
+                }
+
                 reader = new TransformedJarReader(mcJarReader, deobfTransformer, deobfTransformer);
             }
 
