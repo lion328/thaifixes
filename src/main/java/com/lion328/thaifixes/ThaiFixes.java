@@ -1,14 +1,19 @@
 package com.lion328.thaifixes;
 
+import net.minecraft.client.gui.fonts.IGlyphInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dimdev.riftloader.listener.InitializationListener;
 import org.spongepowered.asm.mixin.Mixins;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ThaiFixes implements InitializationListener
 {
 
     private static Logger logger;
+    public static Map<IGlyphInfo, Character> processingThaiChars = new ConcurrentHashMap<>();
 
     @Override
     public void onInitialization()

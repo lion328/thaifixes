@@ -1,6 +1,6 @@
 package com.lion328.thaifixes.mixin;
 
-import com.lion328.thaifixes.HangingUnicodeThaiCharacterGlyphInfo;
+import com.lion328.thaifixes.ThaiFixes;
 import com.lion328.thaifixes.ThaiUtil;
 import net.minecraft.client.gui.fonts.IGlyphInfo;
 import net.minecraft.client.gui.fonts.providers.TextureGlyphProviderUnicode;
@@ -20,6 +20,6 @@ public class MixinTextureGlyphProviderUnicode
             return;
         }
 
-        cir.setReturnValue(new HangingUnicodeThaiCharacterGlyphInfo(cir.getReturnValue()));
+        ThaiFixes.processingThaiChars.put(cir.getReturnValue(), c);
     }
 }
