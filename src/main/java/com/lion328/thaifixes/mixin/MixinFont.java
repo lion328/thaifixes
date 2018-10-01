@@ -15,7 +15,8 @@ public abstract class MixinFont
 {
 
     @Inject(method = "func_211185_a", at = @At("RETURN"), cancellable = true)
-    public void onTexturedGlyphRequest(IGlyphInfo glyphInfo, CallbackInfoReturnable<TexturedGlyph> cir) {
+    public void onTexturedGlyphRequest(IGlyphInfo glyphInfo, CallbackInfoReturnable<TexturedGlyph> cir)
+    {
         if (!ThaiFixes.processingThaiChars.containsKey(glyphInfo))
         {
             return;
@@ -24,7 +25,8 @@ public abstract class MixinFont
         TexturedGlyph parent = cir.getReturnValue();
         char c = ThaiFixes.processingThaiChars.get(glyphInfo);
 
-        cir.setReturnValue(HangingThaiCharacterTexturedGlyph.fromParent(parent, c));
+        TexturedGlyph wrapped = HangingThaiCharacterTexturedGlyph.fromParent(parent, c);
+        cir.setReturnValue(wrapped);
 
         ThaiFixes.processingThaiChars.remove(glyphInfo);
     }

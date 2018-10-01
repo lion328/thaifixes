@@ -10,11 +10,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(TextureGlyphProviderUnicode.class)
-public class MixinTextureGlyphProviderUnicode
+public abstract class MixinTextureGlyphProviderUnicode
 {
 
     @Inject(method = "func_211028_a_", at = @At("RETURN"), cancellable = true)
-    public void onGlyphInfoRequest(char c, CallbackInfoReturnable<IGlyphInfo> cir) {
+    public void onGlyphInfoRequest(char c, CallbackInfoReturnable<IGlyphInfo> cir)
+    {
         if (!ThaiUtil.isSpecialThaiChar(c))
         {
             return;

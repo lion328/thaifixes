@@ -29,22 +29,27 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
     }
 
     @Override
-    public void func_211234_a(TextureManager p_211234_1_, boolean p_211234_2_, float p_211234_3_, float p_211234_4_, BufferBuilder p_211234_5_, float p_211234_6_, float p_211234_7_, float p_211234_8_, float p_211234_9_)
+    public void func_211234_a(TextureManager p_211234_1_, boolean p_211234_2_, float p_211234_3_, float p_211234_4_,
+                              BufferBuilder p_211234_5_, float p_211234_6_, float p_211234_7_, float p_211234_8_,
+                              float p_211234_9_)
     {
         p_211234_3_ -= super.func_211232_a();
 
-        super.func_211234_a(p_211234_1_, p_211234_2_, p_211234_3_, p_211234_4_, p_211234_5_, p_211234_6_, p_211234_7_, p_211234_8_, p_211234_9_);
+        super.func_211234_a(p_211234_1_, p_211234_2_, p_211234_3_, p_211234_4_, p_211234_5_, p_211234_6_, p_211234_7_,
+                p_211234_8_, p_211234_9_);
     }
 
     public static HangingThaiCharacterTexturedGlyph fromParent(TexturedGlyph glyph, char c)
     {
-        if (parentFields == null) {
+        if (parentFields == null)
+        {
             return null;
         }
 
         HangingThaiCharacterTexturedGlyph ret = new HangingThaiCharacterTexturedGlyph(c);
 
-        for (Field field : parentFields) {
+        for (Field field : parentFields)
+        {
             try
             {
                 field.set(ret, field.get(glyph));
@@ -61,7 +66,8 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
 
     public static void initialize() throws NoSuchFieldException, IllegalAccessException
     {
-        if (parentFields != null) {
+        if (parentFields != null)
+        {
             return;
         }
 
@@ -70,14 +76,17 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
 
         List<Field> filteredFields = new ArrayList<>();
 
-        for (Field field : TexturedGlyph.class.getDeclaredFields()) {
+        for (Field field : TexturedGlyph.class.getDeclaredFields())
+        {
             int modifier = modiferField.getInt(field);
 
-            if ((modifier & Modifier.STATIC) == Modifier.STATIC) {
+            if ((modifier & Modifier.STATIC) == Modifier.STATIC)
+            {
                 continue;
             }
 
-            if ((modifier & Modifier.FINAL) == Modifier.FINAL) {
+            if ((modifier & Modifier.FINAL) == Modifier.FINAL)
+            {
                 modiferField.set(field, modifier & ~Modifier.FINAL);
             }
 
@@ -85,6 +94,6 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
             filteredFields.add(field);
         }
 
-        parentFields = filteredFields.toArray(new Field[] {});
+        parentFields = filteredFields.toArray(new Field[]{});
     }
 }
