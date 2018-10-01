@@ -43,6 +43,6 @@ public abstract class MixinTextureGlyphProviderUnicode
             return;
         }
 
-        ThaiFixes.processingThaiChars.put(cir.getReturnValue(), c);
+        ThaiFixes.processingThaiChars.put(cir.getReturnValue(), ThaiUtil.isHangingBelowThaiChar(c));
     }
 }

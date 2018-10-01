@@ -36,7 +36,7 @@ public class ThaiFixes implements InitializationListener
 {
 
     private static Logger logger;
-    public static Map<IGlyphInfo, Character> processingThaiChars = new ConcurrentHashMap<>();
+    public static Map<IGlyphInfo, Boolean> processingThaiChars = new ConcurrentHashMap<>();
 
     @Override
     public void onInitialization()
