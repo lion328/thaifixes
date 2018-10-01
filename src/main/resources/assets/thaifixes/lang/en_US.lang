@@ -1,9 +1,0 @@
-#PARSE_ESCAPES
-
-thaifixes.config.title=ThaiFixes Configuration
-thaifixes.config.fontStyle=Font style
-thaifixes.config.fontStyle.desc=Change Thai characters font\nUnicode: Default unicode font\nMCPX: ThaiFixes' Thai font\nDisable: Disable ThaiFixes
-thaifixes.config.mcpx=MCPX Font Style
-thaifixes.config.mcpx.title=ThaiFixes Configuration - MCPX Font Style
-thaifixes.config.mcpx.enableChatResize=Enable chat box resize (MCPX)
-thaifixes.config.mcpx.enableChatResize.desc=When set to true, chat box in the game will be resized.
