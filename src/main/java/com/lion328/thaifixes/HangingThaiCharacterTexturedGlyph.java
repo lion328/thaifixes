@@ -33,8 +33,6 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
                               BufferBuilder p_211234_5_, float p_211234_6_, float p_211234_7_, float p_211234_8_,
                               float p_211234_9_)
     {
-        p_211234_3_ -= super.getWidth();
-
         super.render(p_211234_1_, p_211234_2_, p_211234_3_, p_211234_4_, p_211234_5_, p_211234_6_, p_211234_7_,
                 p_211234_8_, p_211234_9_);
     }
@@ -60,6 +58,9 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
                 return null;
             }
         }
+
+        ret.field_211240_f -= glyph.getWidth();
+        ret.field_211241_g -= glyph.getWidth();
 
         return ret;
     }
