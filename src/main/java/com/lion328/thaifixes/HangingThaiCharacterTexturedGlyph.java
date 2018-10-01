@@ -59,8 +59,26 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
             }
         }
 
+        float posYShift = 0.0f;
+        float height = 2.99f;
+
+        if (ThaiUtil.isLowerThaiChar(c))
+        {
+            posYShift = 6.0f;
+            height = 1.99f;
+        }
+
+        // X vertices
         ret.field_211240_f -= glyph.getWidth();
         ret.field_211241_g -= glyph.getWidth();
+
+        // Y vertices
+        ret.field_211242_h += posYShift;
+        ret.field_211243_i = ret.field_211242_h + height;
+
+        // UV coordinates
+        ret.v0 += posYShift / 128.0f;
+        ret.v1 = ret.v0 + height / 128.0f;
 
         return ret;
     }
