@@ -23,19 +23,19 @@ public class HangingThaiCharacterTexturedGlyph extends TexturedGlyph
     }
 
     @Override
-    public float func_211232_a()
+    public float getWidth()
     {
         return 0.0f;
     }
 
     @Override
-    public void func_211234_a(TextureManager p_211234_1_, boolean p_211234_2_, float p_211234_3_, float p_211234_4_,
+    public void render(TextureManager p_211234_1_, boolean p_211234_2_, float p_211234_3_, float p_211234_4_,
                               BufferBuilder p_211234_5_, float p_211234_6_, float p_211234_7_, float p_211234_8_,
                               float p_211234_9_)
     {
-        p_211234_3_ -= super.func_211232_a();
+        p_211234_3_ -= super.getWidth();
 
-        super.func_211234_a(p_211234_1_, p_211234_2_, p_211234_3_, p_211234_4_, p_211234_5_, p_211234_6_, p_211234_7_,
+        super.render(p_211234_1_, p_211234_2_, p_211234_3_, p_211234_4_, p_211234_5_, p_211234_6_, p_211234_7_,
                 p_211234_8_, p_211234_9_);
     }
 

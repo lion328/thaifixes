@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinFont
 {
 
-    @Inject(method = "func_211185_a", at = @At("RETURN"), cancellable = true)
-    public void onTexturedGlyphRequest(IGlyphInfo glyphInfo, CallbackInfoReturnable<TexturedGlyph> cir)
+    @Inject(method = "createTexturedGlyph", at = @At("RETURN"), cancellable = true)
+    public void onCreateTexturedGlyph(IGlyphInfo glyphInfo, CallbackInfoReturnable<TexturedGlyph> cir)
     {
         if (!ThaiFixes.processingThaiChars.containsKey(glyphInfo))
         {
