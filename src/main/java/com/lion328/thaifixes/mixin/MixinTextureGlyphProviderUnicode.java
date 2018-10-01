@@ -38,7 +38,7 @@ public abstract class MixinTextureGlyphProviderUnicode
     @Inject(method = "getGlyphInfo", at = @At("RETURN"), cancellable = true)
     public void onGetGlyphInfo(char c, CallbackInfoReturnable<IGlyphInfo> cir)
     {
-        if (!ThaiUtil.isSpecialThaiChar(c))
+        if (!ThaiUtil.isHangingThaiChar(c))
         {
             return;
         }

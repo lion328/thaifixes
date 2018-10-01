@@ -38,22 +38,22 @@ public class ThaiUtil
         return c >= THAI_CHAR_RANGE_MIN && c <= THAI_CHAR_RANGE_MAX;
     }
 
-    public static boolean isSpecialThaiChar(char c)
+    public static boolean isHangingThaiChar(char c)
     {
-        return isUpperThaiChar(c) || isLowerThaiChar(c);
+        return isHangingAboveThaiChar(c) || isHangingBelowThaiChar(c);
     }
 
-    public static boolean isUpperThaiChar(char c)
+    public static boolean isHangingAboveThaiChar(char c)
     {
         return UPPER_CHARS.indexOf(c) != -1;
     }
 
-    public static boolean isLowerThaiChar(char c)
+    public static boolean isHangingBelowThaiChar(char c)
     {
         return LOWER_CHARS.indexOf(c) != -1;
     }
 
-    public static boolean isSpecialUpperThaiChar(char c)
+    public static boolean isHangingAllAboveThaiChar(char c)
     {
         return SPECIAL_UPPER_CHARS.indexOf(c) != -1;
     }

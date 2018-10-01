@@ -50,7 +50,7 @@ public abstract class MixinFont
         float posYShift = 0.0f;
         float height = 2.99f;
 
-        if (ThaiUtil.isLowerThaiChar(c))
+        if (ThaiUtil.isHangingBelowThaiChar(c))
         {
             posYShift = 6.0f;
             height = 1.99f;
