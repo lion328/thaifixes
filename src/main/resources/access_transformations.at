@@ -1,8 +1,9 @@
-protected-f field chy b F
-protected-f field chy c F
-protected-f field chy d F
-protected-f field chy e F
-protected-f field chy f F
-protected-f field chy g F
-protected-f field chy h F
-protected-f field chy i F
+public-f field chy b F
+public-f field chy c F
+public-f field chy d F
+public-f field chy e F
+public-f field chy f F
+public-f field chy g F
+public-f field chy h F
+public-f field chy i F
+public-f field chy j F
