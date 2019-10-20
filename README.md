@@ -2,7 +2,7 @@
 
 Make Thai language in Minecraft looks better by shifting Thai Unicode characters into right place.
 
-This is a repository for the new MinecraftForge-based and Rift-based mod. You can find previous versions at [https://github.com/lion328/thaifixes-old/](https://github.com/lion328/thaifixes-old/).
+This is a repository for the new MinecraftForge-based, Rift-based, and Fabric-based mod. You can find previous versions at [https://github.com/lion328/thaifixes-old/](https://github.com/lion328/thaifixes-old/).
 
 ## Contributors
 
