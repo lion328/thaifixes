@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "com.lion328.thaifixes.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

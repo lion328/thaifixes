@@ -22,27 +22,18 @@
 
 package com.lion328.thaifixes;
 
-import net.minecraft.client.gui.fonts.IGlyphInfo;
+import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dimdev.riftloader.listener.InitializationListener;
-import org.spongepowered.asm.launch.MixinBootstrap;
-import org.spongepowered.asm.mixin.Mixins;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class ThaiFixes implements InitializationListener
+public class ThaiFixes implements ModInitializer
 {
-
     private static Logger logger;
-    public static Map<IGlyphInfo, Boolean> processingThaiChars = new ConcurrentHashMap<>();
 
     @Override
-    public void onInitialization()
+    public void onInitialize()
     {
-        MixinBootstrap.init();
-        Mixins.addConfiguration("mixins.thaifixes.json");
+
     }
 
     public static Logger getLogger()
@@ -55,3 +46,4 @@ public class ThaiFixes implements InitializationListener
         return logger;
     }
 }
+

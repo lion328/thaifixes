@@ -1,4 +1,4 @@
-# [thaifixes](http://thaifixes.lion328.com) [![Build Status](https://travis-ci.org/lion328/ThaiFixes.svg?branch=rift)](https://travis-ci.org/lion328/ThaiFixes)
+# [thaifixes](http://thaifixes.lion328.com) [![Build Status](https://travis-ci.org/lion328/ThaiFixes.svg?branch=fabric)](https://travis-ci.org/lion328/ThaiFixes)
 
 Make Thai language in Minecraft looks better by shifting Thai Unicode characters into right place.
 
