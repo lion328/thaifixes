@@ -16,20 +16,12 @@
   "license": "MIT",
 
   "environment": "client",
-  "entrypoints": {
-    "main": [
-      "com.lion328.thaifixes.ThaiFixes"
-    ]
-  },
+
   "mixins": [
     "thaifixes.mixins.json"
   ],
 
   "depends": {
-    "fabricloader": ">=0.4.0",
-    "fabric": "*"
-  },
-  "suggests": {
-    "flamingo": "*"
+    "fabricloader": ">=0.4.0"
   }
 }

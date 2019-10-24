@@ -20,30 +20,20 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes;
+package com.lion328.thaifixes.mixin;
 
-import net.fabricmc.api.ModInitializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.client.font.RenderableGlyph;
+import net.minecraft.client.texture.NativeImage;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-public class ThaiFixes implements ModInitializer
+@Mixin(targets = "net.minecraft.client.font.UnicodeTextureFont$UnicodeTextureGlyph")
+public interface UnicodeTextureGlyphAccessor extends RenderableGlyph
 {
-    private static Logger logger;
-
-    @Override
-    public void onInitialize()
-    {
-
-    }
-
-    public static Logger getLogger()
-    {
-        if (logger == null)
-        {
-            logger = LogManager.getLogger("ThaiFixes");
-        }
-
-        return logger;
-    }
+    @Accessor
+    int getUnpackSkipPixels();
+    @Accessor
+    int getUnpackSkipRows();
+    @Accessor
+    NativeImage getImage();
 }
-
