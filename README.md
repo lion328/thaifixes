@@ -8,7 +8,7 @@ This is a repository for the new MinecraftForge-based, Rift-based, and Fabric-ba
 
 - [lion328](http://github.com/lion328) (Developer and maintainer)
 - [PCXD](http://pcxd.me) (Developer of the original Minecraft 1.2.4 mod)
-- [secretdataz](https://github.com/secretdataz) (Coremod source code)
+- [secretdataz](https://github.com/secretdataz) (Provided the initial coremod source code for Forge version)
 
 ## Mods compatibility
 
