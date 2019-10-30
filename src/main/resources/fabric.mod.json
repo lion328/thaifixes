@@ -17,11 +17,20 @@
 
   "environment": "client",
 
+  "entrypoints": {
+    "client": ["com.lion328.thaifixes.ThaiFixes"],
+    "modmenu": ["com.lion328.thaifixes.ThaiFixesModMenuApiImpl"]
+  },
+
   "mixins": [
     "thaifixes.mixins.json"
   ],
 
   "depends": {
     "fabricloader": ">=0.4.0"
+  },
+
+  "custom": {
+    "modmenu:clientsideOnly": true
   }
 }
