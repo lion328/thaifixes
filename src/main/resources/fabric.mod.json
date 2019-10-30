@@ -3,14 +3,15 @@
   "id": "thaifixes",
   "version": "${version}",
 
-  "name": "thaifixes",
+  "name": "ThaiFixes",
   "description": "Make Thai language in Minecraft looks better.",
   "authors": [
     "lion328"
   ],
   "contact": {
     "homepage": "https://github.com/lion328/thaifixes/",
-    "sources": "https://github.com/lion328/thaifixes/"
+    "sources": "https://github.com/lion328/thaifixes/",
+    "issues": "https://github.com/lion328/thaifixes/issues/"
   },
 
   "license": "MIT",
