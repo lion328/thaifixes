@@ -21,28 +21,49 @@ archivesBaseName = 'thaifixes'
 
 def coremodClass = 'com.lion328.thaifixes.coremod.CoremodLoader'
 
-compileJava {
-    options.encoding = 'UTF-8'
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-}
+def replaceVars = [
+        'name': project.name,
+        'version': project.version,
+        'modid': project.archivesBaseName,
+        'mcversion': project.minecraft.version,
+]
 
 minecraft {
     version = '1.12.2-14.23.5.2847'
     runDir = 'run'
 
-    mappings = "snapshot_20171003"
+    mappings = 'snapshot_20171003'
     clientJvmArgs = ["-Dfml.coreMods.load=${coremodClass}"]
 }
 
+sourceSets {
+    main.java.srcDir "$buildDir/generated/java"
+    template.java.srcDir 'src/template/java'
+}
+
+task generateSources(type: Copy) {
+    inputs.properties replaceVars
+
+    from(sourceSets.template.java.srcDirs) {
+        expand replaceVars
+    }
+
+    into "$buildDir/generated/java"
+}
+
+sourceCompatibility = targetCompatibility = 1.8
+compileJava {
+    dependsOn generateSources
+    sourceCompatibility = targetCompatibility = 1.8
+    options.encoding = 'UTF-8'
+}
+
 processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    inputs.properties replaceVars
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+        expand replaceVars
     }
 
     from(sourceSets.main.resources.srcDirs) {

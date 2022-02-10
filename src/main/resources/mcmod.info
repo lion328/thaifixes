@@ -1,10 +1,10 @@
 [
     {
-        "modid": "thaifixes",
-        "name": "ThaiFixes",
+        "modid": "${modid}",
+        "name": "${name}",
         "description": "Improve Thai characters support in Minecraft.",
-        "version": "$version",
-        "mcversion": "$mcversion",
+        "version": "${version}",
+        "mcversion": "${mcversion}",
         "url": "http://thaifixes.lion328.com/",
         "authorList": ["lion328"],
         "credits": "PCXD, secretdataz"
