@@ -21,13 +21,6 @@ archivesBaseName = 'thaifixes'
 
 def coremodClass = 'com.lion328.thaifixes.coremod.CoremodLoader'
 
-def replaceVars = [
-        'name': project.name,
-        'version': project.version,
-        'modid': project.archivesBaseName,
-        'mcversion': project.minecraft.version,
-]
-
 minecraft {
     version = '1.12.2-14.23.5.2847'
     runDir = 'run'
@@ -35,6 +28,13 @@ minecraft {
     mappings = 'snapshot_20171003'
     clientJvmArgs = ["-Dfml.coreMods.load=${coremodClass}"]
 }
+
+def replaceVars = [
+        'name': 'ThaiFixes',
+        'version': project.version,
+        'modid': project.archivesBaseName,
+        'mcversion': project.minecraft.version,
+]
 
 sourceSets {
     main.java.srcDir "$buildDir/generated/java"
