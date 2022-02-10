@@ -67,6 +67,11 @@ public class NameMapperPatcher implements IClassPatcher
         this.classMap = classMap;
     }
 
+    public NameMapperPatcher(byte[] classBytecode, IClassMap classMap)
+    {
+        this(null, classBytecode, classMap);
+    }
+
     @Override
     public String getClassName()
     {

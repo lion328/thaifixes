@@ -22,104 +22,7 @@
 
 package com.lion328.thaifixes;
 
-import com.lion328.thaifixes.renderer.IFontRenderer;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.util.ResourceLocation;
-
-import java.io.File;
-
-public class FontRendererWrapper extends FontRenderer
-{
-
-    public static final boolean PATCHED = false;
-
-    public FontRendererWrapper(GameSettings settings, ResourceLocation asciiTex, TextureManager texMan, boolean unicode)
-    {
-        super(settings, asciiTex, texMan, unicode);
-    }
-
-    public static File getMinecraftDirectory()
-    {
-        return null;
-    }
-
-    private static void initialize()
-    {
-
-    }
-
-    public void addRenderer(IFontRenderer renderer)
-    {
-
-    }
-
-    public void removeRenderer(IFontRenderer renderer)
-    {
-
-    }
-
-    public void loadUnicodeTexture(int tex)
-    {
-
-    }
-
-    public byte getRawUnicodeWidth(char c)
-    {
-        return 0;
-    }
-
-    public void bindTexture(String location)
-    {
-
-    }
-
-    public int getDefaultCharacterWidth(char c)
-    {
-        return 0;
-    }
-
-    public float getX()
-    {
-        return posX;
-    }
-
-    public float getY()
-    {
-        return posY;
-    }
-
-    public float renderCharAtPos(int asciiPos, char c, boolean italic)
-    {
-        return 0;
-    }
-
-    public int getCharWidth(char c)
-    {
-        return 0;
-    }
-
-    public float getCharWidthFloat(char c)
-    {
-        return 0;
-    }
-
-    public char getLastCharacterRendered()
-    {
-        return 0;
-    }
-}
-
-// REAL SOURCE CODE
-// Unusable because can't access private fields and methods
-// Need to use access transformer or class patch
-// Use access transformer will make conflict about obfuscated names
-/*
-package com.lion328.thaifixes;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
@@ -132,9 +35,7 @@ import java.util.Map;
 
 import com.lion328.thaifixes.renderer.IFontRenderer;
 
-public class FontRendererWrapper extends FontRenderer {
-
-    public static final boolean PATCHED = true;
+public class FontRendererWrapper extends FakeFontRenderer {
 
     private static Map<String, ResourceLocation> resourceLocationPool = new HashMap<String, ResourceLocation>();
 
@@ -157,10 +58,10 @@ public class FontRendererWrapper extends FontRenderer {
         renderer.setFontRendererWrapper(this);
         renderers.add(renderer);
     }
-    
+
     public void removeRenderer(IFontRenderer renderer) {
-    	renderers.remove(renderer);
-    	renderer.setFontRendererWrapper(null);
+        renderers.remove(renderer);
+        renderer.setFontRendererWrapper(null);
     }
 
     public void loadUnicodeTexture(int tex) {
@@ -242,5 +143,3 @@ public class FontRendererWrapper extends FontRenderer {
         return lastChar;
     }
 }
-
-*/

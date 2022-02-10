@@ -25,6 +25,7 @@ package com.lion328.thaifixes.coremod;
 import com.lion328.thaifixes.ModInformation;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.coremod.patcher.FontRendererPatcher;
+import com.lion328.thaifixes.coremod.patcher.FontRendererWrapperPatcher;
 import com.lion328.thaifixes.coremod.patcher.GuiChatPatcher;
 import com.lion328.thaifixes.coremod.patcher.GuiNewChatPatcher;
 import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
@@ -62,8 +63,7 @@ public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer
             addPatcher(new FontRendererPatcher(classMap));
             addPatcher(new GuiNewChatPatcher(classMap));
             addPatcher(new GuiChatPatcher(classMap));
-
-            addPatcher(new NameMapperPatcher("com.lion328.thaifixes.FontRendererWrapper", CoremodLoader.class.getResourceAsStream(CoremodSettings.DEFAULT_ORIGINAL_CLASSES_PATH + "com/lion328/thaifixes/FontRendererWrapper"), CoremodSettings.getDefaultClassmap()));
+            addPatcher(new FontRendererWrapperPatcher(classMap));
         }
         catch (Exception e)
         {
