@@ -37,7 +37,11 @@ def replaceVars = [
 ]
 
 sourceSets {
-    main.java.srcDir "$buildDir/generated/java"
+    main {
+        java.srcDir "$buildDir/generated/java"
+        // Make Intellij see assets
+        output.resourcesDir = output.classesDir
+    }
     template.java.srcDir 'src/template/java'
 }
 
