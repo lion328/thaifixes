@@ -99,10 +99,10 @@ public class FontRendererWrapper extends FakeFontRenderer {
             }
         if (Float.isNaN(ret))
             ret = super.renderCharAtPos(asciiPos, c, italic);
-        lastChar = c;
         return ret;
     }
 
+    @Override
     public float renderCharAtPos(char c, boolean italic) {
         float ret = Float.NaN;
         for (IFontRenderer renderer : renderers)
@@ -112,7 +112,6 @@ public class FontRendererWrapper extends FakeFontRenderer {
             }
         if (Float.isNaN(ret))
             ret = super.renderCharAtPos(c, italic);
-        lastChar = c;
         return ret;
     }
 
@@ -131,11 +130,17 @@ public class FontRendererWrapper extends FakeFontRenderer {
         lastChar = 0;
     }
 
+    @Override
     public float getCharWidthFloat(char c) {
         for (IFontRenderer renderer : renderers)
             if (renderer.isSupportedCharacter(c))
                 return (float) renderer.getCharacterWidth(c);
         return super.getCharWidthFloat(c);
+    }
+
+    @Override
+    public void onCharRendered(char c) {
+        lastChar = c;
     }
 
     public char getLastCharacterRendered() {

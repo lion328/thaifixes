@@ -22,8 +22,10 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
+import com.lion328.thaifixes.coremod.mapper.IClassDetail;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -31,22 +33,27 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 import java.util.ArrayList;
 
 public class FontRendererPatcher implements IClassPatcher {
 
     private IClassMap classMap;
+    private IClassDetail fontRendererClass;
 
     public FontRendererPatcher(IClassMap classMap) {
         this.classMap = classMap;
+        fontRendererClass = classMap.getClass("net/minecraft/client/gui/FontRenderer");
     }
 
     @Override
     public String getClassName() {
-        return classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.');
+        return fontRendererClass.getObfuscatedName().replace('/', '.');
     }
 
     @Override
@@ -65,7 +72,7 @@ public class FontRendererPatcher implements IClassPatcher {
                 AbstractInsnNode insn = insns.get(i);
                 if (insn.getOpcode() == Opcodes.INVOKESPECIAL) {
                     MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                    if (methodInsn.owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+                    if (methodInsn.owner.equals(fontRendererClass.getObfuscatedName())) {
                         methodInsn.setOpcode(Opcodes.INVOKEVIRTUAL);
                     }
                 }
@@ -102,7 +109,7 @@ public class FontRendererPatcher implements IClassPatcher {
             } else {
                 mv.visitInsn(Opcodes.ACONST_NULL);
             }
-            mv.visitFieldInsn(Opcodes.PUTFIELD, classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName(), fn.name, fn.desc);
+            mv.visitFieldInsn(Opcodes.PUTFIELD, fontRendererClass.getObfuscatedName(), fn.name, fn.desc);
         }
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
@@ -110,7 +117,91 @@ public class FontRendererPatcher implements IClassPatcher {
         mv.visitMaxs(0, 0);
         mv.visitEnd();
 
+        patchLastCharOnRenderString(n, w);
+
         n.accept(w);
         return w.toByteArray();
+    }
+
+    private void patchLastCharOnRenderString(ClassNode classNode, ClassVisitor visitor) {
+        for (MethodNode mn : classNode.methods) {
+            if (!fontRendererClass.getField("renderStringAtPos").equals(mn.name)) {
+                continue;
+            }
+
+            // Find the character variable inside the loop.
+            int charVar = -1;
+            InsnList insns = mn.instructions;
+            for (int i = 0; i < insns.size(); i++) {
+                AbstractInsnNode absInsn = insns.get(i);
+
+                if (absInsn instanceof MethodInsnNode) {
+                    MethodInsnNode insn = (MethodInsnNode) absInsn;
+                    if (!"java/lang/String".equals(insn.owner) || !"charAt".equals(insn.name))
+                        continue;
+
+                    AbstractInsnNode nextInsn = insns.get(i + 1);
+                    if (nextInsn.getOpcode() == Opcodes.ISTORE) {
+                        charVar = ((VarInsnNode) nextInsn).var;
+                        break;
+                    }
+                }
+            }
+
+            // Find index where the loop condition belong.
+            int conditionIdx = -1;
+            for (int i = 0; i < insns.size(); i++) {
+                AbstractInsnNode insn0 = insns.get(i);
+                AbstractInsnNode insn1 = insns.get(i + 1);
+
+                if (!(insn1 instanceof JumpInsnNode && insn0 instanceof MethodInsnNode))
+                    continue;
+
+                MethodInsnNode insn = (MethodInsnNode) insn0;
+                if ("java/lang/String".equals(insn.owner) && "length".equals(insn.name)) {
+                    conditionIdx = i;
+                    break;
+                }
+            }
+
+            // Find jump destination point back from the end of the loop.
+            LabelNode firstLabelNode = null;
+            for (int i = conditionIdx - 1; i >= 0; i--) {
+                AbstractInsnNode insn = insns.get(i);
+
+                if (insn instanceof LabelNode) {
+                    firstLabelNode = (LabelNode) insn;
+                    break;
+                }
+            }
+
+            // Find a jump where its destination = firstLabelNode.
+            JumpInsnNode jumpInsn = null;
+            for (int i = 0; i < insns.size(); i++) {
+                AbstractInsnNode absInsn = insns.get(i);
+                if (absInsn instanceof JumpInsnNode) {
+                    JumpInsnNode insn = (JumpInsnNode) absInsn;
+                    if (insn.label == firstLabelNode) {
+                        jumpInsn = insn;
+                        break;
+                    }
+                }
+            }
+
+            InsnList insertList = new InsnList();
+            insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
+            insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
+                    "onCharRendered", "(C)V", false));
+
+            insns.insertBefore(jumpInsn, insertList);
+
+            break;
+        }
+
+        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "onCharRendered", "(C)V",
+                null, null);
+        mv.visitInsn(Opcodes.RETURN);
+        mv.visitEnd();
     }
 }

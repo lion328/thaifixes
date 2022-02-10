@@ -60,4 +60,8 @@ public class FakeFontRenderer {
     public float getCharWidthFloat(char c) {
         throw new IllegalArgumentException();
     }
+
+    public void onCharRendered(char c) {
+        throw new IllegalArgumentException();
+    }
 }
