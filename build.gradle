@@ -1,18 +1,27 @@
 buildscript {
     repositories {
-        jcenter()
-        maven {
-            url = "http://files.minecraftforge.net/maven"
-        }
+        // Maven central JARs now have Java 9 classes, and Forge can't consume that unfortunately...
+        maven { url = 'https://maven.minecraftforge.net/' }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
+apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'java'
+
+repositories {
+    maven { url = 'https://maven.minecraftforge.net/' }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+}
+
+version = '4.8.2-alpha'
+group = 'com.lion328.thaifixes'
+archivesBaseName = 'thaifixes'
 
 compileJava {
     options.encoding = 'UTF-8'
@@ -20,39 +29,30 @@ compileJava {
     targetCompatibility = 1.8
 }
 
+def coremodClass = 'com.lion328.thaifixes.coremod.CoremodLoader'
+
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'com.lion328.thaifixes.coremod.CoremodLoader'
-        attributes 'FMLCorePluginContainsFMLMod': 'true'
+        attributes([
+                'FMLCorePluginContainsFMLMod': 'true',
+                'FMLCorePlugin': coremodClass,
+        ])
     }
 }
-
-version = "4.8.1-1.12.2"
-group = "com.lion328.thaifixes"
-archivesBaseName = "thaifixes"
 
 minecraft {
-    version = "1.12.2-14.23.4.2764"
-    runDir = "run"
+    runs {
+        client {
+            workingDirectory project.file('run')
 
-    mappings = "snapshot_20171003"
+            jvmArg "-Dfml.coreMods.load=${coremodClass}"
 
-    replace "%VERSION%", project.version
-    replace "%MCVERSION%", project.minecraft.version
-    replaceIn "ModInformation.java"
-}
-
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
     }
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+    mappings channel: 'snapshot', version: '20171003-1.12'
 }
+
+jar.finalizedBy('reobfJar') 
