@@ -26,46 +26,38 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
 
-public class FakeFontRenderer
-{
+public class FakeFontRenderer {
 
     protected float posX;
     protected float posY;
     protected final byte[] glyphWidth = null;
 
-    public FakeFontRenderer(GameSettings settings, ResourceLocation asciiTex, TextureManager texMan, boolean unicode)
-    {
+    public FakeFontRenderer(GameSettings settings, ResourceLocation asciiTex, TextureManager texMan, boolean unicode) {
         throw new IllegalArgumentException();
     }
 
-    protected void loadGlyphTexture(int page)
-    {
+    protected void loadGlyphTexture(int page) {
         throw new IllegalArgumentException();
     }
 
-    public float renderCharAtPos(char c, boolean italic)
-    {
+    public float renderCharAtPos(char c, boolean italic) {
         throw new IllegalArgumentException();
     }
 
-    public float renderCharAtPos(int asciiPos, char c, boolean italic)
-    {
+    public float renderCharAtPos(int asciiPos, char c, boolean italic) {
         throw new IllegalArgumentException();
     }
 
-    public void renderStringAtPos(String text, boolean shadow)
-    {
+    public void renderStringAtPos(String text, boolean shadow) {
         throw new IllegalArgumentException();
     }
 
-    public int getCharWidth(char character)
-    {
+    public int getCharWidth(char character) {
         throw new IllegalArgumentException();
     }
 
     // Optifine
-    public float getCharWidthFloat(char c)
-    {
+    public float getCharWidthFloat(char c) {
         throw new IllegalArgumentException();
     }
 }

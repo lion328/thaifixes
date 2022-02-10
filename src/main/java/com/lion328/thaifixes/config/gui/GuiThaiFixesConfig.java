@@ -36,16 +36,13 @@ import net.minecraftforge.fml.client.config.IConfigElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiThaiFixesConfig extends GuiConfig
-{
+public class GuiThaiFixesConfig extends GuiConfig {
 
-    public GuiThaiFixesConfig(GuiScreen parent)
-    {
+    public GuiThaiFixesConfig(GuiScreen parent) {
         super(parent, getConfigElements(), ModInformation.MODID, false, false, I18n.format("thaifixes.config.title"));
     }
 
-    private static List<IConfigElement> getConfigElements()
-    {
+    private static List<IConfigElement> getConfigElements() {
         List<IConfigElement> elements = new ArrayList<>();
 
         elements.addAll(new ConfigElement(ThaiFixesConfiguration.getConfiguration().getCategory(Configuration.CATEGORY_GENERAL)).getChildElements());
@@ -54,17 +51,14 @@ public class GuiThaiFixesConfig extends GuiConfig
         return elements;
     }
 
-    public static class MCPXEntry extends GuiConfigEntries.CategoryEntry
-    {
+    public static class MCPXEntry extends GuiConfigEntries.CategoryEntry {
 
-        public MCPXEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement)
-        {
+        public MCPXEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
             super(owningScreen, owningEntryList, configElement);
         }
 
         @Override
-        protected GuiScreen buildChildScreen()
-        {
+        protected GuiScreen buildChildScreen() {
             return new GuiConfig(owningScreen, new ConfigElement(ThaiFixesConfiguration.getConfiguration().getCategory(ThaiFixesConfiguration.CATEGORY_MCPX)).getChildElements(),
                     ModInformation.MODID, false, false, I18n.format("thaifixes.config.mcpx.title"));
         }

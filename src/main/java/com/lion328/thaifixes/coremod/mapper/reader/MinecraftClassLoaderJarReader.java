@@ -26,19 +26,16 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import java.io.IOException;
 
-public class MinecraftClassLoaderJarReader implements IJarReader
-{
+public class MinecraftClassLoaderJarReader implements IJarReader {
 
     private LaunchClassLoader classLoader;
 
-    public MinecraftClassLoaderJarReader(LaunchClassLoader classLoader)
-    {
+    public MinecraftClassLoaderJarReader(LaunchClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
     @Override
-    public byte[] getClassBytes(String name) throws IOException
-    {
+    public byte[] getClassBytes(String name) throws IOException {
         return classLoader.getClassBytes(name);
     }
 }

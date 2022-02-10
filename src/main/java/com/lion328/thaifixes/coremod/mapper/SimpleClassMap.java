@@ -25,27 +25,22 @@ package com.lion328.thaifixes.coremod.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleClassMap implements IClassMap
-{
+public class SimpleClassMap implements IClassMap {
 
     private Map<String, IClassDetail> classesDetail;
 
-    public SimpleClassMap()
-    {
+    public SimpleClassMap() {
         classesDetail = new HashMap<String, IClassDetail>();
     }
 
     @Override
-    public IClassDetail getClass(String name)
-    {
+    public IClassDetail getClass(String name) {
         return classesDetail.get(name);
     }
 
     @Override
-    public IClassDetail addClass(IClassDetail classDetail)
-    {
-        if (classesDetail.containsKey(classDetail.getName()))
-        {
+    public IClassDetail addClass(IClassDetail classDetail) {
+        if (classesDetail.containsKey(classDetail.getName())) {
             return classesDetail.get(classDetail.getName());
         }
         classesDetail.put(classDetail.getName(), classDetail);

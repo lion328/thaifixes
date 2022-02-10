@@ -28,30 +28,25 @@ import net.minecraftforge.fml.client.IModGuiFactory;
 
 import java.util.Set;
 
-public class ThaiFixesGuiFactory implements IModGuiFactory
-{
+public class ThaiFixesGuiFactory implements IModGuiFactory {
 
     @Override
-    public void initialize(Minecraft minecraftInstance)
-    {
+    public void initialize(Minecraft minecraftInstance) {
 
     }
 
     @Override
-    public boolean hasConfigGui()
-    {
+    public boolean hasConfigGui() {
         return true;
     }
 
     @Override
-    public GuiScreen createConfigGui(GuiScreen guiScreen)
-    {
+    public GuiScreen createConfigGui(GuiScreen guiScreen) {
         return new GuiThaiFixesConfig(guiScreen);
     }
 
     @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
-    {
+    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
         return null;
     }
 }

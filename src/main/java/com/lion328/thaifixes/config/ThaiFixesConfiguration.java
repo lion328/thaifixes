@@ -28,8 +28,7 @@ import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 
-public class ThaiFixesConfiguration
-{
+public class ThaiFixesConfiguration {
 
     public static final String CATEGORY_MCPX = "mcpx";
 
@@ -40,33 +39,27 @@ public class ThaiFixesConfiguration
     private static FontStyle fontStyle;
     private static boolean enableMCPXChatResize;
 
-    static
-    {
+    static {
         avaliableFontStyle = FontStyle.asStringArray();
     }
 
-    public static void init(File configFile)
-    {
+    public static void init(File configFile) {
         configuration = new Configuration(configFile);
     }
 
-    public static Configuration getConfiguration()
-    {
+    public static Configuration getConfiguration() {
         return configuration;
     }
 
-    public static FontStyle getFontStyle()
-    {
+    public static FontStyle getFontStyle() {
         return fontStyle;
     }
 
-    public static boolean isMCPXChatResizeEnable()
-    {
+    public static boolean isMCPXChatResizeEnable() {
         return fontStyle == FontStyle.MCPX && enableMCPXChatResize;
     }
 
-    public static void syncConfig()
-    {
+    public static void syncConfig() {
         fontStyle = FontStyle.fromString(configuration.getString("fontStyle", Configuration.CATEGORY_GENERAL, "Unicode",
                 I18n.format("thaifixes.config.fontStyle.desc"),
                 avaliableFontStyle, "thaifixes.config.fontStyle"));
@@ -75,8 +68,7 @@ public class ThaiFixesConfiguration
                 I18n.format("thaifixes.config.mcpx.enableChatResize.desc"),
                 "thaifixes.config.mcpx.enableChatResize");
 
-        if (configuration.hasChanged())
-        {
+        if (configuration.hasChanged()) {
             configuration.save();
         }
     }

@@ -36,15 +36,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NameMapperPatcher implements IClassPatcher
-{
+public class NameMapperPatcher implements IClassPatcher {
 
     private String className;
     private byte[] originalBytecode;
     private IClassMap classMap;
 
-    public NameMapperPatcher(String className, InputStream classBytecode, IClassMap classMap) throws IOException
-    {
+    public NameMapperPatcher(String className, InputStream classBytecode, IClassMap classMap) throws IOException {
         this(className, new byte[0], classMap);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -52,35 +50,30 @@ public class NameMapperPatcher implements IClassPatcher
         byte[] buffer = new byte[1024];
         int i;
 
-        while ((i = classBytecode.read(buffer)) != -1)
-        {
+        while ((i = classBytecode.read(buffer)) != -1) {
             out.write(buffer, 0, i);
         }
 
         originalBytecode = out.toByteArray();
     }
 
-    public NameMapperPatcher(String className, byte[] classBytecode, IClassMap classMap)
-    {
+    public NameMapperPatcher(String className, byte[] classBytecode, IClassMap classMap) {
         this.className = className;
         originalBytecode = classBytecode.clone();
         this.classMap = classMap;
     }
 
-    public NameMapperPatcher(byte[] classBytecode, IClassMap classMap)
-    {
+    public NameMapperPatcher(byte[] classBytecode, IClassMap classMap) {
         this(null, classBytecode, classMap);
     }
 
     @Override
-    public String getClassName()
-    {
+    public String getClassName() {
         return className;
     }
 
     @Override
-    public byte[] patch(byte[] original) throws Exception
-    {
+    public byte[] patch(byte[] original) throws Exception {
         ClassReader reader = new ClassReader(originalBytecode);
         ClassNode classNode = new ClassNode();
         ClassVisitor mapper = new RemappingClassAdapter(classNode, new NameRemapper(classMap));
@@ -91,74 +84,60 @@ public class NameMapperPatcher implements IClassPatcher
         return w.toByteArray();
     }
 
-    public static class NameRemapper extends Remapper
-    {
+    public static class NameRemapper extends Remapper {
 
         private final IClassMap classMap;
 
-        public NameRemapper(IClassMap classMap)
-        {
+        public NameRemapper(IClassMap classMap) {
             this.classMap = classMap;
         }
 
         @Override
-        public String mapMethodName(String owner, String name, String desc)
-        {
-            if (classMap.getClass(owner) != null)
-            {
+        public String mapMethodName(String owner, String name, String desc) {
+            if (classMap.getClass(owner) != null) {
                 return classMap.getClass(owner).getMethod(name, desc);
             }
             return name;
         }
 
         @Override
-        public String mapFieldName(String owner, String name, String desc)
-        {
-            if (classMap.getClass(owner) != null)
-            {
+        public String mapFieldName(String owner, String name, String desc) {
+            if (classMap.getClass(owner) != null) {
                 return classMap.getClass(owner).getField(name);
             }
             return name;
         }
 
         @Override
-        public String map(String typeName)
-        {
-            if (classMap.getClass(typeName) != null)
-            {
+        public String map(String typeName) {
+            if (classMap.getClass(typeName) != null) {
                 return classMap.getClass(typeName).getObfuscatedName();
             }
             return typeName;
         }
     }
 
-    public static class NameMapperVisitor extends ClassVisitor
-    {
+    public static class NameMapperVisitor extends ClassVisitor {
 
         private IClassMap classMap;
 
         private String currentSuperclassName;
 
-        public NameMapperVisitor(int api, ClassVisitor cv, IClassMap classMap)
-        {
+        public NameMapperVisitor(int api, ClassVisitor cv, IClassMap classMap) {
             super(api, cv);
             this.classMap = classMap;
         }
 
         @Override
-        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
-        {
+        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
             currentSuperclassName = superName;
             super.visit(version, access, name, signature, superName, interfaces);
         }
 
         @Override
-        public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
-        {
-            if (currentSuperclassName != null)
-            {
-                if (classMap.getClass(currentSuperclassName) != null)
-                {
+        public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+            if (currentSuperclassName != null) {
+                if (classMap.getClass(currentSuperclassName) != null) {
                     name = classMap.getClass(currentSuperclassName).getMethod(name, desc);
                 }
             }

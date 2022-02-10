@@ -42,8 +42,7 @@ import java.lang.reflect.Modifier;
 
 @Mod(name = ModInformation.NAME, modid = ModInformation.MODID, version = ModInformation.VERSION,
         acceptedMinecraftVersions = ModInformation.MCVERSION, guiFactory = "com.lion328.thaifixes.config.gui.ThaiFixesGuiFactory")
-public class ThaiFixes
-{
+public class ThaiFixes {
 
     private static Logger logger;
 
@@ -52,19 +51,16 @@ public class ThaiFixes
     private boolean disabled;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
         ThaiFixesConfiguration.init(event.getSuggestedConfigurationFile());
         ThaiFixesConfiguration.syncConfig();
     }
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event)
-    {
+    public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
 
-        try
-        {
+        try {
             IClassMap map = CoremodSettings.getDefaultClassmap();
 
             Class<?> mcClass = Class.forName(map.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.'));
@@ -76,15 +72,13 @@ public class ThaiFixes
             Object mc = getMc.invoke(null);
             Object fontRenderer = fontRendererObjField.get(mc);
 
-            if (!(fontRenderer instanceof FontRendererWrapper))
-            {
+            if (!(fontRenderer instanceof FontRendererWrapper)) {
                 getLogger().error("Current global FontRenderer object is not FontRendererWrapper (maybe another mod changed)");
 
                 return;
             }
 
-            if (FontRendererWrapper.class.getSuperclass() == FakeFontRenderer.class)
-            {
+            if (FontRendererWrapper.class.getSuperclass() == FakeFontRenderer.class) {
                 getLogger().error("Unpatched FontRendererWrapper, converting to default");
 
                 Class<?> fontRendererClass = Class.forName(map.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName().replace('/', '.'));
@@ -98,8 +92,7 @@ public class ThaiFixes
 
                 Object newFontRenderer = constructor.newInstance();
 
-                for (Field field : fields)
-                {
+                for (Field field : fields) {
                     field.setAccessible(true);
                     modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
                     field.set(newFontRenderer, field.get(fontRenderer));
@@ -115,62 +108,47 @@ public class ThaiFixes
             fontRendererWrapper = (FontRendererWrapper) fontRenderer;
 
             reloadRenderer();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             getLogger().catching(e);
         }
     }
 
     @SubscribeEvent
-    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
-    {
-        if (event.getModID().equals(ModInformation.MODID))
-        {
+    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equals(ModInformation.MODID)) {
             ThaiFixesConfiguration.syncConfig();
 
-            try
-            {
+            try {
                 reloadRenderer();
-            }
-            catch (InstantiationException | IllegalAccessException e)
-            {
+            } catch (InstantiationException | IllegalAccessException e) {
                 getLogger().catching(e);
             }
         }
     }
 
-    public void reloadRenderer() throws InstantiationException, IllegalAccessException
-    {
-        if (fontRendererWrapper == null)
-        {
+    public void reloadRenderer() throws InstantiationException, IllegalAccessException {
+        if (fontRendererWrapper == null) {
             return;
         }
 
         FontStyle fontStyle = ThaiFixesConfiguration.getFontStyle();
 
-        if (currentRenderer != null)
-        {
+        if (currentRenderer != null) {
             fontRendererWrapper.removeRenderer(currentRenderer);
         }
 
-        if (!disabled && fontStyle != FontStyle.DISABLE)
-        {
+        if (!disabled && fontStyle != FontStyle.DISABLE) {
             currentRenderer = fontStyle.newInstance();
             fontRendererWrapper.addRenderer(currentRenderer);
 
             getLogger().info("Using " + fontStyle.getRendererClass().toString() + " as font renderer");
-        }
-        else
-        {
+        } else {
             getLogger().info("ThaiFixes is disabled");
         }
     }
 
-    public static Logger getLogger()
-    {
-        if (logger == null)
-        {
+    public static Logger getLogger() {
+        if (logger == null) {
             logger = LogManager.getLogger("ThaiFixes");
         }
 

@@ -30,7 +30,6 @@ import com.lion328.thaifixes.coremod.patcher.GuiChatPatcher;
 import com.lion328.thaifixes.coremod.patcher.GuiNewChatPatcher;
 import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
 import com.lion328.thaifixes.coremod.patcher.MinecraftPatcher;
-import com.lion328.thaifixes.coremod.patcher.NameMapperPatcher;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
@@ -38,82 +37,65 @@ import java.util.HashMap;
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer
-{
+public class CoremodLoader implements IFMLLoadingPlugin, IClassTransformer {
 
     private static final Map<String, IClassPatcher> patchers = new HashMap<String, IClassPatcher>();
 
-    static
-    {
+    static {
         initializePatchers();
     }
 
-    public static void addPatcher(IClassPatcher patcher)
-    {
+    public static void addPatcher(IClassPatcher patcher) {
         patchers.put(patcher.getClassName(), patcher);
     }
 
-    private static void initializePatchers()
-    {
+    private static void initializePatchers() {
         IClassMap classMap = CoremodSettings.getObfuscatedClassmap();
 
-        try
-        {
+        try {
             addPatcher(new MinecraftPatcher(classMap));
             addPatcher(new FontRendererPatcher(classMap));
             addPatcher(new GuiNewChatPatcher(classMap));
             addPatcher(new GuiChatPatcher(classMap));
             addPatcher(new FontRendererWrapperPatcher(classMap));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             CoremodSettings.LOGGER.catching(e);
         }
     }
 
     @Override
-    public String[] getASMTransformerClass()
-    {
-        return new String[] {getClass().getName()};
+    public String[] getASMTransformerClass() {
+        return new String[]{getClass().getName()};
     }
 
     @Override
-    public String getModContainerClass()
-    {
+    public String getModContainerClass() {
         return null;
     }
 
     @Override
-    public String getSetupClass()
-    {
+    public String getSetupClass() {
         return null;
     }
 
     @Override
-    public void injectData(Map<String, Object> data)
-    {
+    public void injectData(Map<String, Object> data) {
 
     }
 
     @Override
-    public String getAccessTransformerClass()
-    {
+    public String getAccessTransformerClass() {
         return null;
     }
 
     @Override
-    public byte[] transform(String untransformedName, String transformedName, byte[] bytes)
-    {
-        if (patchers.containsKey(untransformedName))
-        {
+    public byte[] transform(String untransformedName, String transformedName, byte[] bytes) {
+        if (patchers.containsKey(untransformedName)) {
             CoremodSettings.LOGGER.info("Patching " + transformedName);
 
-            try
-            {
+            try {
                 return patchers.get(untransformedName).patch(bytes);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 CoremodSettings.LOGGER.catching(e);
             }
         }

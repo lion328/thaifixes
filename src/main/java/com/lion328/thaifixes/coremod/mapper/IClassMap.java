@@ -22,8 +22,7 @@
 
 package com.lion328.thaifixes.coremod.mapper;
 
-public interface IClassMap
-{
+public interface IClassMap {
 
     IClassDetail getClass(String name);
 

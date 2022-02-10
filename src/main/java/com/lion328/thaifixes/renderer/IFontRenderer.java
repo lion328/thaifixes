@@ -24,8 +24,7 @@ package com.lion328.thaifixes.renderer;
 
 import com.lion328.thaifixes.FontRendererWrapper;
 
-public interface IFontRenderer
-{
+public interface IFontRenderer {
 
     /**
      * Set FontRendererWrapper object.

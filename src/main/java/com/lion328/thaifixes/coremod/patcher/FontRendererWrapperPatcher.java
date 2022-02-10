@@ -25,37 +25,28 @@ package com.lion328.thaifixes.coremod.patcher;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
 
-public class FontRendererWrapperPatcher implements IClassPatcher
-{
+public class FontRendererWrapperPatcher implements IClassPatcher {
 
     private IClassMap classMap;
 
-    public FontRendererWrapperPatcher(IClassMap classMap)
-    {
+    public FontRendererWrapperPatcher(IClassMap classMap) {
         this.classMap = classMap;
     }
 
     @Override
-    public String getClassName()
-    {
+    public String getClassName() {
         return "com.lion328.thaifixes.FontRendererWrapper";
     }
 
     @Override
-    public byte[] patch(byte[] original) throws Exception
-    {
+    public byte[] patch(byte[] original) throws Exception {
         ClassReader r = new ClassReader(original);
         ClassNode n = new ClassNode();
         r.accept(n, 0);
@@ -65,25 +56,18 @@ public class FontRendererWrapperPatcher implements IClassPatcher
 
         n.superName = replace;
 
-        for (MethodNode mn : n.methods)
-        {
+        for (MethodNode mn : n.methods) {
             InsnList insns = mn.instructions;
-            for (int i = 0; i < insns.size(); i++)
-            {
+            for (int i = 0; i < insns.size(); i++) {
                 AbstractInsnNode abstractInsn = insns.get(i);
-                if (abstractInsn instanceof MethodInsnNode)
-                {
+                if (abstractInsn instanceof MethodInsnNode) {
                     MethodInsnNode insn = (MethodInsnNode) abstractInsn;
-                    if (target.equals(insn.owner))
-                    {
+                    if (target.equals(insn.owner)) {
                         insn.owner = replace;
                     }
-                }
-                else if (abstractInsn instanceof FieldInsnNode)
-                {
+                } else if (abstractInsn instanceof FieldInsnNode) {
                     FieldInsnNode insn = (FieldInsnNode) abstractInsn;
-                    if (target.equals(insn.owner))
-                    {
+                    if (target.equals(insn.owner)) {
                         insn.owner = replace;
                     }
                 }

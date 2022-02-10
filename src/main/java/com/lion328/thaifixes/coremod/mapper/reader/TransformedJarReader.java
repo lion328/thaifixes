@@ -27,26 +27,22 @@ import net.minecraft.launchwrapper.IClassTransformer;
 
 import java.io.IOException;
 
-public class TransformedJarReader implements IJarReader
-{
+public class TransformedJarReader implements IJarReader {
 
     private IJarReader parent;
     private IClassTransformer classTransformer;
     private IClassNameTransformer nameTransformer;
 
-    public TransformedJarReader(IJarReader parent, IClassTransformer classTransformer, IClassNameTransformer nameTransformer)
-    {
+    public TransformedJarReader(IJarReader parent, IClassTransformer classTransformer, IClassNameTransformer nameTransformer) {
         this.parent = parent;
         this.classTransformer = classTransformer;
         this.nameTransformer = nameTransformer;
     }
 
     @Override
-    public byte[] getClassBytes(String name) throws IOException
-    {
+    public byte[] getClassBytes(String name) throws IOException {
         String untransformedName = name;
-        if (nameTransformer != null)
-        {
+        if (nameTransformer != null) {
             untransformedName = nameTransformer.unmapClassName(name);
         }
         return classTransformer.transform(untransformedName, name, parent.getClassBytes(nameTransformer.unmapClassName(name)));

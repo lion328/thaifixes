@@ -27,33 +27,28 @@ import com.lion328.thaifixes.GLFunctions;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 
-public class UnicodeFontRenderer implements IFontRenderer
-{
+public class UnicodeFontRenderer implements IFontRenderer {
 
     private FontRendererWrapper wrapper;
 
     @Override
-    public void setFontRendererWrapper(FontRendererWrapper wrapper)
-    {
+    public void setFontRendererWrapper(FontRendererWrapper wrapper) {
         this.wrapper = wrapper;
     }
 
     @Override
-    public boolean isSupportedCharacter(char c)
-    {
+    public boolean isSupportedCharacter(char c) {
         return ThaiUtil.isSpecialThaiChar(c);
     }
 
     @Override
-    public float renderCharacter(char c, boolean italic)
-    {
+    public float renderCharacter(char c, boolean italic) {
         wrapper.loadUnicodeTexture(0x0E);
 
         float posYShift = 0.0F;
         float height = 2.99F;
 
-        if (ThaiUtil.isLowerThaiChar(c))
-        {
+        if (ThaiUtil.isLowerThaiChar(c)) {
             height = 1.99F;
             posYShift = 6.0F;
         }
@@ -86,8 +81,7 @@ public class UnicodeFontRenderer implements IFontRenderer
     }
 
     @Override
-    public int getCharacterWidth(char c)
-    {
+    public int getCharacterWidth(char c) {
         return 0;
     }
 }

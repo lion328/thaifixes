@@ -25,21 +25,18 @@ package com.lion328.thaifixes.coremod.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleClassDetail implements IClassDetail
-{
+public class SimpleClassDetail implements IClassDetail {
 
     private Map<String, String> fields;
     private Map<String, Map<String, String>> method;
     private String name, obfuscatedName;
     private IClassDetail superClassMap;
 
-    public SimpleClassDetail(String name, String obfuscatedName)
-    {
+    public SimpleClassDetail(String name, String obfuscatedName) {
         this(name, obfuscatedName, null);
     }
 
-    public SimpleClassDetail(String name, String obfuscatedName, IClassDetail superClassMap)
-    {
+    public SimpleClassDetail(String name, String obfuscatedName, IClassDetail superClassMap) {
         fields = new HashMap<String, String>();
         method = new HashMap<String, Map<String, String>>();
         this.name = name;
@@ -48,24 +45,19 @@ public class SimpleClassDetail implements IClassDetail
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String getObfuscatedName()
-    {
+    public String getObfuscatedName() {
         return obfuscatedName;
     }
 
     @Override
-    public String getField(String name)
-    {
-        if (!fields.containsKey(name))
-        {
-            if (superClassMap != null)
-            {
+    public String getField(String name) {
+        if (!fields.containsKey(name)) {
+            if (superClassMap != null) {
                 return superClassMap.getField(name);
             }
             return name;
@@ -74,44 +66,36 @@ public class SimpleClassDetail implements IClassDetail
     }
 
     @Override
-    public String getMethod(String name, String desc)
-    {
-        if (!method.containsKey(name))
-        {
-            if (superClassMap != null)
-            {
+    public String getMethod(String name, String desc) {
+        if (!method.containsKey(name)) {
+            if (superClassMap != null) {
                 return superClassMap.getMethod(name, desc);
             }
             return name;
         }
         Map<String, String> map = method.get(name);
-        if (!map.containsKey(desc))
-        {
+        if (!map.containsKey(desc)) {
             return name;
         }
         return map.get(desc);
     }
 
     @Override
-    public void addField(String name, String obfuscatedName)
-    {
+    public void addField(String name, String obfuscatedName) {
         fields.put(name, obfuscatedName);
     }
 
     @Override
-    public void addMethod(String name, String obfuscatedName, String desc)
-    {
+    public void addMethod(String name, String obfuscatedName, String desc) {
         Map<String, String> map = method.get(name);
-        if (!method.containsKey(name))
-        {
+        if (!method.containsKey(name)) {
             method.put(name, map = new HashMap<String, String>());
         }
         map.put(desc, obfuscatedName);
     }
 
     @Override
-    public IClassDetail getSuperclassMap()
-    {
+    public IClassDetail getSuperclassMap() {
         return superClassMap;
     }
 }

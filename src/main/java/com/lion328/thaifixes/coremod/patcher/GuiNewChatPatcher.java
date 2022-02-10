@@ -34,49 +34,40 @@ import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class GuiNewChatPatcher implements IClassPatcher
-{
+public class GuiNewChatPatcher implements IClassPatcher {
 
     private IClassMap classMap;
 
-    public GuiNewChatPatcher(IClassMap classMap)
-    {
+    public GuiNewChatPatcher(IClassMap classMap) {
         this.classMap = classMap;
     }
 
-    public static MethodInsnNode getInjectedIntMethod(String methodName)
-    {
+    public static MethodInsnNode getInjectedIntMethod(String methodName) {
         return new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/InjectedConstants", methodName, "()I", false);
     }
 
     @Override
-    public String getClassName()
-    {
+    public String getClassName() {
         return classMap.getClass("net/minecraft/client/gui/GuiNewChat").getObfuscatedName().replace('/', '.');
     }
 
     @Override
-    public byte[] patch(byte[] original)
-    {
+    public byte[] patch(byte[] original) {
         ClassReader r = new ClassReader(original);
         ClassNode n = new ClassNode();
         r.accept(n, 0);
 
-        for (MethodNode mn : n.methods)
-        {
+        for (MethodNode mn : n.methods) {
             InsnList insns = mn.instructions;
 
-            for (int i = 0; i < insns.size(); i++)
-            {
+            for (int i = 0; i < insns.size(); i++) {
                 AbstractInsnNode insn = insns.get(i);
 
-                if (replaceFontHeight(insns, insn))
-                {
+                if (replaceFontHeight(insns, insn)) {
                     continue;
                 }
 
-                if (replaceChatLineHeight(insns, insn))
-                {
+                if (replaceChatLineHeight(insns, insn)) {
                     continue;
                 }
 
@@ -90,27 +81,22 @@ public class GuiNewChatPatcher implements IClassPatcher
         return w.toByteArray();
     }
 
-    private MethodInsnNode getConfigFontHeightMethod()
-    {
+    private MethodInsnNode getConfigFontHeightMethod() {
         return getInjectedIntMethod("getFontHeight");
     }
 
-    private boolean replaceFontHeight(InsnList insns, AbstractInsnNode insn)
-    {
-        if (insn.getOpcode() != Opcodes.GETFIELD)
-        {
+    private boolean replaceFontHeight(InsnList insns, AbstractInsnNode insn) {
+        if (insn.getOpcode() != Opcodes.GETFIELD) {
             return false;
         }
 
         FieldInsnNode fieldInsn = (FieldInsnNode) insn;
 
-        if (!fieldInsn.owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName()))
-        {
+        if (!fieldInsn.owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
             return false;
         }
 
-        if (!fieldInsn.desc.equals("I"))
-        {
+        if (!fieldInsn.desc.equals("I")) {
             return false;
         }
 
@@ -126,17 +112,14 @@ public class GuiNewChatPatcher implements IClassPatcher
         return true;
     }
 
-    private boolean replaceChatLineHeight(InsnList insns, AbstractInsnNode insn)
-    {
-        if (insn.getOpcode() != Opcodes.BIPUSH)
-        {
+    private boolean replaceChatLineHeight(InsnList insns, AbstractInsnNode insn) {
+        if (insn.getOpcode() != Opcodes.BIPUSH) {
             return false;
         }
 
         IntInsnNode intInsn = (IntInsnNode) insn;
 
-        if (intInsn.operand != 9)
-        {
+        if (intInsn.operand != 9) {
             return false;
         }
 
@@ -146,17 +129,14 @@ public class GuiNewChatPatcher implements IClassPatcher
         return true;
     }
 
-    private boolean replaceTextYOffset(InsnList insns, AbstractInsnNode insn)
-    {
-        if (insn.getOpcode() != Opcodes.BIPUSH)
-        {
+    private boolean replaceTextYOffset(InsnList insns, AbstractInsnNode insn) {
+        if (insn.getOpcode() != Opcodes.BIPUSH) {
             return false;
         }
 
         IntInsnNode intInsn = (IntInsnNode) insn;
 
-        if (intInsn.operand != 8)
-        {
+        if (intInsn.operand != 8) {
             return false;
         }
 

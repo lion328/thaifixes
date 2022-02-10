@@ -22,6 +22,7 @@
 
 package com.lion328.thaifixes;
 
+import com.lion328.thaifixes.renderer.IFontRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
@@ -32,8 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.lion328.thaifixes.renderer.IFontRenderer;
 
 public class FontRendererWrapper extends FakeFontRenderer {
 
