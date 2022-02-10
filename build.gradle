@@ -4,24 +4,22 @@ buildscript {
         maven { url = 'https://maven.minecraftforge.net/' }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'java'
 
 repositories {
     maven { url = 'https://maven.minecraftforge.net/' }
 }
 
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
-}
-
 version = '4.8.2-alpha'
 group = 'com.lion328.thaifixes'
 archivesBaseName = 'thaifixes'
+
+def coremodClass = 'com.lion328.thaifixes.coremod.CoremodLoader'
 
 compileJava {
     options.encoding = 'UTF-8'
@@ -29,7 +27,28 @@ compileJava {
     targetCompatibility = 1.8
 }
 
-def coremodClass = 'com.lion328.thaifixes.coremod.CoremodLoader'
+minecraft {
+    version = '1.12.2-14.23.5.2847'
+    runDir = 'run'
+
+    mappings = "snapshot_20171003"
+    clientJvmArgs = ["-Dfml.coreMods.load=${coremodClass}"]
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
 
 jar {
     manifest {
@@ -39,20 +58,3 @@ jar {
         ])
     }
 }
-
-minecraft {
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            jvmArg "-Dfml.coreMods.load=${coremodClass}"
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-        }
-    }
-
-    mappings channel: 'snapshot', version: '20171003-1.12'
-}
-
-jar.finalizedBy('reobfJar') 
