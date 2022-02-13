@@ -64,4 +64,12 @@ public class FakeFontRenderer {
     public void onCharRendered(char c) {
         throw new IllegalArgumentException();
     }
+
+    protected float getShadowShiftSize(char c, float f) {
+        throw new IllegalArgumentException();
+    }
+
+    protected float getBoldShiftSize(char c, float f) {
+        throw new IllegalArgumentException();
+    }
 }
