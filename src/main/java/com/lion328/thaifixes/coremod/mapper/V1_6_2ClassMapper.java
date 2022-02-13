@@ -37,7 +37,6 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -45,20 +44,15 @@ public class V1_6_2ClassMapper implements IClassMapper {
 
     @Override
     public boolean getMap(IJarReader jarReader, IClassMap classMap) throws IOException {
-        Map<String, String> map = new TreeMap<String, String>(new Comparator<String>() {
-
-            @Override
-            public int compare(String o1, String o2) {
-                boolean member1 = o1.indexOf(':') != -1;
-                boolean member2 = o2.indexOf(':') != -1;
-                if (member1 == member2) {
-                    return o1.compareTo(o2);
-                }
-                if (!member1 == member2) {
-                    return 1;
-                }
-                return -1;
-            }
+        Map<String, String> map = new TreeMap<>((a, b) -> {
+            // Sort class names before field/method names
+            boolean isFieldA = a.indexOf(':') != -1;
+            boolean isFieldB = b.indexOf(':') != -1;
+            if (isFieldA == isFieldB)
+                return a.compareTo(b);
+            if (isFieldA)
+                return b.length();
+            return -a.length();
         });
 
         byte[] b = jarReader.getClassBytes("net.minecraft.client.main.Main");
@@ -111,7 +105,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
         node = new ClassNode();
         reader.accept(node, 0);
 
-        byte bFlag = 0;
+        int bFlag = 0;
         L2:
         for (MethodNode method : node.methods) {
             if (bFlag >= 5) {
@@ -227,32 +221,50 @@ public class V1_6_2ClassMapper implements IClassMapper {
         bFlag = 0;
         L4:
         for (MethodNode method : node.methods) {
-            if (bFlag == 255) {
+            if (bFlag == 511) {
                 break;
             }
-            if (method.name.equals("<init>") && (bFlag & 64) == 0) {
+            if (method.name.equals("<init>")) {
                 insns = method.instructions;
-                for (i = 0; i < insns.size(); i++) {
-                    insn = insns.get(i);
+                if ((bFlag & 64) == 0) {
+                    for (i = 0; i < insns.size(); i++) {
+                        insn = insns.get(i);
 
-                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode) insn).var != 0) {
-                        continue;
+                        if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode) insn).var != 0) {
+                            continue;
+                        }
+
+                        insn = insns.get(++i);
+
+                        if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode) insn).var != 3) {
+                            continue;
+                        }
+
+                        insn = insns.get(++i);
+
+                        if (insn.getOpcode() != Opcodes.PUTFIELD) {
+                            continue;
+                        }
+
+                        map.put("net.minecraft.client.gui.FontRenderer.renderEngine:net.minecraft.client.renderer.texture.TextureManager", ((FieldInsnNode) insn).name);
+                        bFlag |= 64;
+                        break;
                     }
-
-                    insn = insns.get(++i);
-
-                    if (insn.getOpcode() != Opcodes.ALOAD || ((VarInsnNode) insn).var != 3) {
-                        continue;
+                }
+                if ((bFlag & 256) == 0) {
+                    for (insn = insns.getFirst(); insn != null; insn = insn.getNext()) {
+                        if (insn.getOpcode() == Opcodes.ILOAD && ((VarInsnNode) insn).var == 4) {
+                            insn = insn.getNext();
+                            if (insn.getOpcode() == Opcodes.PUTFIELD) {
+                                FieldInsnNode field = (FieldInsnNode) insn;
+                                if ("Z".equals(field.desc)) {
+                                    map.put("net.minecraft.client.gui.FontRenderer.unicodeFlag:Z", field.name);
+                                    bFlag |= 256;
+                                    break;
+                                }
+                            }
+                        }
                     }
-
-                    insn = insns.get(++i);
-
-                    if (insn.getOpcode() != Opcodes.PUTFIELD) {
-                        continue;
-                    }
-
-                    map.put("net.minecraft.client.gui.FontRenderer.renderEngine:net.minecraft.client.renderer.texture.TextureManager", ((FieldInsnNode) insn).name);
-                    bFlag |= 64;
                 }
             } else if (method.desc.equals("(CZ)F")) {
                 insns = method.instructions;
@@ -421,6 +433,6 @@ public class V1_6_2ClassMapper implements IClassMapper {
             }
         }
 
-        return map.size() >= 21;
+        return map.size() >= 22;
     }
 }
