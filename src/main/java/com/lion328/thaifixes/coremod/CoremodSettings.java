@@ -25,6 +25,7 @@ package com.lion328.thaifixes.coremod;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.coremod.mapper.IClassMapper;
 import com.lion328.thaifixes.coremod.mapper.SimpleClassMap;
+import com.lion328.thaifixes.coremod.mapper.V1_6_2ClassMapper;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.MinecraftClassLoaderJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.TransformedJarReader;
@@ -36,10 +37,8 @@ import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,7 +46,6 @@ import java.lang.reflect.Method;
 public class CoremodSettings {
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
-    public static final String DEFAULT_ORIGINAL_CLASSES_PATH = "/assets/thaifixes/classes/";
     public static final String BLACKBOARD_DEOBFENV_KEY = "fml.deobfuscatedEnvironment";
 
     private static IClassMap obfuscatedClassmap, defaultClassmap;
@@ -114,41 +112,11 @@ public class CoremodSettings {
                 reader = new TransformedJarReader(mcJarReader, deobfTransformer, deobfTransformer);
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(CoremodSettings.class.getResourceAsStream("/assets/thaifixes/config/classmap/classlist")));
-            String s;
-
             try {
-                boolean valid = false;
+                IClassMapper cm = new V1_6_2ClassMapper();
 
-                while ((s = br.readLine()) != null) {
-                    if (s.length() == 0) {
-                        continue;
-                    }
-
-                    classMap = new SimpleClassMap();
-
-                    Class<?> clazz = Class.forName(s);
-                    Object o = clazz.newInstance();
-
-                    if (!(o instanceof IClassMapper)) {
-                        LOGGER.error(s + " is invalid IClassMapper, skipped");
-                        continue;
-                    }
-
-                    IClassMapper cm = (IClassMapper) o;
-
-                    if (!cm.getMap(reader, classMap)) {
-                        LOGGER.error(s + " can't complete mapping, skipped");
-                        classMap = new SimpleClassMap();
-                        continue;
-                    }
-
-                    valid = true;
-                    break;
-                }
-
-                if (!valid) {
-                    LOGGER.error("Runtime mapping not working");
+                if (!cm.getMap(reader, classMap)) {
+                    LOGGER.error("Runtime mapping is not working.");
                 }
             } catch (Exception e) {
                 LOGGER.catching(e);
