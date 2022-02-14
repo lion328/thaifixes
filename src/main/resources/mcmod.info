@@ -1,8 +1,8 @@
 [
     {
-        "modid": "${modid}",
-        "name": "${name}",
-        "description": "Improve Thai characters support in Minecraft.",
+        "modid": "thaifixes",
+        "name": "ThaiFixes",
+        "description": "Improve Thai characters support in Minecraft. §nทดสอบ หนึ่ง สี่ ห้า หก เปลี่ยนลุกนั่ง §lทดสอบ หนึ่ง สี่ ห้า หก เปลี่ยนลุกนั่ง Improve Thai characters support in Minecraft.",
         "version": "${version}",
         "mcversion": "${mcversion}",
         "url": "http://thaifixes.lion328.com/",
