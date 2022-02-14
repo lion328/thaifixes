@@ -34,9 +34,11 @@ public class UnicodeFontRenderer extends ThaiFontRenderer {
 
     @Override
     public void onWrapperChanged() {
+        if (getWrapper() == null)
+            return;
+
         int aaWidth = (getWrapper().getRawUnicodeWidth(ThaiUtil.SARA_AA) & 15) + 1;
         int amWIdth = (getWrapper().getRawUnicodeWidth(ThaiUtil.SARA_AM) & 15) + 1;
-        saraAmDisplayWidth = aaWidth / 2.0F + 1.0F;
         saraAmDisplayShift = -(amWIdth - aaWidth);
         saraAmDisplayWidth = (aaWidth + saraAmDisplayShift) / 2.0F + 1.0F;
     }
