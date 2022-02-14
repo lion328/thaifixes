@@ -7,3 +7,5 @@ thaifixes.config.mcpx=MCPX Font Style
 thaifixes.config.mcpx.title=ThaiFixes Configuration - MCPX Font Style
 thaifixes.config.mcpx.enableChatResize=Enable chat box resize (MCPX)
 thaifixes.config.mcpx.enableChatResize.desc=When set to true, chat box in the game will be resized.
+thaifixes.config.mcpx.largeMCPXShadow=Enable large shadow (MCPX)
+thaifixes.config.mcpx.largeMCPXShadow.desc=When set to true, characters will have a larger shadow, which is the same size as the ASCII font.

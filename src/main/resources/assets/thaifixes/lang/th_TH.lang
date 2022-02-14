@@ -7,3 +7,5 @@ thaifixes.config.mcpx=รูปแบบฟอนต์ MCPX
 thaifixes.config.mcpx.title=การตั้งค่า ThaiFixes - รูปแบบฟอนต์ MCPX
 thaifixes.config.mcpx.enableChatResize=ปรับขนาดกล่องแชท (MCPX)
 thaifixes.config.mcpx.enableChatResize.desc=เมื่อปรับเป็น true กล่องแชทในเกมจะเปลี่ยนขนาด
+thaifixes.config.mcpx.largeMCPXShadow=เพิ่มขนาดเงาตัวอักษร (MCPX)
+thaifixes.config.mcpx.largeMCPXShadow.desc=เมื่อปรับเป็น true เงาของตัวอักษรจะมีขนาดใหญ่ขึ้นเท่ากับฟอนต์ ASCII ของเกม

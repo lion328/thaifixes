@@ -26,6 +26,7 @@ import com.lion328.thaifixes.FontRendererWrapper;
 import com.lion328.thaifixes.GLFunctions;
 import com.lion328.thaifixes.ThaiFixes;
 import com.lion328.thaifixes.ThaiUtil;
+import com.lion328.thaifixes.config.ThaiFixesConfiguration;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
@@ -161,5 +162,10 @@ public class MCPXFontRenderer extends ThaiFontRenderer {
         }
 
         return ret;
+    }
+
+    @Override
+    public float getShadowShiftSize(char c, float shift) {
+        return ThaiFixesConfiguration.isLargeMCPXShadowEanbled() ? 0 : super.getShadowShiftSize(c, shift);
     }
 }
