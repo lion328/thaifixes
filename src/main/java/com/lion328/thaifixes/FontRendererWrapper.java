@@ -23,6 +23,7 @@
 package com.lion328.thaifixes;
 
 import com.lion328.thaifixes.renderer.IFontRenderer;
+import com.lion328.thaifixes.renderer.StubFontRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
@@ -37,7 +38,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     private Map<String, ResourceLocation> resourceLocationPool = new HashMap<>();
 
-    private IFontRenderer renderer;
+    private IFontRenderer renderer = StubFontRenderer.INSTANCE;
     private TextureManager renderEngine;
     private char lastChar = 0;
     private float lastPosX = Float.NaN;
@@ -64,11 +65,11 @@ public class FontRendererWrapper extends FakeFontRenderer {
     }
 
     public void setRenderer(IFontRenderer newRenderer) {
-        if (renderer != null)
-            renderer.setWrapper(null);
+        if (newRenderer == null)
+            newRenderer = StubFontRenderer.INSTANCE;
 
-        if (newRenderer != null)
-            newRenderer.setWrapper(this);
+        renderer.setWrapper(null);
+        newRenderer.setWrapper(this);
         renderer = newRenderer;
     }
 
@@ -106,7 +107,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
     public float renderCharAtPos(int asciiPos, char c, boolean italic) {
         float ret;
 
-        if (renderer != null && renderer.isSupportedCharacter(c))
+        if (renderer.isSupportedCharacter(c))
             ret = renderer.renderCharacter(c, italic);
         else
             ret = super.renderCharAtPos(asciiPos, c, italic);
@@ -119,7 +120,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
     public float renderCharAtPos(char c, boolean italic) {
         float ret;
 
-        if (renderer != null && renderer.isSupportedCharacter(c))
+        if (renderer.isSupportedCharacter(c))
             ret = renderer.renderCharacter(c, italic);
         else
             ret = super.renderCharAtPos(c, italic);
@@ -130,7 +131,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     @Override
     public int getCharWidth(char c) {
-        if (renderer != null && renderer.isSupportedCharacter(c))
+        if (renderer.isSupportedCharacter(c))
             return renderer.getCharacterWidth(c);
         return super.getCharWidth(c);
     }
@@ -138,19 +139,17 @@ public class FontRendererWrapper extends FakeFontRenderer {
     @Override
     public void renderStringAtPos(String text, boolean shadow) {
         lastChar = 0;
-        if (renderer != null)
-            text = renderer.beforeStringRendered(text);
+        text = renderer.beforeStringRendered(text);
 
         super.renderStringAtPos(text, shadow);
 
-        if (renderer != null)
-            renderer.afterStringRendered();
+        renderer.afterStringRendered();
         lastChar = 0;
     }
 
     @Override
     public float getCharWidthFloat(char c) {
-        if (renderer != null && renderer.isSupportedCharacter(c))
+        if (renderer.isSupportedCharacter(c))
             return (float) renderer.getCharacterWidth(c);
         return super.getCharWidthFloat(c);
     }
@@ -158,25 +157,22 @@ public class FontRendererWrapper extends FakeFontRenderer {
     @Override
     public void onCharRenderedThaiFixes(char c) {
         lastChar = c;
-
-        if (renderer != null)
-            renderer.afterCharacterRendered(c);
+        renderer.afterCharacterRendered(c);
     }
 
     @Override
     protected float getShadowShiftSizeThaiFixes(char c, float f) {
-        if (renderer != null) {
-            renderer.beforeCharacterRendered(c);
+        renderer.beforeCharacterRendered(c);
 
-            if (renderer.isSupportedCharacter(c))
-                return renderer.getShadowShiftSize(c, f);
-        }
+        if (renderer.isSupportedCharacter(c))
+            return renderer.getShadowShiftSize(c, f);
+
         return f;
     }
 
     @Override
     protected float getBoldShiftSizeThaiFixes(char c, float f) {
-        if (renderer != null && renderer.isSupportedCharacter(c))
+        if (renderer.isSupportedCharacter(c))
             return renderer.getBoldShiftSize(c, f);
         return f;
     }
