@@ -49,7 +49,6 @@ public class ThaiFixes {
 
     private FontRendererWrapper fontRendererWrapper;
     private IFontRenderer currentRenderer;
-    private boolean disabled;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -119,18 +118,12 @@ public class ThaiFixes {
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equals(ModInformation.MODID)) {
             ThaiFixesConfiguration.syncConfig();
-
-            try {
-                reloadRenderer();
-            } catch (InstantiationException | IllegalAccessException e) {
-                getLogger().catching(e);
-            }
-
+            reloadRenderer();
             fontRendererWrapper.setUnicodeFlag(Minecraft.getMinecraft().isUnicode());
         }
     }
 
-    public void reloadRenderer() throws InstantiationException, IllegalAccessException {
+    public void reloadRenderer() {
         if (fontRendererWrapper == null) {
             return;
         }
@@ -139,14 +132,10 @@ public class ThaiFixes {
 
         fontRendererWrapper.setRenderer(null);
 
-        if (!disabled && fontStyle != FontStyle.DISABLE) {
-            currentRenderer = fontStyle.newInstance();
-            fontRendererWrapper.setRenderer(currentRenderer);
+        currentRenderer = fontStyle.newInstance();
+        fontRendererWrapper.setRenderer(currentRenderer);
 
-            getLogger().info("Using " + fontStyle.getRendererClass().toString() + " as font renderer");
-        } else {
-            getLogger().info("ThaiFixes is disabled");
-        }
+        getLogger().info("Using " + currentRenderer.getClass().getName() + " as font renderer");
     }
 
     public static Logger getLogger() {
