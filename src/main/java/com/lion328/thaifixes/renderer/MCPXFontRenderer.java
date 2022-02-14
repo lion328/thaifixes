@@ -98,8 +98,32 @@ public class MCPXFontRenderer extends ThaiFontRenderer {
     }
 
     @Override
+    public String beforeStringRendered(String text) {
+        StringBuilder sb = new StringBuilder();
+        char[] chars = text.toCharArray();
+        for (int i = 0; i < text.length(); i++) {
+            char cur = chars[i];
+            if (cur == ThaiUtil.SARA_AM && i > 0) {
+                char prev = chars[i - 1];
+
+                sb.append(ThaiUtil.NIKHAHIT);
+                if (ThaiUtil.isUpperThaiChar(prev)) {
+                    sb.append(prev);
+                    sb.deleteCharAt(i - 1);
+                }
+                sb.append(ThaiUtil.SARA_AA);
+
+                continue;
+            }
+            sb.append(cur);
+        }
+        return sb.toString();
+    }
+
+    @Override
     public float renderCharacter(char c, boolean italic) {
         FontRendererWrapper wrapper = getWrapper();
+        char lastChar = wrapper.getLastCharacterRendered();
 
         int offset = c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1;
 
@@ -117,14 +141,14 @@ public class MCPXFontRenderer extends ThaiFontRenderer {
                 cPosY += 2.0F;
             }
 
-            if (ThaiUtil.isVeryLongTailThaiChar(wrapper.getLastCharacterRendered())) {
+            if (ThaiUtil.isVeryLongTailThaiChar(lastChar)) {
                 cPosY -= 1.0F;
             }
 
-            if (ThaiUtil.isUpperThaiChar(wrapper.getLastCharacterRendered())) {
+            if (ThaiUtil.isUpperThaiChar(lastChar)) {
                 cPosY -= 2.25F;
             }
-        } else if (c == ThaiUtil.SARA_UM) {
+        } else if (c == ThaiUtil.SARA_AM) {
             cPosX -= 2.0F;
         }
 
@@ -157,7 +181,7 @@ public class MCPXFontRenderer extends ThaiFontRenderer {
 
         int ret = thaiCharWidth[c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1];
 
-        if (c == ThaiUtil.SARA_UM) {
+        if (c == ThaiUtil.SARA_AM) {
             return ret - 2;
         }
 

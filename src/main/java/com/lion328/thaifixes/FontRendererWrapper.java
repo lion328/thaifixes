@@ -138,6 +138,9 @@ public class FontRendererWrapper extends FakeFontRenderer {
     public void renderStringAtPos(String text, boolean shadow) {
         lastChar = 0;
 
+        for (IFontRenderer renderer : renderers)
+            text = renderer.beforeStringRendered(text);
+
         super.renderStringAtPos(text, shadow);
 
         for (IFontRenderer renderer : renderers)

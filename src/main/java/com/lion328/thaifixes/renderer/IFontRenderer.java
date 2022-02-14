@@ -66,6 +66,14 @@ public interface IFontRenderer {
     int getCharacterWidth(char c);
 
     /**
+     * A callback before a string is rendered.
+     *
+     * @param text Text to be rendered.
+     * @return Transformed text
+     */
+    String beforeStringRendered(String text);
+
+    /**
      * A callback before a character is rendered.
      *
      * @param c Character.

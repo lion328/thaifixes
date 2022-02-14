@@ -42,6 +42,11 @@ public abstract class AbstractFontRenderer implements IFontRenderer {
     }
 
     @Override
+    public String beforeStringRendered(String text) {
+        return text;
+    }
+
+    @Override
     public void beforeCharacterRendered(char c) {
     }
 

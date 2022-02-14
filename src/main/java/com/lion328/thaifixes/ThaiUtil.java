@@ -32,6 +32,7 @@ public class ThaiUtil {
     public static final String LONG_TAIL_CHARS = "\u0E1B\u0E1F\u0E1D\u0E2C";
     public static final char SARA_AM = '\u0E33';
     public static final char SARA_AA = '\u0E32';
+    public static final char NIKHAHIT = '\u0E4D';
 
     public static boolean isThaiChar(char c) {
         return c >= THAI_CHAR_RANGE_MIN && c <= THAI_CHAR_RANGE_MAX;
