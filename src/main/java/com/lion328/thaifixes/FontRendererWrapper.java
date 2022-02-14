@@ -29,6 +29,7 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +52,15 @@ public class FontRendererWrapper extends FakeFontRenderer {
         super(settings, asciiTex, texMan, unicode);
 
         renderEngine = texMan;
+    }
+
+    public boolean isSuperclassPatched() {
+        try {
+            Field field = getClass().getSuperclass().getField("PATCHED_BY_THAIFIXES");
+            return (boolean) field.get(null);
+        } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            return false;
+        }
     }
 
     public void setRenderer(IFontRenderer newRenderer) {

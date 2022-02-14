@@ -28,6 +28,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class FakeFontRenderer {
 
+    public static final boolean PATCHED_BY_THAIFIXES = false;
+
     protected float posX;
     protected float posY;
     protected final byte[] glyphWidth = null;

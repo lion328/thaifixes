@@ -78,6 +78,11 @@ public class ThaiFixes {
                 return;
             }
 
+            if (!((FontRendererWrapper) fontRenderer).isSuperclassPatched()) {
+                getLogger().error("FontRenderer is not patched!");
+                return;
+            }
+
             if (FontRendererWrapper.class.getSuperclass() == FakeFontRenderer.class) {
                 getLogger().error("Unpatched FontRendererWrapper, converting to default");
 

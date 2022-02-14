@@ -121,9 +121,15 @@ public class FontRendererPatcher implements IClassPatcher {
         mv.visitEnd();
 
         patchRenderStringAtPos(n, w);
+        patchIndicator(w);
 
         n.accept(w);
         return w.toByteArray();
+    }
+
+    private void patchIndicator(ClassVisitor visitor) {
+        visitor.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
+                "PATCHED_BY_THAIFIXES", "Z", null, true).visitEnd();
     }
 
     private void patchRenderStringAtPos(ClassNode classNode, ClassVisitor visitor) {
