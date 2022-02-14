@@ -38,7 +38,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     private Map<String, ResourceLocation> resourceLocationPool = new HashMap<>();
 
-    private IFontRenderer renderer = StubFontRenderer.INSTANCE;
+    private IFontRenderer renderer = new StubFontRenderer();
     private TextureManager renderEngine;
     private char lastChar = 0;
     private float lastPosX = Float.NaN;
@@ -65,9 +65,6 @@ public class FontRendererWrapper extends FakeFontRenderer {
     }
 
     public void setRenderer(IFontRenderer newRenderer) {
-        if (newRenderer == null)
-            newRenderer = StubFontRenderer.INSTANCE;
-
         renderer.setWrapper(null);
         newRenderer.setWrapper(this);
         renderer = newRenderer;

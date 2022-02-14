@@ -130,8 +130,6 @@ public class ThaiFixes {
 
         FontStyle fontStyle = ThaiFixesConfiguration.getFontStyle();
 
-        fontRendererWrapper.setRenderer(null);
-
         currentRenderer = fontStyle.newInstance();
         fontRendererWrapper.setRenderer(currentRenderer);
 

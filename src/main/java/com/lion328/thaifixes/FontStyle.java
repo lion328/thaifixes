@@ -44,7 +44,7 @@ public enum FontStyle {
     DISABLE("Disable") {
         @Override
         public IFontRenderer newInstance() {
-            return StubFontRenderer.INSTANCE;
+            return new StubFontRenderer();
         }
     };
 

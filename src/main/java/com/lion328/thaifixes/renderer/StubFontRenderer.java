@@ -23,11 +23,6 @@
 package com.lion328.thaifixes.renderer;
 
 public class StubFontRenderer extends AbstractFontRenderer {
-    public static final StubFontRenderer INSTANCE = new StubFontRenderer();
-
-    protected StubFontRenderer() {
-    }
-
     @Override
     public boolean isSupportedCharacter(char c) {
         return false;
