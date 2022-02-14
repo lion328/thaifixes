@@ -53,44 +53,80 @@ public class MinecraftPatcher implements IClassPatcher {
         ClassNode n = new ClassNode();
         r.accept(n, 0);
 
-        OUT:
-        for (MethodNode mn : n.methods) {
-            InsnList insns = mn.instructions;
-            for (int i = 0; i < insns.size(); i++) {
-                AbstractInsnNode insn = insns.get(i);
-                if (insn.getOpcode() != Opcodes.LDC) {
-                    continue;
-                }
-                LdcInsnNode ldc = (LdcInsnNode) insn;
-                if (!ldc.cst.equals("textures/font/ascii.png")) {
-                    continue;
-                }
-                for (i--; i < insns.size(); i--) {
-                    if (insns.get(i).getOpcode() != Opcodes.NEW) {
-                        continue;
-                    }
-                    TypeInsnNode type = (TypeInsnNode) insns.get(i);
-                    if (type.desc.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
-                        type.desc = "com/lion328/thaifixes/FontRendererWrapper";
-                        break;
-                    }
-                }
-                for (; i < insns.size(); i++) {
-                    if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL) {
-                        continue;
-                    }
-                    if (((MethodInsnNode) insns.get(i)).owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
-                        MethodInsnNode method = (MethodInsnNode) insns.get(i);
-                        method.owner = "com/lion328/thaifixes/FontRendererWrapper";
-                        break;
-                    }
-                }
-                break OUT;
-            }
-        }
+        for (MethodNode mn : n.methods)
+            if (patchFontRendererField(mn))
+                break;
+        for (MethodNode mn : n.methods)
+            if (patchLanguageManagerField(mn))
+                break;
 
         ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         n.accept(w);
         return w.toByteArray();
+    }
+
+    private boolean patchFontRendererField(MethodNode node) {
+        InsnList insns = node.instructions;
+        for (int i = 0; i < insns.size(); i++) {
+            AbstractInsnNode insn = insns.get(i);
+            if (insn.getOpcode() != Opcodes.LDC) {
+                continue;
+            }
+            LdcInsnNode ldc = (LdcInsnNode) insn;
+            if (!ldc.cst.equals("textures/font/ascii.png")) {
+                continue;
+            }
+            for (i--; i < insns.size(); i--) {
+                if (insns.get(i).getOpcode() != Opcodes.NEW) {
+                    continue;
+                }
+                TypeInsnNode type = (TypeInsnNode) insns.get(i);
+                if (type.desc.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+                    type.desc = "com/lion328/thaifixes/FontRendererWrapper";
+                    break;
+                }
+            }
+            for (; i < insns.size(); i++) {
+                if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL) {
+                    continue;
+                }
+                if (((MethodInsnNode) insns.get(i)).owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+                    MethodInsnNode method = (MethodInsnNode) insns.get(i);
+                    method.owner = "com/lion328/thaifixes/FontRendererWrapper";
+                    break;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean patchLanguageManagerField(MethodNode node) {
+        String orig = classMap.getClass("net/minecraft/client/resources/LanguageManager").getObfuscatedName();
+        String ours = "com/lion328/thaifixes/ThaiFixesLanguageManager";
+
+        InsnList insns = node.instructions;
+        for (int i = 0; i < insns.size(); i++) {
+            if (insns.get(i).getOpcode() != Opcodes.NEW)
+                continue;
+
+            TypeInsnNode type = (TypeInsnNode) insns.get(i);
+            if (!orig.equals(type.desc))
+                continue;
+            type.desc = ours;
+
+            for (; i < insns.size(); i++) {
+                if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL)
+                    continue;
+
+                if (orig.equals(((MethodInsnNode) insns.get(i)).owner)) {
+                    MethodInsnNode method = (MethodInsnNode) insns.get(i);
+                    method.owner = ours;
+                    break;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

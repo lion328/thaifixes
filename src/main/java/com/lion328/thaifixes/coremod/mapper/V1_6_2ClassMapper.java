@@ -149,6 +149,31 @@ public class V1_6_2ClassMapper implements IClassMapper {
                             }
                             map.put("net.minecraft.client.settings.GameSettings", methodInsn.desc.substring(2, methodInsn.desc.indexOf(';')));
                             map.put("net.minecraft.client.renderer.texture.TextureManager", methodInsn.desc.substring(6 + map.get("net.minecraft.client.settings.GameSettings").length() + map.get("net.minecraft.util.ResourceLocation").length(), methodInsn.desc.lastIndexOf(';')));
+
+                            String fontRendererType = "L" + map.get("net.minecraft.client.gui.FontRenderer") + ";";
+
+                            while (true) {
+                                while ((insn = insns.get(++j)).getOpcode() != Opcodes.GETFIELD) {
+                                    ;
+                                }
+                                fieldInsn = (FieldInsnNode) insn;
+                                if (fieldInsn.desc.equals(fontRendererType)) {
+                                    break;
+                                }
+                            }
+                            while (true) {
+                                while ((insn = insns.get(++j)).getOpcode() != Opcodes.GETFIELD) {
+                                    ;
+                                }
+                                fieldInsn = (FieldInsnNode) insn;
+                                if (!fieldInsn.desc.equals(fontRendererType)) {
+                                    break;
+                                }
+                            }
+
+                            map.put("net.minecraft.client.resources.LanguageManager", fieldInsn.desc.substring(1, fieldInsn.desc.indexOf(';')));
+                            map.put("net.minecraft.client.Minecraft.mcLanguageManager:Lnet/minecraft/client/resources/LanguageManager;", fieldInsn.name);
+
                             bFlag++;
                             continue L2;
                         } else if (cst.equals("crash-reports")) {
@@ -433,6 +458,6 @@ public class V1_6_2ClassMapper implements IClassMapper {
             }
         }
 
-        return map.size() >= 22;
+        return map.size() >= 24;
     }
 }

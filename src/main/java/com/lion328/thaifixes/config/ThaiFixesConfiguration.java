@@ -39,6 +39,7 @@ public class ThaiFixesConfiguration {
     private static FontStyle fontStyle;
     private static boolean enableMCPXChatResize;
     private static boolean largeMCPXShadow;
+    private static boolean asciiFontWithMCPX;
 
     static {
         avaliableFontStyle = FontStyle.asStringArray();
@@ -64,6 +65,10 @@ public class ThaiFixesConfiguration {
         return fontStyle == FontStyle.MCPX && largeMCPXShadow;
     }
 
+    public static boolean isASCIIFontWithMCPXEnabled() {
+        return fontStyle == FontStyle.MCPX && asciiFontWithMCPX;
+    }
+
     public static void syncConfig() {
         fontStyle = FontStyle.fromString(configuration.getString("fontStyle", Configuration.CATEGORY_GENERAL, "Unicode",
                 I18n.format("thaifixes.config.fontStyle.desc"),
@@ -76,6 +81,10 @@ public class ThaiFixesConfiguration {
         largeMCPXShadow = configuration.getBoolean("largeMCPXShadow", CATEGORY_MCPX, true,
                 I18n.format("thaifixes.config.mcpx.largeMCPXShadow.desc"),
                 "thaifixes.config.mcpx.largeMCPXShadow");
+
+        asciiFontWithMCPX = configuration.getBoolean("asciiFontWithMCPX", CATEGORY_MCPX, true,
+                I18n.format("thaifixes.config.mcpx.asciiFontWithMCPX.desc"),
+                "thaifixes.config.mcpx.asciiFontWithMCPX");
 
         if (configuration.hasChanged()) {
             configuration.save();
