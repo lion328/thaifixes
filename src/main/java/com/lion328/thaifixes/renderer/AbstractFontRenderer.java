@@ -30,11 +30,15 @@ public abstract class AbstractFontRenderer implements IFontRenderer {
     @Override
     public final void setWrapper(FontRendererWrapper wrapper) {
         this.wrapper = wrapper;
+        onWrapperChanged();
     }
 
     @Override
     public final FontRendererWrapper getWrapper() {
         return wrapper;
+    }
+
+    public void onWrapperChanged() {
     }
 
     @Override

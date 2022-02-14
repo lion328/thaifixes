@@ -29,38 +29,54 @@ import org.lwjgl.opengl.GL11;
 
 public class UnicodeFontRenderer extends ThaiFontRenderer {
 
+    private float saraAmDisplayWidth = Float.NaN;
+    private float saraAmDisplayShift = Float.NaN;
+
+    @Override
+    public void onWrapperChanged() {
+        int aaWidth = (getWrapper().getRawUnicodeWidth(ThaiUtil.SARA_AA) & 15) + 1;
+        int amWIdth = (getWrapper().getRawUnicodeWidth(ThaiUtil.SARA_AM) & 15) + 1;
+        saraAmDisplayWidth = aaWidth / 2.0F + 1.0F;
+        saraAmDisplayShift = -(amWIdth - aaWidth);
+        saraAmDisplayWidth = (aaWidth + saraAmDisplayShift) / 2.0F + 1.0F;
+    }
+
     @Override
     public boolean isSupportedCharacter(char c) {
-        return ThaiUtil.isSpecialThaiChar(c);
+        return ThaiUtil.isSpecialThaiChar(c) || c == ThaiUtil.SARA_AM;
     }
 
     @Override
     public float renderCharacter(char c, boolean italic) {
         FontRendererWrapper wrapper = getWrapper();
 
-        wrapper.loadUnicodeTexture(0x0E);
+        int rawWidth = wrapper.getRawUnicodeWidth(c) & 0xFF;
+        float startTexcoordX = (float) (rawWidth >>> 4);
+        float charWidth = (float) ((rawWidth & 15) + 1);
 
+        float posXShift = -((charWidth - startTexcoordX) / 2.0F + 1.0F);
         float posYShift = 0.0F;
         float height = 2.99F;
 
-        if (ThaiUtil.isLowerThaiChar(c)) {
+        if (c == ThaiUtil.SARA_AM) {
+            posXShift = saraAmDisplayShift;
+            height = 8.0F;
+        } else if (ThaiUtil.isLowerThaiChar(c)) {
             height = 1.99F;
             posYShift = 6.0F;
         }
 
         float heightX2 = height * 2;
 
-        int rawWidth = wrapper.getRawUnicodeWidth(c) & 0xFF;
-
-        float startTexcoordX = (float) (rawWidth >>> 4);
-        float charWidth = (float) ((rawWidth & 15) + 1);
         float texcoordX = (float) (c % 16 * 16) + startTexcoordX;
         float texcoordY = (float) ((c & 255) / 16 * 16) + (posYShift * 2);
         float texcoordXEnd = charWidth - startTexcoordX - 0.02F;
         float skew = italic ? 1.0F : 0.0F;
 
-        float posX = wrapper.getX() - ((charWidth - startTexcoordX) / 2.0F + 1.0F);
+        float posX = wrapper.getX() + posXShift;
         float posY = wrapper.getY() + posYShift;
+
+        wrapper.loadUnicodeTexture(0x0E);
 
         GLFunctions.begin(GL11.GL_TRIANGLE_STRIP);
         GLFunctions.texCoord(texcoordX / 256.0F, texcoordY / 256.0F);
@@ -72,11 +88,17 @@ public class UnicodeFontRenderer extends ThaiFontRenderer {
         GLFunctions.texCoord((texcoordX + texcoordXEnd) / 256.0F, (texcoordY + heightX2) / 256.0F);
         GLFunctions.vertex(posX + texcoordXEnd / 2.0F - skew, posY + height, 0.0F);
         GLFunctions.end();
+
+        if (c == ThaiUtil.SARA_AM)
+            return saraAmDisplayWidth;
+
         return 0.0F;
     }
 
     @Override
     public int getCharacterWidth(char c) {
+        if (c == ThaiUtil.SARA_AM)
+            return (int) saraAmDisplayWidth;
         return 0;
     }
 }

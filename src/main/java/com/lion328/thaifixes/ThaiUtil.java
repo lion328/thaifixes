@@ -31,6 +31,7 @@ public class ThaiUtil {
     public static final String UPPER_CHARS = "\u0E31\u0E34\u0E35\u0E36\u0E37\u0E47\u0E4C\u0E4D\u0E4E" + SPECIAL_UPPER_CHARS;
     public static final String LONG_TAIL_CHARS = "\u0E1B\u0E1F\u0E1D\u0E2C";
     public static final char SARA_AM = '\u0E33';
+    public static final char SARA_AA = '\u0E32';
 
     public static boolean isThaiChar(char c) {
         return c >= THAI_CHAR_RANGE_MIN && c <= THAI_CHAR_RANGE_MAX;
