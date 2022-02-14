@@ -156,7 +156,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
     }
 
     @Override
-    public void onCharRendered(char c) {
+    public void onCharRenderedThaiFixes(char c) {
         lastChar = c;
 
         if (renderer != null)
@@ -164,7 +164,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
     }
 
     @Override
-    protected float getShadowShiftSize(char c, float f) {
+    protected float getShadowShiftSizeThaiFixes(char c, float f) {
         if (renderer != null) {
             renderer.beforeCharacterRendered(c);
 
@@ -175,7 +175,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
     }
 
     @Override
-    protected float getBoldShiftSize(char c, float f) {
+    protected float getBoldShiftSizeThaiFixes(char c, float f) {
         if (renderer != null && renderer.isSupportedCharacter(c))
             return renderer.getBoldShiftSize(c, f);
         return f;

@@ -63,15 +63,15 @@ public class FakeFontRenderer {
         throw new IllegalArgumentException();
     }
 
-    public void onCharRendered(char c) {
+    public void onCharRenderedThaiFixes(char c) {
         throw new IllegalArgumentException();
     }
 
-    protected float getShadowShiftSize(char c, float f) {
+    protected float getShadowShiftSizeThaiFixes(char c, float f) {
         throw new IllegalArgumentException();
     }
 
-    protected float getBoldShiftSize(char c, float f) {
+    protected float getBoldShiftSizeThaiFixes(char c, float f) {
         throw new IllegalArgumentException();
     }
 }

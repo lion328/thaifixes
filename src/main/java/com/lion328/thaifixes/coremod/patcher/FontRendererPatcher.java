@@ -214,10 +214,10 @@ public class FontRendererPatcher implements IClassPatcher {
         insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
         insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
         insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
-                "onCharRendered", "(C)V", false));
+                "onCharRenderedThaiFixes", "(C)V", false));
         insns.insertBefore(jumpInsn, insertList);
 
-        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "onCharRendered", "(C)V",
+        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "onCharRenderedThaiFixes", "(C)V",
                 null, null);
         mv.visitInsn(Opcodes.RETURN);
         mv.visitEnd();
@@ -265,14 +265,14 @@ public class FontRendererPatcher implements IClassPatcher {
         insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
         insertList.add(new VarInsnNode(Opcodes.FLOAD, originalShiftVar));
         insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
-                "getShadowShiftSize", "(CF)F", false));
+                "getShadowShiftSizeThaiFixes", "(CF)F", false));
         insertList.add(new VarInsnNode(Opcodes.FSTORE, shiftVar));
 
         setShiftVarInsn.var = originalShiftVar;
         insns.insert(setShiftVarInsn, insertList);
 
         // Add a new method for interception.
-        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "getShadowShiftSize", "(CF)F",
+        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "getShadowShiftSizeThaiFixes", "(CF)F",
                 null, null);
         mv.visitVarInsn(Opcodes.FLOAD, 2);
         mv.visitInsn(Opcodes.FRETURN);
@@ -333,7 +333,7 @@ public class FontRendererPatcher implements IClassPatcher {
                 insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
                 insertList.add(new VarInsnNode(Opcodes.FLOAD, originalShiftVar));
                 insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
-                        "getBoldShiftSize", "(CF)F", false));
+                        "getBoldShiftSizeThaiFixes", "(CF)F", false));
                 insertList.add(new InsnNode(Opcodes.DUP));
                 insertList.add(new VarInsnNode(Opcodes.FSTORE, boldShiftVar));
 
@@ -346,7 +346,7 @@ public class FontRendererPatcher implements IClassPatcher {
             }
         }
 
-        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "getBoldShiftSize", "(CF)F",
+        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "getBoldShiftSizeThaiFixes", "(CF)F",
                 null, null);
         mv.visitVarInsn(Opcodes.FLOAD, 2);
         mv.visitInsn(Opcodes.FRETURN);
