@@ -133,13 +133,11 @@ public class ThaiFixes {
 
         FontStyle fontStyle = ThaiFixesConfiguration.getFontStyle();
 
-        if (currentRenderer != null) {
-            fontRendererWrapper.removeRenderer(currentRenderer);
-        }
+        fontRendererWrapper.setRenderer(null);
 
         if (!disabled && fontStyle != FontStyle.DISABLE) {
             currentRenderer = fontStyle.newInstance();
-            fontRendererWrapper.addRenderer(currentRenderer);
+            fontRendererWrapper.setRenderer(currentRenderer);
 
             getLogger().info("Using " + fontStyle.getRendererClass().toString() + " as font renderer");
         } else {

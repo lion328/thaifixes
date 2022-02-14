@@ -29,16 +29,14 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class FontRendererWrapper extends FakeFontRenderer {
 
-    private static Map<String, ResourceLocation> resourceLocationPool = new HashMap<String, ResourceLocation>();
+    private Map<String, ResourceLocation> resourceLocationPool = new HashMap<>();
 
-    private static List<IFontRenderer> renderers = new ArrayList<IFontRenderer>();
+    private IFontRenderer renderer;
     private TextureManager renderEngine;
     private char lastChar = 0;
     private float lastPosX = Float.NaN;
@@ -55,15 +53,13 @@ public class FontRendererWrapper extends FakeFontRenderer {
         renderEngine = texMan;
     }
 
-    public void addRenderer(IFontRenderer renderer) {
-        if (renderers.contains(renderer)) return;
-        renderer.setWrapper(this);
-        renderers.add(renderer);
-    }
+    public void setRenderer(IFontRenderer newRenderer) {
+        if (renderer != null)
+            renderer.setWrapper(null);
 
-    public void removeRenderer(IFontRenderer renderer) {
-        renderers.remove(renderer);
-        renderer.setWrapper(null);
+        if (newRenderer != null)
+            newRenderer.setWrapper(this);
+        renderer = newRenderer;
     }
 
     public void loadUnicodeTexture(int tex) {
@@ -98,13 +94,11 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     @Override
     public float renderCharAtPos(int asciiPos, char c, boolean italic) {
-        float ret = Float.NaN;
-        for (IFontRenderer renderer : renderers)
-            if (renderer.isSupportedCharacter(c)) {
-                ret = renderer.renderCharacter(c, italic);
-                break;
-            }
-        if (Float.isNaN(ret))
+        float ret;
+
+        if (renderer != null && renderer.isSupportedCharacter(c))
+            ret = renderer.renderCharacter(c, italic);
+        else
             ret = super.renderCharAtPos(asciiPos, c, italic);
 
         lastCharShift = ret;
@@ -113,13 +107,11 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     @Override
     public float renderCharAtPos(char c, boolean italic) {
-        float ret = Float.NaN;
-        for (IFontRenderer renderer : renderers)
-            if (renderer.isSupportedCharacter(c)) {
-                ret = renderer.renderCharacter(c, italic);
-                break;
-            }
-        if (Float.isNaN(ret))
+        float ret;
+
+        if (renderer != null && renderer.isSupportedCharacter(c))
+            ret = renderer.renderCharacter(c, italic);
+        else
             ret = super.renderCharAtPos(c, italic);
 
         lastCharShift = ret;
@@ -128,48 +120,44 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     @Override
     public int getCharWidth(char c) {
-        for (IFontRenderer renderer : renderers)
-            if (renderer.isSupportedCharacter(c))
-                return renderer.getCharacterWidth(c);
+        if (renderer != null && renderer.isSupportedCharacter(c))
+            return renderer.getCharacterWidth(c);
         return super.getCharWidth(c);
     }
 
     @Override
     public void renderStringAtPos(String text, boolean shadow) {
         lastChar = 0;
-
-        for (IFontRenderer renderer : renderers)
+        if (renderer != null)
             text = renderer.beforeStringRendered(text);
 
         super.renderStringAtPos(text, shadow);
 
-        for (IFontRenderer renderer : renderers)
+        if (renderer != null)
             renderer.afterStringRendered();
-
         lastChar = 0;
     }
 
     @Override
     public float getCharWidthFloat(char c) {
-        for (IFontRenderer renderer : renderers)
-            if (renderer.isSupportedCharacter(c))
-                return (float) renderer.getCharacterWidth(c);
+        if (renderer != null && renderer.isSupportedCharacter(c))
+            return (float) renderer.getCharacterWidth(c);
         return super.getCharWidthFloat(c);
     }
 
     @Override
     public void onCharRendered(char c) {
         lastChar = c;
-        for (IFontRenderer renderer : renderers)
+
+        if (renderer != null)
             renderer.afterCharacterRendered(c);
     }
 
     @Override
     protected float getShadowShiftSize(char c, float f) {
-        for (IFontRenderer renderer : renderers)
+        if (renderer != null) {
             renderer.beforeCharacterRendered(c);
 
-        for (IFontRenderer renderer : renderers) {
             if (renderer.isSupportedCharacter(c))
                 return renderer.getShadowShiftSize(c, f);
         }
@@ -178,9 +166,8 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     @Override
     protected float getBoldShiftSize(char c, float f) {
-        for (IFontRenderer renderer : renderers)
-            if (renderer.isSupportedCharacter(c))
-                return renderer.getBoldShiftSize(c, f);
+        if (renderer != null && renderer.isSupportedCharacter(c))
+            return renderer.getBoldShiftSize(c, f);
         return f;
     }
 
