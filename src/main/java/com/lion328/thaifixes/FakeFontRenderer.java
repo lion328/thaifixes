@@ -42,6 +42,10 @@ public class FakeFontRenderer {
         throw new IllegalArgumentException();
     }
 
+    public void setUnicodeFlag(boolean flag) {
+        throw new IllegalArgumentException();
+    }
+
     public float renderCharAtPos(char c, boolean italic) {
         throw new IllegalArgumentException();
     }

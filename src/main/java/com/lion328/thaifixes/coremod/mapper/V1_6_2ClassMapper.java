@@ -246,7 +246,7 @@ public class V1_6_2ClassMapper implements IClassMapper {
         bFlag = 0;
         L4:
         for (MethodNode method : node.methods) {
-            if (bFlag == 511) {
+            if (bFlag == 1023) {
                 break;
             }
             if (method.name.equals("<init>")) {
@@ -361,6 +361,15 @@ public class V1_6_2ClassMapper implements IClassMapper {
             } else if (method.desc.equals("(Ljava/lang/String;Z)V") && (bFlag & 128) == 0) {
                 map.put("net.minecraft.client.gui.FontRenderer.renderStringAtPos:(Ljava/lang/String;Z)V", method.name);
                 bFlag |= 128;
+            } else if ((bFlag & 512) == 0 && "(Z)V".equals(method.desc) && (method.access & Opcodes.ACC_PUBLIC) != 0) {
+                insns = method.instructions;
+                for (i = 0; i < insns.size(); i++) {
+                    insn = insns.get(i);
+                    if (insn.getOpcode() == Opcodes.PUTFIELD && map.get("net.minecraft.client.gui.FontRenderer.unicodeFlag:Z").equals(((FieldInsnNode) insn).name)) {
+                        map.put("net.minecraft.client.gui.FontRenderer.setUnicodeFlag:(Z)V", method.name);
+                        bFlag |= 512;
+                    }
+                }
             }
         }
 
@@ -458,6 +467,6 @@ public class V1_6_2ClassMapper implements IClassMapper {
             }
         }
 
-        return map.size() >= 24;
+        return map.size() >= 25;
     }
 }
