@@ -31,7 +31,14 @@ public interface IFontRenderer {
      *
      * @param wrapper FontRendererWrapper object.
      */
-    void setFontRendererWrapper(FontRendererWrapper wrapper);
+    void setWrapper(FontRendererWrapper wrapper);
+
+    /**
+     * Get FontRendererWrapper object.
+     *
+     * @return Return the current FontRendererWrapper object.
+     */
+    FontRendererWrapper getWrapper();
 
     /**
      * Check for supported character.
@@ -57,4 +64,41 @@ public interface IFontRenderer {
      * @return Width of character.
      */
     int getCharacterWidth(char c);
+
+    /**
+     * A callback before a character is rendered.
+     *
+     * @param c Character.
+     */
+    void beforeCharacterRendered(char c);
+
+    /**
+     * Get shadow shift size.
+     *
+     * @param c     Character.
+     * @param shift Original shift size.
+     * @return A new shift size.
+     */
+    float getShadowShiftSize(char c, float shift);
+
+    /**
+     * Get bold style shift size.
+     *
+     * @param c     Character.
+     * @param shift Original shift size.
+     * @return A new shift size.
+     */
+    float getBoldShiftSize(char c, float shift);
+
+    /**
+     * A callback when a character in a string successfully rendered.
+     *
+     * @param c Character.
+     */
+    void afterCharacterRendered(char c);
+
+    /**
+     * A callback when a string successfully rendered.
+     */
+    void afterStringRendered();
 }

@@ -41,6 +41,9 @@ public class FontRendererWrapper extends FakeFontRenderer {
     private static List<IFontRenderer> renderers = new ArrayList<IFontRenderer>();
     private TextureManager renderEngine;
     private char lastChar = 0;
+    private float lastPosX = Float.NaN;
+    private float lastPosY = Float.NaN;
+    private float lastCharShift = Float.NaN;
 
     public static File getMinecraftDirectory() {
         return Minecraft.getMinecraft().mcDataDir;
@@ -54,13 +57,13 @@ public class FontRendererWrapper extends FakeFontRenderer {
 
     public void addRenderer(IFontRenderer renderer) {
         if (renderers.contains(renderer)) return;
-        renderer.setFontRendererWrapper(this);
+        renderer.setWrapper(this);
         renderers.add(renderer);
     }
 
     public void removeRenderer(IFontRenderer renderer) {
         renderers.remove(renderer);
-        renderer.setFontRendererWrapper(null);
+        renderer.setWrapper(null);
     }
 
     public void loadUnicodeTexture(int tex) {
@@ -89,6 +92,10 @@ public class FontRendererWrapper extends FakeFontRenderer {
         return super.posY;
     }
 
+    public void setX(float v) {
+        posX = v;
+    }
+
     @Override
     public float renderCharAtPos(int asciiPos, char c, boolean italic) {
         float ret = Float.NaN;
@@ -99,6 +106,8 @@ public class FontRendererWrapper extends FakeFontRenderer {
             }
         if (Float.isNaN(ret))
             ret = super.renderCharAtPos(asciiPos, c, italic);
+
+        lastCharShift = ret;
         return ret;
     }
 
@@ -112,6 +121,8 @@ public class FontRendererWrapper extends FakeFontRenderer {
             }
         if (Float.isNaN(ret))
             ret = super.renderCharAtPos(c, italic);
+
+        lastCharShift = ret;
         return ret;
     }
 
@@ -126,7 +137,12 @@ public class FontRendererWrapper extends FakeFontRenderer {
     @Override
     public void renderStringAtPos(String text, boolean shadow) {
         lastChar = 0;
+
         super.renderStringAtPos(text, shadow);
+
+        for (IFontRenderer renderer : renderers)
+            renderer.afterStringRendered();
+
         lastChar = 0;
     }
 
@@ -141,9 +157,35 @@ public class FontRendererWrapper extends FakeFontRenderer {
     @Override
     public void onCharRendered(char c) {
         lastChar = c;
+        for (IFontRenderer renderer : renderers)
+            renderer.afterCharacterRendered(c);
+    }
+
+    @Override
+    protected float getShadowShiftSize(char c, float f) {
+        for (IFontRenderer renderer : renderers)
+            renderer.beforeCharacterRendered(c);
+
+        for (IFontRenderer renderer : renderers) {
+            if (renderer.isSupportedCharacter(c))
+                return renderer.getShadowShiftSize(c, f);
+        }
+        return f;
+    }
+
+    @Override
+    protected float getBoldShiftSize(char c, float f) {
+        for (IFontRenderer renderer : renderers)
+            if (renderer.isSupportedCharacter(c))
+                return renderer.getBoldShiftSize(c, f);
+        return f;
     }
 
     public char getLastCharacterRendered() {
         return lastChar;
+    }
+
+    public float getLastCharacterShiftOriginal() {
+        return lastCharShift;
     }
 }

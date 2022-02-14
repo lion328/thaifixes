@@ -27,14 +27,7 @@ import com.lion328.thaifixes.GLFunctions;
 import com.lion328.thaifixes.ThaiUtil;
 import org.lwjgl.opengl.GL11;
 
-public class UnicodeFontRenderer implements IFontRenderer {
-
-    private FontRendererWrapper wrapper;
-
-    @Override
-    public void setFontRendererWrapper(FontRendererWrapper wrapper) {
-        this.wrapper = wrapper;
-    }
+public class UnicodeFontRenderer extends ThaiFontRenderer {
 
     @Override
     public boolean isSupportedCharacter(char c) {
@@ -43,6 +36,8 @@ public class UnicodeFontRenderer implements IFontRenderer {
 
     @Override
     public float renderCharacter(char c, boolean italic) {
+        FontRendererWrapper wrapper = getWrapper();
+
         wrapper.loadUnicodeTexture(0x0E);
 
         float posYShift = 0.0F;
@@ -64,7 +59,7 @@ public class UnicodeFontRenderer implements IFontRenderer {
         float texcoordXEnd = charWidth - startTexcoordX - 0.02F;
         float skew = italic ? 1.0F : 0.0F;
 
-        float posX = wrapper.getX() - ((charWidth - startTexcoordX) / 2.0F + 0.5F);
+        float posX = wrapper.getX() - ((charWidth - startTexcoordX) / 2.0F + 1.0F);
         float posY = wrapper.getY() + posYShift;
 
         GLFunctions.begin(GL11.GL_TRIANGLE_STRIP);

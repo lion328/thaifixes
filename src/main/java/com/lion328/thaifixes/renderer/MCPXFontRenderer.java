@@ -32,13 +32,13 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class MCPXFontRenderer implements IFontRenderer {
+public class MCPXFontRenderer extends ThaiFontRenderer {
 
     public static final String MCPX_TEXTURE_LOCATION_RESOURCE = "thaifixes:textures/font/mcpx.png";
     public static final String MCPX_TEXTURE_LOCATION_JAR = "/assets/thaifixes/textures/font/mcpx.png";
 
-    private FontRendererWrapper wrapper;
     private int[] thaiCharWidth;
+    private float lastPosX = Float.NaN;
 
     public MCPXFontRenderer() {
         thaiCharWidth = new int[256];
@@ -92,17 +92,14 @@ public class MCPXFontRenderer implements IFontRenderer {
     }
 
     @Override
-    public void setFontRendererWrapper(FontRendererWrapper wrapper) {
-        this.wrapper = wrapper;
-    }
-
-    @Override
     public boolean isSupportedCharacter(char c) {
         return ThaiUtil.isThaiChar(c);
     }
 
     @Override
     public float renderCharacter(char c, boolean italic) {
+        FontRendererWrapper wrapper = getWrapper();
+
         int offset = c - ThaiUtil.THAI_CHAR_RANGE_MIN + 1;
 
         float posX = wrapper.getX();
