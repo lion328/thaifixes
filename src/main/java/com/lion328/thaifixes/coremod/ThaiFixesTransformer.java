@@ -51,7 +51,7 @@ public class ThaiFixesTransformer implements IClassTransformer {
             patchers.add(new GuiChatPatcher(classMap));
             patchers.add(new FontRendererWrapperPatcher(classMap));
         } catch (Exception e) {
-            CoremodSettings.LOGGER.catching(e);
+            ThaiFixesCoremod.LOGGER.catching(e);
         }
     }
 
@@ -61,12 +61,12 @@ public class ThaiFixesTransformer implements IClassTransformer {
 
         for (IClassPatcher patcher : patchers) {
             if (patcher.isSupported(name)) {
-                CoremodSettings.LOGGER.info("Patching {} by {}", transformedName, patcher.getClass().getName());
+                ThaiFixesCoremod.LOGGER.info("Patching {} by {}", transformedName, patcher.getClass().getName());
 
                 try {
                     result = patcher.patch(result);
                 } catch (Exception e) {
-                    CoremodSettings.LOGGER.catching(e);
+                    ThaiFixesCoremod.LOGGER.catching(e);
                 }
             }
         }

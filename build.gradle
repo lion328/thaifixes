@@ -19,7 +19,7 @@ version = '4.9-alpha'
 group = 'com.lion328.thaifixes'
 archivesBaseName = 'thaifixes'
 
-def coremodClass = 'com.lion328.thaifixes.coremod.CoremodLoader'
+def coremodClass = 'com.lion328.thaifixes.coremod.ThaiFixesCoremod'
 
 minecraft {
     version = '1.12.2-14.23.5.2847'

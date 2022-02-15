@@ -24,11 +24,14 @@ package com.lion328.thaifixes.coremod;
 
 import com.lion328.thaifixes.ModInformation;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class CoremodLoader implements IFMLLoadingPlugin {
+public class ThaiFixesCoremod implements IFMLLoadingPlugin {
+    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
 
     @Override
     public String[] getASMTransformerClass() {

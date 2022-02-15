@@ -31,15 +31,11 @@ import com.lion328.thaifixes.coremod.mapper.reader.MinecraftClassLoaderJarReader
 import com.lion328.thaifixes.coremod.mapper.reader.TransformedJarReader;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 public class CoremodSettings {
-
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
-
     private static IClassMap obfuscatedClassmap, defaultClassmap;
 
     public static IClassMap getObfuscatedClassmap() {
@@ -63,7 +59,7 @@ public class CoremodSettings {
     }
 
     private static IClassMap generateClassmap(boolean transfromedReading) {
-        LOGGER.info("Generating class map (transformedReading = " + transfromedReading + ")");
+        getLogger().info("Generating class map (transformedReading = " + transfromedReading + ")");
 
         IClassMap classMap = new SimpleClassMap();
 
@@ -92,15 +88,19 @@ public class CoremodSettings {
                 IClassMapper cm = new V1_6_2ClassMapper();
 
                 if (!cm.getMap(reader, classMap)) {
-                    LOGGER.error("Runtime mapping is not working.");
+                    getLogger().error("Runtime mapping is not working.");
                 }
             } catch (Exception e) {
-                LOGGER.catching(e);
+                getLogger().catching(e);
             }
         } else {
-            LOGGER.error("Can't run runtime mapping (Invalid classloader type)");
+            getLogger().error("Can't run runtime mapping (Invalid classloader type)");
         }
 
         return classMap;
+    }
+
+    private static Logger getLogger() {
+        return ThaiFixesCoremod.LOGGER;
     }
 }
