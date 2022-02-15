@@ -133,8 +133,11 @@ public class FontRendererPatcher implements IClassPatcher {
     }
 
     private void patchRenderStringAtPos(ClassNode classNode, ClassVisitor visitor) {
+        String desc = "(Ljava/lang/String;Z)V";
+        String name = fontRendererClass.getMethod("renderStringAtPos", desc);
+
         for (MethodNode mn : classNode.methods) {
-            if (!fontRendererClass.getField("renderStringAtPos").equals(mn.name)) {
+            if (!name.equals(mn.name) || !desc.equals(mn.desc)) {
                 continue;
             }
 

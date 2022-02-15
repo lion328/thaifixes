@@ -97,7 +97,7 @@ public class FontRendererWrapper extends FakeFontRenderer {
     }
 
     public void setX(float v) {
-        posX = v;
+        super.posX = v;
     }
 
     @Override
