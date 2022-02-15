@@ -47,6 +47,7 @@ public class ThaiFixes {
 
     private static Logger logger;
 
+    private FontRenderer fontRenderer;
     private FontRendererWrapper fontRendererWrapper;
     private IFontRenderer currentRenderer;
 
@@ -107,6 +108,7 @@ public class ThaiFixes {
             getLogger().info("FontRendererWrapper is successfully patched");
 
             fontRendererWrapper = (FontRendererWrapper) fontRenderer;
+            this.fontRenderer = (FontRenderer) fontRenderer;
 
             reloadRenderer();
         } catch (Exception e) {
@@ -119,7 +121,7 @@ public class ThaiFixes {
         if (event.getModID().equals(ModInformation.MODID)) {
             ThaiFixesConfiguration.syncConfig();
             reloadRenderer();
-            fontRendererWrapper.setUnicodeFlag(Minecraft.getMinecraft().isUnicode());
+            fontRenderer.setUnicodeFlag(Minecraft.getMinecraft().isUnicode());
         }
     }
 
