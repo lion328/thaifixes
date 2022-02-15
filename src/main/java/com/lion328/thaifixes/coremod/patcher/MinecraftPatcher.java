@@ -76,7 +76,7 @@ public class MinecraftPatcher implements IClassPatcher {
             if (!ldc.cst.equals("textures/font/ascii.png")) {
                 continue;
             }
-            for (i--; i < insns.size(); i--) {
+            for (; i >= 0; i--) {
                 if (insns.get(i).getOpcode() != Opcodes.NEW) {
                     continue;
                 }

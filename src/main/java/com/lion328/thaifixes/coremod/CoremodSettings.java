@@ -29,30 +29,18 @@ import com.lion328.thaifixes.coremod.mapper.V1_6_2ClassMapper;
 import com.lion328.thaifixes.coremod.mapper.reader.IJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.MinecraftClassLoaderJarReader;
 import com.lion328.thaifixes.coremod.mapper.reader.TransformedJarReader;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer;
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
-import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class CoremodSettings {
 
     public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
-    public static final String BLACKBOARD_DEOBFENV_KEY = "fml.deobfuscatedEnvironment";
 
     private static IClassMap obfuscatedClassmap, defaultClassmap;
-
-    static {
-        initializeRemapper();
-    }
 
     public static IClassMap getObfuscatedClassmap() {
         if (obfuscatedClassmap == null) {
@@ -91,24 +79,12 @@ public class CoremodSettings {
             }
 
             MinecraftClassLoaderJarReader mcJarReader = new MinecraftClassLoaderJarReader(cl);
-            IJarReader reader;
+            IJarReader reader = mcJarReader;
 
             if (deobfuscatedEnvironment || !transfromedReading) {
                 reader = mcJarReader;
             } else {
-                // HACK! We will rewrite the mod in 1.13 anyway.
-                boolean isKeyNull = Launch.blackboard.get(BLACKBOARD_DEOBFENV_KEY) == null;
-
-                if (isKeyNull) {
-                    Launch.blackboard.put(BLACKBOARD_DEOBFENV_KEY, false);
-                }
-
                 DeobfuscationTransformer deobfTransformer = new DeobfuscationTransformer();
-
-                if (isKeyNull) {
-                    Launch.blackboard.remove(BLACKBOARD_DEOBFENV_KEY);
-                }
-
                 reader = new TransformedJarReader(mcJarReader, deobfTransformer, deobfTransformer);
             }
 
@@ -126,23 +102,5 @@ public class CoremodSettings {
         }
 
         return classMap;
-    }
-
-    private static void initializeRemapper() {
-        try {
-            Field mcDirField = FMLInjectionData.class.getDeclaredField("minecraftHome");
-            mcDirField.setAccessible(true);
-
-            File mcDir = (File) mcDirField.get(null);
-
-            Method deobfuscationDataName = FMLInjectionData.class.getDeclaredMethod("debfuscationDataName");
-            deobfuscationDataName.setAccessible(true);
-
-            String deobfuscationFileName = (String) deobfuscationDataName.invoke(null);
-
-            FMLDeobfuscatingRemapper.INSTANCE.setup(mcDir, (LaunchClassLoader) Thread.currentThread().getContextClassLoader(), deobfuscationFileName);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | NoSuchFieldException e) {
-            CoremodSettings.LOGGER.catching(e);
-        }
     }
 }

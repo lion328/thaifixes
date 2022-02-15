@@ -22,6 +22,7 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
+import com.lion328.thaifixes.coremod.CoremodSettings;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -78,6 +79,6 @@ public class FontRendererWrapperPatcher implements IClassPatcher {
         n.accept(w);
         byte[] stage0 = w.toByteArray();
 
-        return new NameMapperPatcher(w.toByteArray(), classMap).patch(stage0);
+        return new NameMapperPatcher(w.toByteArray(), CoremodSettings.getDefaultClassmap()).patch(stage0);
     }
 }
