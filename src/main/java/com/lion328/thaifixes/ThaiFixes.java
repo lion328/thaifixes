@@ -23,7 +23,7 @@
 package com.lion328.thaifixes;
 
 import com.lion328.thaifixes.config.ThaiFixesConfiguration;
-import com.lion328.thaifixes.coremod.CoremodSettings;
+import com.lion328.thaifixes.coremod.ClassMapManager;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import com.lion328.thaifixes.renderer.IFontRenderer;
 import net.minecraft.client.Minecraft;
@@ -61,7 +61,7 @@ public class ThaiFixes {
         MinecraftForge.EVENT_BUS.register(this);
 
         try {
-            IClassMap map = CoremodSettings.getDefaultClassmap();
+            IClassMap map = ClassMapManager.getDefaultClassmap();
 
             String fontRendererObjFieldName = map.getClass("net/minecraft/client/Minecraft").getField("fontRendererObj");
             Field fontRendererObjField = Minecraft.class.getDeclaredField(fontRendererObjFieldName);

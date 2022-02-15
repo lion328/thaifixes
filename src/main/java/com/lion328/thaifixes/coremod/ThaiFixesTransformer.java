@@ -42,7 +42,7 @@ public class ThaiFixesTransformer implements IClassTransformer {
     }
 
     private void initializePatchers() {
-        IClassMap classMap = CoremodSettings.getObfuscatedClassmap();
+        IClassMap classMap = ClassMapManager.getObfuscatedClassmap();
 
         try {
             patchers.add(new MinecraftPatcher(classMap));

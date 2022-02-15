@@ -22,7 +22,7 @@
 
 package com.lion328.thaifixes.coremod.patcher;
 
-import com.lion328.thaifixes.coremod.CoremodSettings;
+import com.lion328.thaifixes.coremod.ClassMapManager;
 import com.lion328.thaifixes.coremod.mapper.IClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -79,6 +79,6 @@ public class FontRendererWrapperPatcher extends SingleClassPatcher {
         n.accept(w);
         byte[] stage0 = w.toByteArray();
 
-        return new NameMapperPatcher(w.toByteArray(), CoremodSettings.getDefaultClassmap()).patch(stage0);
+        return new NameMapperPatcher(w.toByteArray(), ClassMapManager.getDefaultClassmap()).patch(stage0);
     }
 }

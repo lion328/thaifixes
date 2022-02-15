@@ -35,7 +35,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-public class CoremodSettings {
+public class ClassMapManager {
     private static IClassMap obfuscatedClassmap, defaultClassmap;
 
     public static IClassMap getObfuscatedClassmap() {
