@@ -38,7 +38,7 @@ import java.io.IOException;
 
 public class CoremodSettings {
 
-    public static final Logger LOGGER = LogManager.getFormatterLogger("ThaiFixes-Coremod");
+    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
 
     private static IClassMap obfuscatedClassmap, defaultClassmap;
 
