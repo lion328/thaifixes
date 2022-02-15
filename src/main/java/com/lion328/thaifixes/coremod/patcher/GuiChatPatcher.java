@@ -32,7 +32,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class GuiChatPatcher implements IClassPatcher {
+public class GuiChatPatcher extends SingleClassPatcher {
 
     private final IClassMap classMap;
 

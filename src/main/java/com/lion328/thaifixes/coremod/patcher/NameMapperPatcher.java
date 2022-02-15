@@ -36,7 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NameMapperPatcher implements IClassPatcher {
+public class NameMapperPatcher extends SingleClassPatcher {
 
     private String className;
     private byte[] originalBytecode;

@@ -44,7 +44,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import java.util.ArrayList;
 
-public class FontRendererPatcher implements IClassPatcher {
+public class FontRendererPatcher extends SingleClassPatcher {
 
     private IClassMap classMap;
     private IClassDetail fontRendererClass;

@@ -24,7 +24,7 @@ package com.lion328.thaifixes.coremod.patcher;
 
 public interface IClassPatcher {
 
-    String getClassName();
+    boolean isSupported(String name);
 
     byte[] patch(byte[] original) throws Exception;
 }

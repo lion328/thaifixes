@@ -33,7 +33,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class FontRendererWrapperPatcher implements IClassPatcher {
+public class FontRendererWrapperPatcher extends SingleClassPatcher {
 
     private IClassMap classMap;
 

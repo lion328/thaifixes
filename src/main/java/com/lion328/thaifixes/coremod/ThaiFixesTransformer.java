@@ -9,11 +9,11 @@ import com.lion328.thaifixes.coremod.patcher.IClassPatcher;
 import com.lion328.thaifixes.coremod.patcher.MinecraftPatcher;
 import net.minecraft.launchwrapper.IClassTransformer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ThaiFixesTransformer implements IClassTransformer {
-    private Map<String, IClassPatcher> patchers = new HashMap<String, IClassPatcher>();
+    private List<IClassPatcher> patchers = new ArrayList<>();
 
     public ThaiFixesTransformer() {
         initializePatchers();
@@ -23,32 +23,32 @@ public class ThaiFixesTransformer implements IClassTransformer {
         IClassMap classMap = CoremodSettings.getObfuscatedClassmap();
 
         try {
-            addPatcher(new MinecraftPatcher(classMap));
-            addPatcher(new FontRendererPatcher(classMap));
-            addPatcher(new GuiNewChatPatcher(classMap));
-            addPatcher(new GuiChatPatcher(classMap));
-            addPatcher(new FontRendererWrapperPatcher(classMap));
+            patchers.add(new MinecraftPatcher(classMap));
+            patchers.add(new FontRendererPatcher(classMap));
+            patchers.add(new GuiNewChatPatcher(classMap));
+            patchers.add(new GuiChatPatcher(classMap));
+            patchers.add(new FontRendererWrapperPatcher(classMap));
         } catch (Exception e) {
             CoremodSettings.LOGGER.catching(e);
         }
     }
 
-    private void addPatcher(IClassPatcher patcher) {
-        patchers.put(patcher.getClassName(), patcher);
-    }
-
     @Override
     public byte[] transform(String name, String transformedName, byte[] original) {
-        if (patchers.containsKey(name)) {
-            CoremodSettings.LOGGER.info("Patching " + transformedName);
+        byte[] result = original;
 
-            try {
-                return patchers.get(name).patch(original);
-            } catch (Exception e) {
-                CoremodSettings.LOGGER.catching(e);
+        for (IClassPatcher patcher : patchers) {
+            if (patcher.isSupported(name)) {
+                CoremodSettings.LOGGER.info("Patching {} by {}", transformedName, patcher.getClass().getName());
+
+                try {
+                    result = patcher.patch(result);
+                } catch (Exception e) {
+                    CoremodSettings.LOGGER.catching(e);
+                }
             }
         }
 
-        return original;
+        return result;
     }
 }

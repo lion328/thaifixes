@@ -34,7 +34,7 @@ import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class GuiNewChatPatcher implements IClassPatcher {
+public class GuiNewChatPatcher extends SingleClassPatcher {
 
     private IClassMap classMap;
 

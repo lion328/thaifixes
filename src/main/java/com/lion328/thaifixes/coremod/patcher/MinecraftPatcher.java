@@ -34,7 +34,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-public class MinecraftPatcher implements IClassPatcher {
+public class MinecraftPatcher extends SingleClassPatcher {
 
     private IClassMap classMap;
 
