@@ -57,4 +57,26 @@ public class ThaiUtil {
     public static boolean isTallAlphabet(char c) {
         return TALL_CHARS.indexOf(c) != -1;
     }
+
+    public static String expandSaraAm(String text) {
+        StringBuilder sb = new StringBuilder();
+        char[] chars = text.toCharArray();
+        for (int i = 0; i < text.length(); i++) {
+            char cur = chars[i];
+            if (cur == SARA_AM && i > 0) {
+                char prev = chars[i - 1];
+
+                sb.append(NIKHAHIT);
+                if (isFloatingAbove(prev)) {
+                    sb.append(prev);
+                    sb.deleteCharAt(i - 1);
+                }
+                sb.append(SARA_AA);
+
+                continue;
+            }
+            sb.append(cur);
+        }
+        return sb.toString();
+    }
 }

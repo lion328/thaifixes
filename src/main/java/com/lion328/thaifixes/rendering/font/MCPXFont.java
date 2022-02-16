@@ -99,25 +99,7 @@ public class MCPXFont extends ThaiFont {
 
     @Override
     public String preStringRendered(String text) {
-        StringBuilder sb = new StringBuilder();
-        char[] chars = text.toCharArray();
-        for (int i = 0; i < text.length(); i++) {
-            char cur = chars[i];
-            if (cur == ThaiUtil.SARA_AM && i > 0) {
-                char prev = chars[i - 1];
-
-                sb.append(ThaiUtil.NIKHAHIT);
-                if (ThaiUtil.isFloatingAbove(prev)) {
-                    sb.append(prev);
-                    sb.deleteCharAt(i - 1);
-                }
-                sb.append(ThaiUtil.SARA_AA);
-
-                continue;
-            }
-            sb.append(cur);
-        }
-        return sb.toString();
+        return ThaiUtil.expandSaraAm(text);
     }
 
     @Override
