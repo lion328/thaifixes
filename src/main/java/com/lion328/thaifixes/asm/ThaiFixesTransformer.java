@@ -62,7 +62,7 @@ public class ThaiFixesTransformer implements IClassTransformer {
 
         for (IClassPatcher patcher : patchers) {
             if (patcher.isSupported(name)) {
-                ThaiFixesCoremod.LOGGER.info("Patching {} by {}", transformedName, patcher.getClass().getName());
+                ThaiFixesCoremod.LOGGER.info("Patching {}", transformedName);
 
                 try {
                     result = patcher.patch(result);
