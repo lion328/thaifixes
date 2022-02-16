@@ -20,41 +20,31 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod;
+package com.lion328.thaifixes.asm.mapper.reader;
 
-import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.asm.ThaiFixesTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.launchwrapper.IClassNameTransformer;
+import net.minecraft.launchwrapper.IClassTransformer;
 
-import java.util.Map;
+import java.io.IOException;
 
-@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class ThaiFixesCoremod implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
+public class TransformedJarReader implements IJarReader {
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{ThaiFixesTransformer.class.getName()};
+    private IJarReader parent;
+    private IClassTransformer classTransformer;
+    private IClassNameTransformer nameTransformer;
+
+    public TransformedJarReader(IJarReader parent, IClassTransformer classTransformer, IClassNameTransformer nameTransformer) {
+        this.parent = parent;
+        this.classTransformer = classTransformer;
+        this.nameTransformer = nameTransformer;
     }
 
     @Override
-    public String getModContainerClass() {
-        return null;
-    }
-
-    @Override
-    public String getSetupClass() {
-        return null;
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {
-    }
-
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
+    public byte[] getClassBytes(String name) throws IOException {
+        String untransformedName = name;
+        if (nameTransformer != null) {
+            untransformedName = nameTransformer.unmapClassName(name);
+        }
+        return classTransformer.transform(untransformedName, name, parent.getClassBytes(nameTransformer.unmapClassName(name)));
     }
 }

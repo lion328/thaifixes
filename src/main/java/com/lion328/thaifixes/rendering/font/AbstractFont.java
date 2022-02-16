@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Waritnan Sookbuntherng
+ * Copyright (c) 2022 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,41 +20,51 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod;
+package com.lion328.thaifixes.rendering.font;
 
-import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.asm.ThaiFixesTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.lion328.thaifixes.rendering.ThaiFixesFontRenderer;
 
-import java.util.Map;
-
-@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class ThaiFixesCoremod implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
+public abstract class AbstractFont implements Font {
+    private ThaiFixesFontRenderer renderer;
 
     @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{ThaiFixesTransformer.class.getName()};
+    public final void setFontRenderer(ThaiFixesFontRenderer renderer) {
+        this.renderer = renderer;
+        onFontRendererChanged();
     }
 
     @Override
-    public String getModContainerClass() {
-        return null;
+    public final ThaiFixesFontRenderer getRenderer() {
+        return renderer;
+    }
+
+    public void onFontRendererChanged() {
     }
 
     @Override
-    public String getSetupClass() {
-        return null;
+    public String preStringRendered(String text) {
+        return text;
     }
 
     @Override
-    public void injectData(Map<String, Object> data) {
+    public void preCharacterRendered(char c) {
     }
 
     @Override
-    public String getAccessTransformerClass() {
-        return null;
+    public float getShadowShiftSize(char c, float shift) {
+        return shift;
+    }
+
+    @Override
+    public float getBoldShiftSize(char c, float shift) {
+        return shift;
+    }
+
+    @Override
+    public void postCharacterRendered(char c) {
+    }
+
+    @Override
+    public void postStringRendered() {
     }
 }

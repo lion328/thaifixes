@@ -20,41 +20,29 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod;
+package com.lion328.thaifixes.rendering;
 
-import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.asm.ThaiFixesTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
-import java.util.Map;
+public class GLFunctions {
 
-@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class ThaiFixesCoremod implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
-
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{ThaiFixesTransformer.class.getName()};
+    public static void begin(int f) {
+        GL11.glBegin(f);
     }
 
-    @Override
-    public String getModContainerClass() {
-        return null;
+    public static void end() {
+        GL11.glEnd();
     }
 
-    @Override
-    public String getSetupClass() {
-        return null;
+    public static void texCoord(float u, float v) {
+        GL11.glTexCoord2f(u, v);
     }
 
-    @Override
-    public void injectData(Map<String, Object> data) {
+    public static void vertex(float x, float y, float z) {
+        GL11.glVertex3f(x, y, z);
     }
 
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
+    public static void vertex(float x, float y) {
+        GL11.glVertex2f(x, y);
     }
 }

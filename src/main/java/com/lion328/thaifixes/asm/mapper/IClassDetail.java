@@ -20,41 +20,21 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod;
+package com.lion328.thaifixes.asm.mapper;
 
-import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.asm.ThaiFixesTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public interface IClassDetail {
 
-import java.util.Map;
+    String getName();
 
-@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class ThaiFixesCoremod implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
+    String getObfuscatedName();
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{ThaiFixesTransformer.class.getName()};
-    }
+    String getField(String name);
 
-    @Override
-    public String getModContainerClass() {
-        return null;
-    }
+    String getMethod(String name, String desc);
 
-    @Override
-    public String getSetupClass() {
-        return null;
-    }
+    void addField(String name, String obfuscatedName);
 
-    @Override
-    public void injectData(Map<String, Object> data) {
-    }
+    void addMethod(String name, String obfuscatedName, String desc);
 
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
-    }
+    IClassDetail getSuperclassMap();
 }

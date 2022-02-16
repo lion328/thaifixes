@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Waritnan Sookbuntherng
+ * Copyright (c) 2022 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,41 +20,21 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod;
+package com.lion328.thaifixes.rendering.font;
 
-import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.asm.ThaiFixesTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.Map;
-
-@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class ThaiFixesCoremod implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
-
+public class StubFont extends AbstractFont {
     @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{ThaiFixesTransformer.class.getName()};
+    public boolean isSupportedCharacter(char c) {
+        return false;
     }
 
     @Override
-    public String getModContainerClass() {
-        return null;
+    public float renderCharacter(char c, boolean italic) {
+        throw new IllegalArgumentException("stub");
     }
 
     @Override
-    public String getSetupClass() {
-        return null;
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {
-    }
-
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
+    public int getCharacterWidth(char c) {
+        throw new IllegalArgumentException("stub");
     }
 }

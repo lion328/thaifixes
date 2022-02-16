@@ -20,41 +20,59 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod;
+package com.lion328.thaifixes.rendering.font;
 
-import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.asm.ThaiFixesTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public enum FontStyle {
 
-import java.util.Map;
+    UNICODE("Unicode") {
+        @Override
+        public Font newInstance() {
+            return new UnicodeFont();
+        }
+    },
+    MCPX("MCPX") {
+        @Override
+        public Font newInstance() {
+            return new MCPXFont();
+        }
+    },
+    DISABLE("Disable") {
+        @Override
+        public Font newInstance() {
+            return new StubFont();
+        }
+    };
 
-@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class ThaiFixesCoremod implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
+    private final String name;
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{ThaiFixesTransformer.class.getName()};
+    FontStyle(String name) {
+        this.name = name;
     }
 
-    @Override
-    public String getModContainerClass() {
+    public static FontStyle fromString(String s) {
+        for (FontStyle fontStyle : FontStyle.values()) {
+            if (s.equalsIgnoreCase(fontStyle.name)) {
+                return fontStyle;
+            }
+        }
+
         return null;
     }
 
-    @Override
-    public String getSetupClass() {
-        return null;
+    public static String[] asStringArray() {
+        FontStyle[] available = FontStyle.values();
+        String[] ret = new String[FontStyle.values().length];
+
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = available[i].toString();
+        }
+
+        return ret;
     }
 
-    @Override
-    public void injectData(Map<String, Object> data) {
-    }
+    public abstract Font newInstance();
 
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
+    public String toString() {
+        return name;
     }
 }

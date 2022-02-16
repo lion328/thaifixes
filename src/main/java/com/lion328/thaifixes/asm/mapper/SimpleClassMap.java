@@ -20,41 +20,30 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.coremod;
+package com.lion328.thaifixes.asm.mapper;
 
-import com.lion328.thaifixes.ModInformation;
-import com.lion328.thaifixes.asm.ThaiFixesTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import java.util.HashMap;
 import java.util.Map;
 
-@IFMLLoadingPlugin.MCVersion(ModInformation.MCVERSION)
-public class ThaiFixesCoremod implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("ThaiFixes-Coremod");
+public class SimpleClassMap implements IClassMap {
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{ThaiFixesTransformer.class.getName()};
+    private Map<String, IClassDetail> classesDetail;
+
+    public SimpleClassMap() {
+        classesDetail = new HashMap<String, IClassDetail>();
     }
 
     @Override
-    public String getModContainerClass() {
-        return null;
+    public IClassDetail getClass(String name) {
+        return classesDetail.get(name);
     }
 
     @Override
-    public String getSetupClass() {
-        return null;
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {
-    }
-
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
+    public IClassDetail addClass(IClassDetail classDetail) {
+        if (classesDetail.containsKey(classDetail.getName())) {
+            return classesDetail.get(classDetail.getName());
+        }
+        classesDetail.put(classDetail.getName(), classDetail);
+        return classDetail;
     }
 }

@@ -22,7 +22,7 @@
 
 package com.lion328.thaifixes.config;
 
-import com.lion328.thaifixes.FontStyle;
+import com.lion328.thaifixes.rendering.font.FontStyle;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.Configuration;
 
