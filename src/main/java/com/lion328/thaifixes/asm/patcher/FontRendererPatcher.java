@@ -24,6 +24,8 @@ package com.lion328.thaifixes.asm.patcher;
 
 import com.lion328.thaifixes.asm.mapper.IClassDetail;
 import com.lion328.thaifixes.asm.mapper.IClassMap;
+import com.lion328.thaifixes.asm.util.Cell;
+import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -155,23 +157,14 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
     private int patchOnCharRendered(MethodNode node, ClassVisitor visitor) {
         InsnList insns = node.instructions;
+
         // Find the character variable inside the loop.
-        int charVar = -1;
-        for (int i = 0; i < insns.size(); i++) {
-            AbstractInsnNode absInsn = insns.get(i);
-
-            if (absInsn instanceof MethodInsnNode) {
-                MethodInsnNode insn = (MethodInsnNode) absInsn;
-                if (!"java/lang/String".equals(insn.owner) || !"charAt".equals(insn.name))
-                    continue;
-
-                AbstractInsnNode nextInsn = insns.get(i + 1);
-                if (nextInsn.getOpcode() == Opcodes.ISTORE) {
-                    charVar = ((VarInsnNode) nextInsn).var;
-                    break;
-                }
-            }
-        }
+        Cell<Integer> charVarCell = new Cell<>();
+        new InstructionFinder()
+                .method().owner("java/lang/String").name("charAt")
+                .var(Opcodes.ISTORE).whenMatch(insn -> charVarCell.set(((VarInsnNode) insn).var))
+                .findFirst(insns);
+        int charVar = charVarCell.get();
 
         // Find index where the loop condition belong.
         int conditionIdx = -1;

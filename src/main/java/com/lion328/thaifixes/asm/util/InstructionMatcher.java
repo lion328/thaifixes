@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Waritnan Sookbuntherng
+ * Copyright (c) 2022 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +20,17 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.asm.mapper;
+package com.lion328.thaifixes.asm.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.objectweb.asm.tree.AbstractInsnNode;
 
-public class SimpleClassMap implements IClassMap {
+import java.util.ListIterator;
 
-    private Map<String, IClassDetail> classesDetail;
+public interface InstructionMatcher {
+    InstructionMatcher SKIP_ONE = it -> {
+        it.next();
+        return true;
+    };
 
-    public SimpleClassMap() {
-        classesDetail = new HashMap<String, IClassDetail>();
-    }
-
-    @Override
-    public IClassDetail getClass(String name) {
-        return classesDetail.getOrDefault(name, IdentityClassMap.INSTANCE.getClass(name));
-    }
-
-    @Override
-    public IClassDetail addClass(IClassDetail classDetail) {
-        if (classesDetail.containsKey(classDetail.getName())) {
-            return classesDetail.get(classDetail.getName());
-        }
-        classesDetail.put(classDetail.getName(), classDetail);
-        return classDetail;
-    }
+    boolean match(ListIterator<AbstractInsnNode> it);
 }
