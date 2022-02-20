@@ -27,13 +27,13 @@ import net.minecraft.launchwrapper.IClassTransformer;
 
 import java.io.IOException;
 
-public class TransformedJarReader implements IJarReader {
+public class TransformedJarReader implements JarReader {
 
-    private IJarReader parent;
+    private JarReader parent;
     private IClassTransformer classTransformer;
     private IClassNameTransformer nameTransformer;
 
-    public TransformedJarReader(IJarReader parent, IClassTransformer classTransformer, IClassNameTransformer nameTransformer) {
+    public TransformedJarReader(JarReader parent, IClassTransformer classTransformer, IClassNameTransformer nameTransformer) {
         this.parent = parent;
         this.classTransformer = classTransformer;
         this.nameTransformer = nameTransformer;

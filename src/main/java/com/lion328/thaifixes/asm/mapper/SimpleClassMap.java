@@ -25,21 +25,21 @@ package com.lion328.thaifixes.asm.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleClassMap implements IClassMap {
+public class SimpleClassMap implements ClassMap {
 
-    private Map<String, IClassDetail> classesDetail;
+    private Map<String, ClassDetail> classesDetail;
 
     public SimpleClassMap() {
-        classesDetail = new HashMap<String, IClassDetail>();
+        classesDetail = new HashMap<String, ClassDetail>();
     }
 
     @Override
-    public IClassDetail getClass(String name) {
+    public ClassDetail getClass(String name) {
         return classesDetail.getOrDefault(name, IdentityClassMap.INSTANCE.getClass(name));
     }
 
     @Override
-    public IClassDetail addClass(IClassDetail classDetail) {
+    public ClassDetail addClass(ClassDetail classDetail) {
         if (classesDetail.containsKey(classDetail.getName())) {
             return classesDetail.get(classDetail.getName());
         }

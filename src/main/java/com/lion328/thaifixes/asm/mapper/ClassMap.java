@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.asm.mapper.reader;
+package com.lion328.thaifixes.asm.mapper;
 
-import java.io.IOException;
+public interface ClassMap {
 
-public interface IJarReader {
+    ClassDetail getClass(String name);
 
-    byte[] getClassBytes(String name) throws IOException;
+    ClassDetail addClass(ClassDetail classDetail);
 }

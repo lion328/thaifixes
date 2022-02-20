@@ -1,7 +1,7 @@
 package com.lion328.thaifixes.asm.util;
 
-import com.lion328.thaifixes.asm.mapper.IClassDetail;
-import com.lion328.thaifixes.asm.mapper.IClassMap;
+import com.lion328.thaifixes.asm.mapper.ClassDetail;
+import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.mapper.IdentityClassMap;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -21,15 +21,15 @@ public class InstructionFinder implements InstructionMatcher {
     private InstructionFinderRecord record;
 
     private boolean reversed;
-    private IClassMap classMap = IdentityClassMap.INSTANCE;
-    private IClassDetail currentClassDetail;
+    private ClassMap classMap = IdentityClassMap.INSTANCE;
+    private ClassDetail currentClassDetail;
 
     public InstructionFinder reversed() {
         reversed = !reversed;
         return this;
     }
 
-    public InstructionFinder withClassMap(IClassMap classMap) {
+    public InstructionFinder withClassMap(ClassMap classMap) {
         this.classMap = classMap;
         return this;
     }

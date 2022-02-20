@@ -26,7 +26,7 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import java.io.IOException;
 
-public class MinecraftClassLoaderJarReader implements IJarReader {
+public class MinecraftClassLoaderJarReader implements JarReader {
 
     private LaunchClassLoader classLoader;
 

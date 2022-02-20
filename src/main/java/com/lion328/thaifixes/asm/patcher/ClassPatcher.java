@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.asm.mapper;
+package com.lion328.thaifixes.asm.patcher;
 
-public interface IClassMap {
+public interface ClassPatcher {
 
-    IClassDetail getClass(String name);
+    boolean isSupported(String name);
 
-    IClassDetail addClass(IClassDetail classDetail);
+    byte[] patch(byte[] original) throws Exception;
 }

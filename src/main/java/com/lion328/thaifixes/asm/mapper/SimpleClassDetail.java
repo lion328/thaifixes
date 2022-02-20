@@ -25,18 +25,18 @@ package com.lion328.thaifixes.asm.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleClassDetail implements IClassDetail {
+public class SimpleClassDetail implements ClassDetail {
 
     private Map<String, String> fields;
     private Map<String, Map<String, String>> method;
     private String name, obfuscatedName;
-    private IClassDetail superClassMap;
+    private ClassDetail superClassMap;
 
     public SimpleClassDetail(String name, String obfuscatedName) {
         this(name, obfuscatedName, null);
     }
 
-    public SimpleClassDetail(String name, String obfuscatedName, IClassDetail superClassMap) {
+    public SimpleClassDetail(String name, String obfuscatedName, ClassDetail superClassMap) {
         fields = new HashMap<String, String>();
         method = new HashMap<String, Map<String, String>>();
         this.name = name;
@@ -95,7 +95,7 @@ public class SimpleClassDetail implements IClassDetail {
     }
 
     @Override
-    public IClassDetail getSuperclassMap() {
+    public ClassDetail getSuperclassMap() {
         return superClassMap;
     }
 }

@@ -22,19 +22,11 @@
 
 package com.lion328.thaifixes.asm.mapper;
 
-public interface IClassDetail {
+import com.lion328.thaifixes.asm.mapper.reader.JarReader;
 
-    String getName();
+import java.io.IOException;
 
-    String getObfuscatedName();
+public interface ClassMapper {
 
-    String getField(String name);
-
-    String getMethod(String name, String desc);
-
-    void addField(String name, String obfuscatedName);
-
-    void addMethod(String name, String obfuscatedName, String desc);
-
-    IClassDetail getSuperclassMap();
+    boolean getMap(JarReader reader, ClassMap map) throws IOException;
 }

@@ -22,11 +22,11 @@
 
 package com.lion328.thaifixes.asm;
 
-import com.lion328.thaifixes.asm.mapper.IClassMap;
-import com.lion328.thaifixes.asm.mapper.IClassMapper;
+import com.lion328.thaifixes.asm.mapper.ClassMap;
+import com.lion328.thaifixes.asm.mapper.ClassMapper;
 import com.lion328.thaifixes.asm.mapper.SimpleClassMap;
 import com.lion328.thaifixes.asm.mapper.V1_6_2ClassMapper;
-import com.lion328.thaifixes.asm.mapper.reader.IJarReader;
+import com.lion328.thaifixes.asm.mapper.reader.JarReader;
 import com.lion328.thaifixes.asm.mapper.reader.MinecraftClassLoaderJarReader;
 import com.lion328.thaifixes.asm.mapper.reader.TransformedJarReader;
 import com.lion328.thaifixes.coremod.ThaiFixesCoremod;
@@ -37,9 +37,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 
 public class ClassMapManager {
-    private static IClassMap obfuscatedClassmap, defaultClassmap;
+    private static ClassMap obfuscatedClassmap, defaultClassmap;
 
-    public static IClassMap getObfuscatedClassmap() {
+    public static ClassMap getObfuscatedClassmap() {
         if (obfuscatedClassmap == null) {
             obfuscatedClassmap = generateClassmap(false);
         }
@@ -47,7 +47,7 @@ public class ClassMapManager {
         return obfuscatedClassmap;
     }
 
-    public static IClassMap getDefaultClassmap() {
+    public static ClassMap getDefaultClassmap() {
         if (defaultClassmap == null) {
             defaultClassmap = generateClassmap();
         }
@@ -55,14 +55,14 @@ public class ClassMapManager {
         return defaultClassmap;
     }
 
-    private static IClassMap generateClassmap() {
+    private static ClassMap generateClassmap() {
         return generateClassmap(true);
     }
 
-    private static IClassMap generateClassmap(boolean transfromedReading) {
+    private static ClassMap generateClassmap(boolean transfromedReading) {
         getLogger().info("Generating class map (transformedReading = " + transfromedReading + ")");
 
-        IClassMap classMap = new SimpleClassMap();
+        ClassMap classMap = new SimpleClassMap();
 
         if (Thread.currentThread().getContextClassLoader() instanceof LaunchClassLoader) {
             LaunchClassLoader cl = (LaunchClassLoader) Thread.currentThread().getContextClassLoader();
@@ -76,7 +76,7 @@ public class ClassMapManager {
             }
 
             MinecraftClassLoaderJarReader mcJarReader = new MinecraftClassLoaderJarReader(cl);
-            IJarReader reader = mcJarReader;
+            JarReader reader = mcJarReader;
 
             if (deobfuscatedEnvironment || !transfromedReading) {
                 reader = mcJarReader;
@@ -86,7 +86,7 @@ public class ClassMapManager {
             }
 
             try {
-                IClassMapper cm = new V1_6_2ClassMapper();
+                ClassMapper cm = new V1_6_2ClassMapper();
 
                 if (!cm.getMap(reader, classMap)) {
                     getLogger().error("Runtime mapping is not working.");

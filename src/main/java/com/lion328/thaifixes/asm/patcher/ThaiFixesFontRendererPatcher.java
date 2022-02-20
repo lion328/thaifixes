@@ -23,7 +23,7 @@
 package com.lion328.thaifixes.asm.patcher;
 
 import com.lion328.thaifixes.asm.ClassMapManager;
-import com.lion328.thaifixes.asm.mapper.IClassMap;
+import com.lion328.thaifixes.asm.mapper.ClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -35,9 +35,9 @@ import org.objectweb.asm.tree.MethodNode;
 
 public class ThaiFixesFontRendererPatcher extends SingleClassPatcher {
 
-    private IClassMap classMap;
+    private ClassMap classMap;
 
-    public ThaiFixesFontRendererPatcher(IClassMap classMap) {
+    public ThaiFixesFontRendererPatcher(ClassMap classMap) {
         this.classMap = classMap;
     }
 

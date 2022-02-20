@@ -22,7 +22,7 @@
 
 package com.lion328.thaifixes.asm.patcher;
 
-public abstract class SingleClassPatcher implements IClassPatcher {
+public abstract class SingleClassPatcher implements ClassPatcher {
     @Override
     public boolean isSupported(String name) {
         return getClassName().equals(name);

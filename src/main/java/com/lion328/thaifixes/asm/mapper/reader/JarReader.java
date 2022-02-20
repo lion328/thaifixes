@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.asm.patcher;
+package com.lion328.thaifixes.asm.mapper.reader;
 
-public interface IClassPatcher {
+import java.io.IOException;
 
-    boolean isSupported(String name);
+public interface JarReader {
 
-    byte[] patch(byte[] original) throws Exception;
+    byte[] getClassBytes(String name) throws IOException;
 }

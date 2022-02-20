@@ -1,19 +1,19 @@
 package com.lion328.thaifixes.asm.mapper;
 
-public final class IdentityClassMap implements IClassMap {
+public final class IdentityClassMap implements ClassMap {
     public static final IdentityClassMap INSTANCE = new IdentityClassMap();
 
     @Override
-    public IClassDetail getClass(String name) {
+    public ClassDetail getClass(String name) {
         return new IdentityClassDetail(name);
     }
 
     @Override
-    public IClassDetail addClass(IClassDetail classDetail) {
+    public ClassDetail addClass(ClassDetail classDetail) {
         throw new UnsupportedOperationException();
     }
 
-    private static class IdentityClassDetail implements IClassDetail {
+    private static class IdentityClassDetail implements ClassDetail {
         private final String className;
 
         public IdentityClassDetail(String className) {
@@ -51,7 +51,7 @@ public final class IdentityClassMap implements IClassMap {
         }
 
         @Override
-        public IClassDetail getSuperclassMap() {
+        public ClassDetail getSuperclassMap() {
             return null;
         }
     }

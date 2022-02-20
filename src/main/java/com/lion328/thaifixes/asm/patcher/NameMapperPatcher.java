@@ -22,7 +22,7 @@
 
 package com.lion328.thaifixes.asm.patcher;
 
-import com.lion328.thaifixes.asm.mapper.IClassMap;
+import com.lion328.thaifixes.asm.mapper.ClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -40,9 +40,9 @@ public class NameMapperPatcher extends SingleClassPatcher {
 
     private String className;
     private byte[] originalBytecode;
-    private IClassMap classMap;
+    private ClassMap classMap;
 
-    public NameMapperPatcher(String className, InputStream classBytecode, IClassMap classMap) throws IOException {
+    public NameMapperPatcher(String className, InputStream classBytecode, ClassMap classMap) throws IOException {
         this(className, new byte[0], classMap);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -57,13 +57,13 @@ public class NameMapperPatcher extends SingleClassPatcher {
         originalBytecode = out.toByteArray();
     }
 
-    public NameMapperPatcher(String className, byte[] classBytecode, IClassMap classMap) {
+    public NameMapperPatcher(String className, byte[] classBytecode, ClassMap classMap) {
         this.className = className;
         originalBytecode = classBytecode.clone();
         this.classMap = classMap;
     }
 
-    public NameMapperPatcher(byte[] classBytecode, IClassMap classMap) {
+    public NameMapperPatcher(byte[] classBytecode, ClassMap classMap) {
         this(null, classBytecode, classMap);
     }
 
@@ -86,9 +86,9 @@ public class NameMapperPatcher extends SingleClassPatcher {
 
     public static class NameRemapper extends Remapper {
 
-        private final IClassMap classMap;
+        private final ClassMap classMap;
 
-        public NameRemapper(IClassMap classMap) {
+        public NameRemapper(ClassMap classMap) {
             this.classMap = classMap;
         }
 
@@ -119,11 +119,11 @@ public class NameMapperPatcher extends SingleClassPatcher {
 
     public static class NameMapperVisitor extends ClassVisitor {
 
-        private IClassMap classMap;
+        private ClassMap classMap;
 
         private String currentSuperclassName;
 
-        public NameMapperVisitor(int api, ClassVisitor cv, IClassMap classMap) {
+        public NameMapperVisitor(int api, ClassVisitor cv, ClassMap classMap) {
             super(api, cv);
             this.classMap = classMap;
         }

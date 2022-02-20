@@ -22,7 +22,7 @@
 
 package com.lion328.thaifixes.asm.mapper;
 
-import com.lion328.thaifixes.asm.mapper.reader.IJarReader;
+import com.lion328.thaifixes.asm.mapper.reader.JarReader;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -40,10 +40,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class V1_6_2ClassMapper implements IClassMapper {
+public class V1_6_2ClassMapper implements ClassMapper {
 
     @Override
-    public boolean getMap(IJarReader jarReader, IClassMap classMap) throws IOException {
+    public boolean getMap(JarReader jarReader, ClassMap classMap) throws IOException {
         Map<String, String> map = new TreeMap<>((a, b) -> {
             // Sort class names before field/method names
             boolean isFieldA = a.indexOf(':') != -1;

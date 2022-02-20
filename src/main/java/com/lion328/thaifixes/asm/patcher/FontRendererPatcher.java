@@ -22,8 +22,8 @@
 
 package com.lion328.thaifixes.asm.patcher;
 
-import com.lion328.thaifixes.asm.mapper.IClassDetail;
-import com.lion328.thaifixes.asm.mapper.IClassMap;
+import com.lion328.thaifixes.asm.mapper.ClassDetail;
+import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.util.Cell;
 import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.ClassReader;
@@ -48,10 +48,10 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
     private static final String fontRendererInternalName = "net/minecraft/client/gui/FontRenderer";
 
-    private IClassMap classMap;
-    private IClassDetail fontRendererClass;
+    private ClassMap classMap;
+    private ClassDetail fontRendererClass;
 
-    public FontRendererPatcher(IClassMap classMap) {
+    public FontRendererPatcher(ClassMap classMap) {
         this.classMap = classMap;
         fontRendererClass = classMap.getClass(fontRendererInternalName);
     }

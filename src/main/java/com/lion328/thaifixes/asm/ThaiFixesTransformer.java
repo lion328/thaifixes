@@ -22,11 +22,11 @@
 
 package com.lion328.thaifixes.asm;
 
-import com.lion328.thaifixes.asm.mapper.IClassMap;
+import com.lion328.thaifixes.asm.mapper.ClassMap;
+import com.lion328.thaifixes.asm.patcher.ClassPatcher;
 import com.lion328.thaifixes.asm.patcher.FontRendererPatcher;
 import com.lion328.thaifixes.asm.patcher.GuiChatPatcher;
 import com.lion328.thaifixes.asm.patcher.GuiNewChatPatcher;
-import com.lion328.thaifixes.asm.patcher.IClassPatcher;
 import com.lion328.thaifixes.asm.patcher.MinecraftPatcher;
 import com.lion328.thaifixes.asm.patcher.ThaiFixesFontRendererPatcher;
 import com.lion328.thaifixes.coremod.ThaiFixesCoremod;
@@ -36,14 +36,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ThaiFixesTransformer implements IClassTransformer {
-    private List<IClassPatcher> patchers = new ArrayList<>();
+    private List<ClassPatcher> patchers = new ArrayList<>();
 
     public ThaiFixesTransformer() {
         initializePatchers();
     }
 
     private void initializePatchers() {
-        IClassMap classMap = ClassMapManager.getObfuscatedClassmap();
+        ClassMap classMap = ClassMapManager.getObfuscatedClassmap();
 
         try {
             patchers.add(new MinecraftPatcher(classMap));
@@ -60,7 +60,7 @@ public class ThaiFixesTransformer implements IClassTransformer {
     public byte[] transform(String name, String transformedName, byte[] original) {
         byte[] result = original;
 
-        for (IClassPatcher patcher : patchers) {
+        for (ClassPatcher patcher : patchers) {
             if (patcher.isSupported(name)) {
                 ThaiFixesCoremod.LOGGER.info("Patching {}", transformedName);
 

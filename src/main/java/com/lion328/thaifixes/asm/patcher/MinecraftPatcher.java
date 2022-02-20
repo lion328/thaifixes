@@ -22,7 +22,7 @@
 
 package com.lion328.thaifixes.asm.patcher;
 
-import com.lion328.thaifixes.asm.mapper.IClassMap;
+import com.lion328.thaifixes.asm.mapper.ClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -36,9 +36,9 @@ import org.objectweb.asm.tree.TypeInsnNode;
 
 public class MinecraftPatcher extends SingleClassPatcher {
 
-    private IClassMap classMap;
+    private ClassMap classMap;
 
-    public MinecraftPatcher(IClassMap classMap) {
+    public MinecraftPatcher(ClassMap classMap) {
         this.classMap = classMap;
     }
 
