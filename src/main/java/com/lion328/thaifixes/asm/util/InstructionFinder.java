@@ -27,8 +27,14 @@ import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.mapper.IdentityClassMap;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,64 +44,105 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
-public class InstructionFinder implements InstructionMatcher {
-    private ArrayList<InstructionMatcher> sequence = new ArrayList<>();
-    private InstructionFinderRecord record;
+public class InstructionFinder<T> implements InstructionMatcher {
+    private final List<InstructionMatcher> sequence;
+    private final InstructionFinderRecord record;
 
-    private boolean reversed;
-    private ClassMap classMap = IdentityClassMap.INSTANCE;
-    private ClassDetail currentClassDetail;
+    private final boolean reversed;
+    private final ClassMap classMap;
+    private final ClassDetail currentClassDetail;
 
-    public InstructionFinder reversed() {
-        reversed = !reversed;
-        return this;
+    private InstructionFinder() {
+        sequence = Collections.emptyList();
+        record = null;
+        reversed = false;
+        classMap = IdentityClassMap.INSTANCE;
+        currentClassDetail = null;
     }
 
-    public InstructionFinder withClassMap(ClassMap classMap) {
+    private InstructionFinder(List<InstructionMatcher> sequence, InstructionFinderRecord record, boolean reversed,
+                              ClassMap classMap, ClassDetail currentClassDetail) {
+        this.sequence = sequence;
+        this.record = record;
+        this.reversed = reversed;
         this.classMap = classMap;
+        this.currentClassDetail = currentClassDetail;
+    }
+
+    public static InstructionFinder<Void> create() {
+        return new InstructionFinder<>();
+    }
+
+    private InstructionFinder<T> flush() {
+        if (record != null) {
+            InstructionFinder<T> o = obfuscate();
+            return withRecord(null).addMatcher(o.record);
+        }
         return this;
     }
 
-    private void flush() {
-        if (record != null) {
-            obfuscate();
+    private <U> InstructionFinder<U> addMatcher(InstructionMatcher matcher) {
+        InstructionFinder<T> o = flush();
 
-            sequence.add(record);
-            record = null;
-        }
+        ArrayList<InstructionMatcher> sequence = new ArrayList<>(o.sequence);
+        sequence.add(matcher);
+
+        return new InstructionFinder<>(Collections.unmodifiableList(sequence), o.record, o.reversed, o.classMap,
+                o.currentClassDetail);
     }
 
-    private void obfuscate() {
+    private <U> InstructionFinder<U> withRecord(InstructionFinderRecord record) {
+        return new InstructionFinder<>(sequence, record, reversed, classMap, currentClassDetail);
+    }
+
+    public InstructionFinder<T> reversed() {
+        return new InstructionFinder<>(sequence, record, !reversed, classMap, currentClassDetail);
+    }
+
+    public InstructionFinder<T> withClassMap(ClassMap classMap) {
+        return new InstructionFinder<>(sequence, record, reversed, classMap, currentClassDetail);
+    }
+
+    private InstructionFinder<T> obfuscate() {
+        if (record == null)
+            throw new IllegalArgumentException();
+
+        InstructionFinderRecord record = this.record;
         if (record.type == AbstractInsnNode.FIELD_INSN)
-            obfuscateField();
+            record = obfuscateField();
         else if (record.type == AbstractInsnNode.METHOD_INSN)
-            obfuscateMethod();
+            record = obfuscateMethod();
 
         if (record.owner != null)
-            record.owner = currentClassDetail.getObfuscatedName();
+            record = record.withOwner(currentClassDetail.getObfuscatedName());
+
+        return withRecord(record);
     }
 
-    private void obfuscateField() {
+    private InstructionFinderRecord obfuscateField() {
+        InstructionFinderRecord record = this.record;
         if (record.name != null)
-            record.name = currentClassDetail.getField(record.name);
+            record = record.withName(currentClassDetail.getField(record.name));
 
         if (record.desc == null)
-            return;
+            return record;
 
         Type type = Type.getType(record.desc);
 
         if (type.getSort() == Type.OBJECT)
             type = Type.getObjectType(classMap.getClass(type.getClassName()).getObfuscatedName());
 
-        record.desc = type.getDescriptor();
+        record = record.withDescriptor(type.getDescriptor());
+        return record;
     }
 
-    private void obfuscateMethod() {
+    private InstructionFinderRecord obfuscateMethod() {
         if (record.desc == null)
-            return;
+            return record;
 
+        InstructionFinderRecord record = this.record;
         if (record.name != null)
-            record.name = currentClassDetail.getMethod(record.name, record.desc);
+            record.withName(currentClassDetail.getMethod(record.name, record.desc));
 
         Type type = Type.getMethodType(record.desc);
         Type[] argTypes = type.getArgumentTypes();
@@ -112,123 +159,113 @@ public class InstructionFinder implements InstructionMatcher {
         }
 
         type = Type.getMethodType(returnType, argTypes);
-        record.desc = type.getDescriptor();
+        record = record.withDescriptor(type.getDescriptor());
+
+        return record;
     }
 
-    private InstructionFinder newRecord(int type) {
-        flush();
-        record = new InstructionFinderRecord(type);
-        return this;
+    private <U> InstructionFinder<U> newRecord(int type) {
+        return flush().withRecord(new InstructionFinderRecord(type));
     }
 
-    public InstructionFinder field() {
+    public InstructionFinder<FieldInsnNode> field() {
         return newRecord(AbstractInsnNode.FIELD_INSN);
     }
 
-    public InstructionFinder field(int opcode) {
-        field();
-        record.opcode = opcode;
-        return this;
+    public InstructionFinder<FieldInsnNode> field(int opcode) {
+        InstructionFinder<FieldInsnNode> newFinder = field();
+        return newFinder.withRecord(newFinder.record.withOpcode(opcode));
     }
 
-    public InstructionFinder method() {
+    public InstructionFinder<MethodInsnNode> method() {
         return newRecord(AbstractInsnNode.METHOD_INSN);
     }
 
-    public InstructionFinder method(int opcode) {
-        method();
-        record.opcode = opcode;
-        return this;
+    public InstructionFinder<MethodInsnNode> method(int opcode) {
+        InstructionFinder<MethodInsnNode> newFinder = method();
+        return newFinder.withRecord(newFinder.record.withOpcode(opcode));
     }
 
-    public InstructionFinder var() {
+    public InstructionFinder<VarInsnNode> var() {
         return newRecord(AbstractInsnNode.VAR_INSN);
     }
 
-    public InstructionFinder var(int opcode) {
-        var();
-        record.opcode = opcode;
-        return this;
+    public InstructionFinder<VarInsnNode> var(int opcode) {
+        InstructionFinder<VarInsnNode> newFinder = var();
+        return newFinder.withRecord(newFinder.record.withOpcode(opcode));
     }
 
-    public InstructionFinder ldc(Object obj) {
-        newRecord(AbstractInsnNode.LDC_INSN);
-        record.constant = obj;
-        return this;
+    public InstructionFinder<LdcInsnNode> ldc(Object obj) {
+        InstructionFinder<VarInsnNode> newFinder = newRecord(AbstractInsnNode.LDC_INSN);
+        return newFinder.withRecord(newFinder.record.withConstant(obj));
     }
 
-    public InstructionFinder jump() {
+    public InstructionFinder<JumpInsnNode> jump() {
         return newRecord(AbstractInsnNode.JUMP_INSN);
     }
 
-    public InstructionFinder label() {
+    public InstructionFinder<LabelNode> label() {
         return newRecord(AbstractInsnNode.LABEL);
     }
 
-    public InstructionFinder insn() {
+    public InstructionFinder<InsnNode> insn() {
         return newRecord(AbstractInsnNode.INSN);
     }
 
-    public InstructionFinder insn(int opcode) {
-        newRecord(AbstractInsnNode.INSN);
-        record.opcode = opcode;
-        return this;
+    public InstructionFinder<InsnNode> insn(int opcode) {
+        InstructionFinder<InsnNode> newFinder = insn();
+        return newFinder.withRecord(newFinder.record.withOpcode(opcode));
     }
 
-    public InstructionFinder owner(String owner) {
-        if (record.owner != null || record.type != AbstractInsnNode.FIELD_INSN &&
+    public InstructionFinder<T> owner(String owner) {
+        if (record == null || record.owner != null || record.type != AbstractInsnNode.FIELD_INSN &&
                 record.type != AbstractInsnNode.METHOD_INSN)
             throw new IllegalArgumentException();
 
-        currentClassDetail = classMap.getClass(owner);
-        record.owner = owner;
-        return this;
+        return new InstructionFinder<>(sequence, record.withOwner(owner), reversed, classMap, classMap.getClass(owner));
     }
 
-    public InstructionFinder name(String name) {
-        if (record.name != null || record.type != AbstractInsnNode.FIELD_INSN &&
+    public InstructionFinder<T> name(String name) {
+        if (record == null || record.name != null || record.type != AbstractInsnNode.FIELD_INSN &&
                 record.type != AbstractInsnNode.METHOD_INSN)
             throw new IllegalArgumentException();
 
-        record.name = name;
-        return this;
+        return withRecord(record.withName(name));
     }
 
-    public InstructionFinder desc(String desc) {
-        if (record.desc != null)
+    public InstructionFinder<T> desc(String desc) {
+        if (record == null || record.desc != null)
             throw new IllegalArgumentException();
         if (record.type == AbstractInsnNode.METHOD_INSN && !desc.startsWith("("))
             throw new IllegalArgumentException();
 
-        record.desc = desc;
-        return this;
+        return withRecord(record.withDescriptor(desc));
     }
 
-    public InstructionFinder number(int i) {
-        if (record.type != AbstractInsnNode.VAR_INSN)
+    public InstructionFinder<T> number(int i) {
+        if (record == null || record.type != AbstractInsnNode.VAR_INSN)
             throw new IllegalArgumentException();
-        record.var = i;
-        return this;
+
+        return withRecord(record.withVariableNumber(i));
     }
 
-    public InstructionFinder label(LabelNode node) {
-        if (record.type != AbstractInsnNode.JUMP_INSN)
+    public InstructionFinder<T> label(LabelNode node) {
+        if (record == null || record.type != AbstractInsnNode.JUMP_INSN)
             throw new IllegalArgumentException();
-        record.label = node;
-        return this;
+
+        return withRecord(record.withLabel(node));
     }
 
-    public InstructionFinder skip() {
+    public InstructionFinder<Void> skip() {
         return skip(1);
     }
 
-    public InstructionFinder skip(int count) {
+    public InstructionFinder<Void> skip(int count) {
         return skipCountedWithCondition(count, node -> true);
     }
 
-    public InstructionFinder skipCountedWithCondition(int count, Function<AbstractInsnNode, Boolean> counted) {
-        flush();
-        sequence.add((it, cbs) -> {
+    public InstructionFinder<Void> skipCountedWithCondition(int count, Function<AbstractInsnNode, Boolean> counted) {
+        return addMatcher((it, cbs) -> {
             for (int i = 0; i < count; ) {
                 if (!it.hasNext())
                     return false;
@@ -237,34 +274,27 @@ public class InstructionFinder implements InstructionMatcher {
             }
             return true;
         });
-        return this;
     }
 
-    public InstructionFinder group(Function<InstructionFinder, InstructionMatcher> lambda) {
-        flush();
+    public InstructionFinder<Void> group(Function<InstructionFinder<Void>, InstructionMatcher> lambda) {
+        InstructionFinder<Void> child = new InstructionFinder<>(Collections.emptyList(), null, reversed,
+                classMap, null);
 
-        InstructionFinder child = new InstructionFinder();
-        child.classMap = classMap;
-        child.reversed = reversed;
-
-        sequence.add(lambda.apply(child));
-
-        return this;
+        return addMatcher(lambda.apply(child));
     }
 
-    public InstructionFinder not(Function<InstructionFinder, InstructionMatcher> lambda) {
+    public InstructionFinder<Void> not(Function<InstructionFinder<Void>, InstructionMatcher> lambda) {
         return group(finder -> {
             InstructionMatcher matcher = lambda.apply(finder);
             return (it, cbs) -> !matcher.matchAndComputeCallback(it, Collections.emptyList());
         });
     }
 
-    public InstructionFinder whenMatch(Consumer<AbstractInsnNode> fn) {
-        record.addCallback(fn);
-        return this;
+    public InstructionFinder<T> whenMatch(Consumer<T> fn) {
+        return withRecord(record.withCallbackAdded(node -> fn.accept((T) node)));
     }
 
-    public InstructionFinder whenMatchOnce(Consumer<AbstractInsnNode> fn) {
+    public InstructionFinder<T> whenMatchOnce(Consumer<T> fn) {
         Cell<Boolean> allowToCall = new Cell<>(true);
         return whenMatch(node -> {
             if (allowToCall.get()) {
@@ -277,7 +307,8 @@ public class InstructionFinder implements InstructionMatcher {
     private boolean find(InsnList list, AbstractInsnNode start, boolean once) {
         ArrayList<Runnable> callbacks = new ArrayList<>();
 
-        IntFunction<Boolean> matchFn = i -> matchAndComputeCallback(list.iterator(i), callbacks);
+        InstructionFinder<T> finder = flush();
+        IntFunction<Boolean> matchFn = i -> finder.matchAndComputeCallback(list.iterator(i), callbacks);
 
         boolean matchSome = false;
         int i = list.indexOf(start);
@@ -320,11 +351,11 @@ public class InstructionFinder implements InstructionMatcher {
 
     @Override
     public boolean matchAndComputeCallback(ListIterator<AbstractInsnNode> it, List<Runnable> returnCallbacks) {
-        flush();
+        InstructionFinder<T> finder = flush();
 
         ArrayList<Runnable> callbacks = new ArrayList<>();
 
-        for (InstructionMatcher matcher : sequence)
+        for (InstructionMatcher matcher : finder.sequence)
             if (!matcher.matchAndComputeCallback(it, callbacks))
                 return false;
 

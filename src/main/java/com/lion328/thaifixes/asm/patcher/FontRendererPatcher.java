@@ -31,7 +31,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
@@ -73,15 +72,15 @@ public class FontRendererPatcher extends SingleClassPatcher {
                 mn.access &= ~Opcodes.ACC_PRIVATE;
             }
 
-            new InstructionFinder()
+            InstructionFinder.create()
                     .withClassMap(classMap)
                     .method(Opcodes.INVOKESPECIAL)
                     .owner(fontRendererInternalName)
-                    .whenMatch(insn -> ((MethodInsnNode) insn).setOpcode(Opcodes.INVOKEVIRTUAL))
+                    .whenMatch(node -> node.setOpcode(Opcodes.INVOKEVIRTUAL))
                     .find(mn.instructions);
         }
 
-        ArrayList<FieldNode> allObjectField = new ArrayList<FieldNode>();
+        ArrayList<FieldNode> allObjectField = new ArrayList<>();
         for (FieldNode fn : n.fields) {
             if ((fn.access & Opcodes.ACC_STATIC) == 0) {
                 allObjectField.add(fn);
@@ -99,14 +98,19 @@ public class FontRendererPatcher extends SingleClassPatcher {
         for (FieldNode fn : allObjectField) {
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             if (fn.desc.length() == 1) { // primitives
-                if (fn.desc.equals("F")) {
-                    mv.visitInsn(Opcodes.FCONST_0);
-                } else if (fn.desc.equals("D")) {
-                    mv.visitInsn(Opcodes.DCONST_0);
-                } else if (fn.desc.equals("J")) {
-                    mv.visitInsn(Opcodes.LCONST_0);
-                } else {
-                    mv.visitInsn(Opcodes.ICONST_0);
+                switch (fn.desc) {
+                    case "F":
+                        mv.visitInsn(Opcodes.FCONST_0);
+                        break;
+                    case "D":
+                        mv.visitInsn(Opcodes.DCONST_0);
+                        break;
+                    case "J":
+                        mv.visitInsn(Opcodes.LCONST_0);
+                        break;
+                    default:
+                        mv.visitInsn(Opcodes.ICONST_0);
+                        break;
                 }
             } else {
                 mv.visitInsn(Opcodes.ACONST_NULL);
@@ -157,27 +161,27 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
         // Find the character variable inside the loop.
         Cell<Integer> charVarCell = new Cell<>();
-        new InstructionFinder()
+        InstructionFinder.create()
                 .method().owner("java/lang/String").name("charAt")
-                .var(Opcodes.ISTORE).whenMatch(node -> charVarCell.set(((VarInsnNode) node).var))
+                .var(Opcodes.ISTORE).whenMatch(node -> charVarCell.set(node.var))
                 .findFirst(insns);
 
         // Find index where the loop condition belong.
         Cell<JumpInsnNode> conditionInsnCell = new Cell<>();
-        new InstructionFinder()
+        InstructionFinder.create()
                 .method().owner("java/lang/String").name("length")
-                .jump().whenMatch(node -> conditionInsnCell.set((JumpInsnNode) node))
+                .jump().whenMatch(conditionInsnCell::set)
                 .findFirst(insns);
 
         // Find jump destination point back from the end of the loop.
         Cell<LabelNode> labelCell = new Cell<>();
-        new InstructionFinder()
+        InstructionFinder.create()
                 .reversed()
-                .label().whenMatch(node -> labelCell.set((LabelNode) node))
+                .label().whenMatch(labelCell::set)
                 .findFirstStartFrom(insns, conditionInsnCell.get());
 
         // Find a jump where its destination = firstLabelNode and insert instructions.
-        new InstructionFinder().jump().label(labelCell.get()).whenMatch(insn -> {
+        InstructionFinder.create().jump().label(labelCell.get()).whenMatch(insn -> {
             InsnList list = new InsnList();
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
             list.add(new VarInsnNode(Opcodes.ILOAD, charVarCell.get()));
@@ -196,21 +200,18 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
     private int patchShadowShiftSize(MethodNode methodNode, ClassVisitor visitor, int charVar, int originalShiftVar) {
         InsnList insns = methodNode.instructions;
-        AbstractInsnNode absInsn;
 
         // Find shiftVar.
         Cell<Integer> shiftVarCell = new Cell<>();
-        new InstructionFinder()
+        InstructionFinder.create()
                 .withClassMap(classMap)
                 .field(Opcodes.GETFIELD).owner(fontRendererInternalName).name("posY")
-                .var(Opcodes.FLOAD).whenMatch(node -> shiftVarCell.set(((VarInsnNode) node).var))
+                .var(Opcodes.FLOAD).whenMatch(node -> shiftVarCell.set(node.var))
                 .insn(Opcodes.FSUB)
                 .findFirst(insns);
 
         // Find the instruction that set the variable and add instructions.
-        new InstructionFinder().var(Opcodes.FSTORE).number(shiftVarCell.get()).whenMatch(node -> {
-            VarInsnNode insn = (VarInsnNode) node;
-
+        InstructionFinder.create().var(Opcodes.FSTORE).number(shiftVarCell.get()).whenMatch(node -> {
             InsnList insertList = new InsnList();
             insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
             insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
@@ -218,9 +219,9 @@ public class FontRendererPatcher extends SingleClassPatcher {
             insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
                     "getShadowShiftSizeThaiFixes", "(CF)F", false));
             insertList.add(new VarInsnNode(Opcodes.FSTORE, shiftVarCell.get()));
-            insns.insert(insn, insertList);
+            insns.insert(node, insertList);
 
-            insn.var = originalShiftVar;
+            node.var = originalShiftVar;
         }).findFirst(insns);
 
         // Add a new method for interception.
@@ -235,12 +236,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
     private void patchBoldShiftSize(MethodNode methodNode, ClassVisitor visitor, int charVar, int shiftVar,
                                     int originalShiftVar, int boldShiftVar) {
-        String posX = fontRendererClass.getField("posX");
-        String posY = fontRendererClass.getField("posY");
-
         InsnList insns = methodNode.instructions;
-        AbstractInsnNode absInsn;
-        boolean getVarInserted = false;
 
         // Find posX -= shiftVar that not immediately followed by posY.
 
@@ -251,7 +247,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
         // 5. FADD/FSUB
         // 6. PUTFIELD posX/Y
         // Total: 6 instructions
-        new InstructionFinder()
+        InstructionFinder.create()
                 .withClassMap(classMap)
                 .field(Opcodes.GETFIELD).owner(fontRendererInternalName).name("posX")
                 .var(Opcodes.FLOAD).number(shiftVar)
@@ -266,7 +262,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
                     insns.insertBefore(node, insertList);
                 })
-                .whenMatch(node -> ((VarInsnNode) node).var = boldShiftVar)
+                .whenMatch(node -> node.var = boldShiftVar)
                 .skip()
                 .field(Opcodes.PUTFIELD).owner(fontRendererInternalName).name("posX")
                 .skipCountedWithCondition(2, node ->

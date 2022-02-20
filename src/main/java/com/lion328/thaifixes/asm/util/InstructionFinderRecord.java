@@ -31,27 +31,79 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 
 public class InstructionFinderRecord implements InstructionMatcher {
-    final int type;
-    private List<Consumer<AbstractInsnNode>> callbacks = new ArrayList<>();
-    Integer opcode;
-    String owner;
-    String name;
-    String desc;
-    Integer var;
-    Object constant;
-    LabelNode label;
+    public final int type;
+    private final List<Consumer<AbstractInsnNode>> callbacks;
+    public final Integer opcode;
+    public final String owner;
+    public final String name;
+    public final String desc;
+    public final Integer var;
+    public final Object constant;
+    public final LabelNode label;
 
     public InstructionFinderRecord(int type) {
         this.type = type;
+        callbacks = Collections.emptyList();
+        opcode = null;
+        owner = null;
+        name = null;
+        desc = null;
+        var = null;
+        constant = null;
+        label = null;
     }
 
-    public void addCallback(Consumer<AbstractInsnNode> callback) {
-        callbacks.add(callback);
+    private InstructionFinderRecord(int type, List<Consumer<AbstractInsnNode>> callbacks, Integer opcode, String owner,
+                                    String name, String desc, Integer var, Object constant, LabelNode label) {
+        this.type = type;
+        this.callbacks = callbacks;
+        this.opcode = opcode;
+        this.owner = owner;
+        this.name = name;
+        this.desc = desc;
+        this.var = var;
+        this.constant = constant;
+        this.label = label;
+    }
+
+    public InstructionFinderRecord withCallbackAdded(Consumer<AbstractInsnNode> callback) {
+        ArrayList<Consumer<AbstractInsnNode>> newCallbackList = new ArrayList<>(callbacks);
+        newCallbackList.add(callback);
+        return new InstructionFinderRecord(type, newCallbackList, opcode, owner, name, desc, var, constant, label);
+    }
+
+    public InstructionFinderRecord withOpcode(int opcode) {
+        return new InstructionFinderRecord(type, callbacks, opcode, owner, name, desc, var, constant, label);
+    }
+
+    public InstructionFinderRecord withOwner(String owner) {
+        return new InstructionFinderRecord(type, callbacks, opcode, owner, name, desc, var, constant, label);
+    }
+
+    public InstructionFinderRecord withName(String name) {
+        return new InstructionFinderRecord(type, callbacks, opcode, owner, name, desc, var, constant, label);
+    }
+
+    public InstructionFinderRecord withDescriptor(String desc) {
+        return new InstructionFinderRecord(type, callbacks, opcode, owner, name, desc, var, constant, label);
+    }
+
+    public InstructionFinderRecord withVariableNumber(int var) {
+        return new InstructionFinderRecord(type, callbacks, opcode, owner, name, desc, var, constant, label);
+    }
+
+    public InstructionFinderRecord withConstant(Object constant) {
+        return new InstructionFinderRecord(type, callbacks, opcode, owner, name, desc, var, constant, label);
+    }
+
+    public InstructionFinderRecord withLabel(LabelNode label) {
+        return new InstructionFinderRecord(type, callbacks, opcode, owner, name, desc, var, constant, label);
     }
 
     private boolean match(AbstractInsnNode obj) {
