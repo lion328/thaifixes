@@ -1,4 +1,6 @@
-# [ThaiFixes](http://thaifixes.lion328.com) [![Build Status](https://travis-ci.org/lion328/ThaiFixes.svg?branch=master)](https://travis-ci.org/lion328/ThaiFixes)
+# [ThaiFixes](http://thaifixes.lion328.com)
+
+[![CI](https://github.com/lion328/thaifixes/actions/workflows/ci.yml/badge.svg)](https://github.com/lion328/thaifixes/actions/workflows/ci.yml)
 
 Make Thai language in Minecraft looks better.
 
