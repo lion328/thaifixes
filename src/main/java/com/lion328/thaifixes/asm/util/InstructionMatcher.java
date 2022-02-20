@@ -24,13 +24,9 @@ package com.lion328.thaifixes.asm.util;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 
+import java.util.List;
 import java.util.ListIterator;
 
 public interface InstructionMatcher {
-    InstructionMatcher SKIP_ONE = it -> {
-        it.next();
-        return true;
-    };
-
-    boolean match(ListIterator<AbstractInsnNode> it);
+    boolean matchAndComputeCallback(ListIterator<AbstractInsnNode> it, List<Runnable> callbacks);
 }

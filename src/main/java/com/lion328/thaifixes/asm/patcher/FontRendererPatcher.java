@@ -33,10 +33,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
@@ -48,12 +46,14 @@ import java.util.ArrayList;
 
 public class FontRendererPatcher extends SingleClassPatcher {
 
+    private static final String fontRendererInternalName = "net/minecraft/client/gui/FontRenderer";
+
     private IClassMap classMap;
     private IClassDetail fontRendererClass;
 
     public FontRendererPatcher(IClassMap classMap) {
         this.classMap = classMap;
-        fontRendererClass = classMap.getClass("net/minecraft/client/gui/FontRenderer");
+        fontRendererClass = classMap.getClass(fontRendererInternalName);
     }
 
     @Override
@@ -72,16 +72,13 @@ public class FontRendererPatcher extends SingleClassPatcher {
                 mn.access |= Opcodes.ACC_PROTECTED;
                 mn.access &= ~Opcodes.ACC_PRIVATE;
             }
-            InsnList insns = mn.instructions;
-            for (int i = 0; i < insns.size(); i++) {
-                AbstractInsnNode insn = insns.get(i);
-                if (insn.getOpcode() == Opcodes.INVOKESPECIAL) {
-                    MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                    if (methodInsn.owner.equals(fontRendererClass.getObfuscatedName())) {
-                        methodInsn.setOpcode(Opcodes.INVOKEVIRTUAL);
-                    }
-                }
-            }
+
+            new InstructionFinder()
+                    .withClassMap(classMap)
+                    .method(Opcodes.INVOKESPECIAL)
+                    .owner(fontRendererInternalName)
+                    .whenMatch(insn -> ((MethodInsnNode) insn).setOpcode(Opcodes.INVOKEVIRTUAL))
+                    .find(mn.instructions);
         }
 
         ArrayList<FieldNode> allObjectField = new ArrayList<FieldNode>();
@@ -155,117 +152,76 @@ public class FontRendererPatcher extends SingleClassPatcher {
         }
     }
 
-    private int patchOnCharRendered(MethodNode node, ClassVisitor visitor) {
-        InsnList insns = node.instructions;
+    private int patchOnCharRendered(MethodNode methodNode, ClassVisitor visitor) {
+        InsnList insns = methodNode.instructions;
 
         // Find the character variable inside the loop.
         Cell<Integer> charVarCell = new Cell<>();
         new InstructionFinder()
                 .method().owner("java/lang/String").name("charAt")
-                .var(Opcodes.ISTORE).whenMatch(insn -> charVarCell.set(((VarInsnNode) insn).var))
+                .var(Opcodes.ISTORE).whenMatch(node -> charVarCell.set(((VarInsnNode) node).var))
                 .findFirst(insns);
-        int charVar = charVarCell.get();
 
         // Find index where the loop condition belong.
-        int conditionIdx = -1;
-        for (int i = 0; i < insns.size(); i++) {
-            AbstractInsnNode insn0 = insns.get(i);
-            AbstractInsnNode insn1 = insns.get(i + 1);
-
-            if (!(insn1 instanceof JumpInsnNode && insn0 instanceof MethodInsnNode))
-                continue;
-
-            MethodInsnNode insn = (MethodInsnNode) insn0;
-            if ("java/lang/String".equals(insn.owner) && "length".equals(insn.name)) {
-                conditionIdx = i;
-                break;
-            }
-        }
+        Cell<JumpInsnNode> conditionInsnCell = new Cell<>();
+        new InstructionFinder()
+                .method().owner("java/lang/String").name("length")
+                .jump().whenMatch(node -> conditionInsnCell.set((JumpInsnNode) node))
+                .findFirst(insns);
 
         // Find jump destination point back from the end of the loop.
-        LabelNode firstLabelNode = null;
-        for (int i = conditionIdx - 1; i >= 0; i--) {
-            AbstractInsnNode insn = insns.get(i);
+        Cell<LabelNode> labelCell = new Cell<>();
+        new InstructionFinder()
+                .reversed()
+                .label().whenMatch(node -> labelCell.set((LabelNode) node))
+                .findFirstStartFrom(insns, conditionInsnCell.get());
 
-            if (insn instanceof LabelNode) {
-                firstLabelNode = (LabelNode) insn;
-                break;
-            }
-        }
+        // Find a jump where its destination = firstLabelNode and insert instructions.
+        new InstructionFinder().jump().label(labelCell.get()).whenMatch(insn -> {
+            InsnList list = new InsnList();
+            list.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            list.add(new VarInsnNode(Opcodes.ILOAD, charVarCell.get()));
+            list.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
+                    "onCharRenderedThaiFixes", "(C)V", false));
+            insns.insertBefore(insn, list);
+        }).findFirst(insns);
 
-        // Find a jump where its destination = firstLabelNode.
-        JumpInsnNode jumpInsn = null;
-        for (int i = 0; i < insns.size(); i++) {
-            AbstractInsnNode absInsn = insns.get(i);
-            if (absInsn instanceof JumpInsnNode) {
-                JumpInsnNode insn = (JumpInsnNode) absInsn;
-                if (insn.label == firstLabelNode) {
-                    jumpInsn = insn;
-                    break;
-                }
-            }
-        }
-
-        InsnList insertList = new InsnList();
-        insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-        insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
-        insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
-                "onCharRenderedThaiFixes", "(C)V", false));
-        insns.insertBefore(jumpInsn, insertList);
-
+        // Create the method.
         MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "onCharRenderedThaiFixes", "(C)V",
                 null, null);
         mv.visitInsn(Opcodes.RETURN);
-        mv.visitEnd();
 
-        return charVar;
+        return charVarCell.get();
     }
 
-    private int patchShadowShiftSize(MethodNode node, ClassVisitor visitor, int charVar, int originalShiftVar) {
-        String posY = fontRendererClass.getField("posY");
-
-        int shiftVar = -1;
-
-        InsnList insns = node.instructions;
+    private int patchShadowShiftSize(MethodNode methodNode, ClassVisitor visitor, int charVar, int originalShiftVar) {
+        InsnList insns = methodNode.instructions;
         AbstractInsnNode absInsn;
 
         // Find shiftVar.
-        for (int i = 0; i < insns.size(); i++) {
-            absInsn = insns.get(i);
-            if (absInsn.getOpcode() != Opcodes.GETFIELD || !posY.equals(((FieldInsnNode) absInsn).name))
-                continue;
+        Cell<Integer> shiftVarCell = new Cell<>();
+        new InstructionFinder()
+                .withClassMap(classMap)
+                .field(Opcodes.GETFIELD).owner(fontRendererInternalName).name("posY")
+                .var(Opcodes.FLOAD).whenMatch(node -> shiftVarCell.set(((VarInsnNode) node).var))
+                .insn(Opcodes.FSUB)
+                .findFirst(insns);
 
-            absInsn = insns.get(++i);
-            if (absInsn.getOpcode() != Opcodes.FLOAD)
-                continue;
+        // Find the instruction that set the variable and add instructions.
+        new InstructionFinder().var(Opcodes.FSTORE).number(shiftVarCell.get()).whenMatch(node -> {
+            VarInsnNode insn = (VarInsnNode) node;
 
-            if (insns.get(++i).getOpcode() == Opcodes.FSUB) {
-                shiftVar = ((VarInsnNode) absInsn).var;
-                break;
-            }
-        }
+            InsnList insertList = new InsnList();
+            insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
+            insertList.add(new VarInsnNode(Opcodes.FLOAD, originalShiftVar));
+            insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
+                    "getShadowShiftSizeThaiFixes", "(CF)F", false));
+            insertList.add(new VarInsnNode(Opcodes.FSTORE, shiftVarCell.get()));
+            insns.insert(insn, insertList);
 
-        // Find the instruction that set the variable.
-        VarInsnNode setShiftVarInsn = null;
-        for (int i = 0; i < insns.size(); i++) {
-            absInsn = insns.get(i);
-            if (absInsn.getOpcode() == Opcodes.FSTORE && ((VarInsnNode) absInsn).var == shiftVar) {
-                setShiftVarInsn = (VarInsnNode) absInsn;
-                break;
-            }
-        }
-
-        // Intercept it.
-        InsnList insertList = new InsnList();
-        insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-        insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
-        insertList.add(new VarInsnNode(Opcodes.FLOAD, originalShiftVar));
-        insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
-                "getShadowShiftSizeThaiFixes", "(CF)F", false));
-        insertList.add(new VarInsnNode(Opcodes.FSTORE, shiftVar));
-
-        setShiftVarInsn.var = originalShiftVar;
-        insns.insert(setShiftVarInsn, insertList);
+            insn.var = originalShiftVar;
+        }).findFirst(insns);
 
         // Add a new method for interception.
         MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "getShadowShiftSizeThaiFixes", "(CF)F",
@@ -274,73 +230,49 @@ public class FontRendererPatcher extends SingleClassPatcher {
         mv.visitInsn(Opcodes.FRETURN);
         mv.visitEnd();
 
-        return shiftVar;
+        return shiftVarCell.get();
     }
 
-    private void patchBoldShiftSize(MethodNode node, ClassVisitor visitor, int charVar, int shiftVar,
+    private void patchBoldShiftSize(MethodNode methodNode, ClassVisitor visitor, int charVar, int shiftVar,
                                     int originalShiftVar, int boldShiftVar) {
         String posX = fontRendererClass.getField("posX");
         String posY = fontRendererClass.getField("posY");
 
-        InsnList insns = node.instructions;
+        InsnList insns = methodNode.instructions;
         AbstractInsnNode absInsn;
         boolean getVarInserted = false;
 
         // Find posX -= shiftVar that not immediately followed by posY.
-        for (int i = 0; i < insns.size(); i++) {
-            absInsn = insns.get(i);
 
-            // Basically,
-            // 1. ALOAD 0
-            // 2. DUP
-            // 3. GETFIELD posX/Y
-            // 4. FLOAD shiftVar
-            // 5. FADD/FSUB
-            // 6. PUTFIELD posX/Y
-            // Total: 6 instructions
+        // 1. ALOAD 0
+        // 2. DUP
+        // 3. GETFIELD posX/Y
+        // 4. FLOAD shiftVar
+        // 5. FADD/FSUB
+        // 6. PUTFIELD posX/Y
+        // Total: 6 instructions
+        new InstructionFinder()
+                .withClassMap(classMap)
+                .field(Opcodes.GETFIELD).owner(fontRendererInternalName).name("posX")
+                .var(Opcodes.FLOAD).number(shiftVar)
+                .whenMatchOnce(node -> {
+                    InsnList insertList = new InsnList();
+                    insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                    insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
+                    insertList.add(new VarInsnNode(Opcodes.FLOAD, originalShiftVar));
+                    insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
+                            "getBoldShiftSizeThaiFixes", "(CF)F", false));
+                    insertList.add(new VarInsnNode(Opcodes.FSTORE, boldShiftVar));
 
-            if (absInsn.getOpcode() != Opcodes.GETFIELD || !posX.equals(((FieldInsnNode) absInsn).name))
-                continue;
-
-            absInsn = insns.get(++i);
-            if (absInsn.getOpcode() != Opcodes.FLOAD || ((VarInsnNode) absInsn).var != shiftVar)
-                continue;
-            VarInsnNode floadInsn = (VarInsnNode) absInsn;
-
-            i++; // Skip FADD/FSUB.
-            absInsn = insns.get(++i);
-            if (absInsn.getOpcode() != Opcodes.PUTFIELD || !posX.equals(((FieldInsnNode) absInsn).name))
-                break;
-
-            for (int j = 0; j < 3; ) {
-                absInsn = insns.get(++i);
-                if (absInsn instanceof LabelNode || absInsn instanceof LineNumberNode)
-                    continue;
-                j++;
-            }
-
-            // Only GETFIELD posY check should be sufficient.
-            if (absInsn.getOpcode() == Opcodes.GETFIELD && posY.equals(((FieldInsnNode) absInsn).name))
-                continue;
-
-            if (!getVarInserted) {
-                InsnList insertList = new InsnList();
-                insertList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                insertList.add(new VarInsnNode(Opcodes.ILOAD, charVar));
-                insertList.add(new VarInsnNode(Opcodes.FLOAD, originalShiftVar));
-                insertList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, fontRendererClass.getObfuscatedName(),
-                        "getBoldShiftSizeThaiFixes", "(CF)F", false));
-                insertList.add(new InsnNode(Opcodes.DUP));
-                insertList.add(new VarInsnNode(Opcodes.FSTORE, boldShiftVar));
-
-                insns.insert(floadInsn, insertList);
-                insns.remove(floadInsn);
-
-                getVarInserted = true;
-            } else {
-                floadInsn.var = boldShiftVar;
-            }
-        }
+                    insns.insertBefore(node, insertList);
+                })
+                .whenMatch(node -> ((VarInsnNode) node).var = boldShiftVar)
+                .skip()
+                .field(Opcodes.PUTFIELD).owner(fontRendererInternalName).name("posX")
+                .skipCountedWithCondition(2, node ->
+                        !(node instanceof LabelNode || node instanceof LineNumberNode))
+                .not(f -> f.field(Opcodes.GETFIELD).owner(fontRendererInternalName).name("posY"))
+                .find(insns);
 
         MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PROTECTED, "getBoldShiftSizeThaiFixes", "(CF)F",
                 null, null);

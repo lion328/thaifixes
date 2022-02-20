@@ -4,6 +4,13 @@ public class Cell<T> {
 
     private T value;
 
+    public Cell() {
+    }
+
+    public Cell(T value) {
+        set(value);
+    }
+
     public T get() {
         return value;
     }

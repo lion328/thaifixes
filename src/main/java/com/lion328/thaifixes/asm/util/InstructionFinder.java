@@ -3,31 +3,40 @@ package com.lion328.thaifixes.asm.util;
 import com.lion328.thaifixes.asm.mapper.IClassDetail;
 import com.lion328.thaifixes.asm.mapper.IClassMap;
 import com.lion328.thaifixes.asm.mapper.IdentityClassMap;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.LabelNode;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class InstructionFinder implements InstructionMatcher {
     private ArrayList<InstructionMatcher> sequence = new ArrayList<>();
     private InstructionFinderRecord record;
 
-    // TODO: how to reverse?
     private boolean reversed;
-    private Object returnValue;
-
     private IClassMap classMap = IdentityClassMap.INSTANCE;
     private IClassDetail currentClassDetail;
 
+    public InstructionFinder reversed() {
+        reversed = !reversed;
+        return this;
+    }
+
+    public InstructionFinder withClassMap(IClassMap classMap) {
+        this.classMap = classMap;
+        return this;
+    }
+
     private void flush() {
         if (record != null) {
-            if (record.desc != null)
-                obfuscate();
+            obfuscate();
 
             sequence.add(record);
             record = null;
@@ -39,11 +48,17 @@ public class InstructionFinder implements InstructionMatcher {
             obfuscateField();
         else if (record.type == AbstractInsnNode.METHOD_INSN)
             obfuscateMethod();
+
+        if (record.owner != null)
+            record.owner = currentClassDetail.getObfuscatedName();
     }
 
     private void obfuscateField() {
         if (record.name != null)
             record.name = currentClassDetail.getField(record.name);
+
+        if (record.desc == null)
+            return;
 
         Type type = Type.getType(record.desc);
 
@@ -78,10 +93,14 @@ public class InstructionFinder implements InstructionMatcher {
         record.desc = type.getDescriptor();
     }
 
-    public InstructionFinder field() {
+    private InstructionFinder newRecord(int type) {
         flush();
-        record = new InstructionFinderRecord(AbstractInsnNode.FIELD_INSN);
+        record = new InstructionFinderRecord(type);
         return this;
+    }
+
+    public InstructionFinder field() {
+        return newRecord(AbstractInsnNode.FIELD_INSN);
     }
 
     public InstructionFinder field(int opcode) {
@@ -91,9 +110,7 @@ public class InstructionFinder implements InstructionMatcher {
     }
 
     public InstructionFinder method() {
-        flush();
-        record = new InstructionFinderRecord(AbstractInsnNode.METHOD_INSN);
-        return this;
+        return newRecord(AbstractInsnNode.METHOD_INSN);
     }
 
     public InstructionFinder method(int opcode) {
@@ -103,14 +120,36 @@ public class InstructionFinder implements InstructionMatcher {
     }
 
     public InstructionFinder var() {
-        flush();
-        record = new InstructionFinderRecord(AbstractInsnNode.VAR_INSN);
+        return newRecord(AbstractInsnNode.VAR_INSN);
+    }
+
+    public InstructionFinder var(int opcode) {
+        var();
+        record.opcode = opcode;
         return this;
     }
 
-    public InstructionFinder var(int i) {
-        var();
-        record.opcode = i;
+    public InstructionFinder ldc(Object obj) {
+        newRecord(AbstractInsnNode.LDC_INSN);
+        record.constant = obj;
+        return this;
+    }
+
+    public InstructionFinder jump() {
+        return newRecord(AbstractInsnNode.JUMP_INSN);
+    }
+
+    public InstructionFinder label() {
+        return newRecord(AbstractInsnNode.LABEL);
+    }
+
+    public InstructionFinder insn() {
+        return newRecord(AbstractInsnNode.INSN);
+    }
+
+    public InstructionFinder insn(int opcode) {
+        newRecord(AbstractInsnNode.INSN);
+        record.opcode = opcode;
         return this;
     }
 
@@ -150,10 +189,10 @@ public class InstructionFinder implements InstructionMatcher {
         return this;
     }
 
-    public InstructionFinder ldc(Object obj) {
-        flush();
-        record = new InstructionFinderRecord(Opcodes.LDC);
-        record.constant = obj;
+    public InstructionFinder label(LabelNode node) {
+        if (record.type != AbstractInsnNode.JUMP_INSN)
+            throw new IllegalArgumentException();
+        record.label = node;
         return this;
     }
 
@@ -162,14 +201,20 @@ public class InstructionFinder implements InstructionMatcher {
     }
 
     public InstructionFinder skip(int count) {
-        flush();
-        for (int i = 0; i < count; i++)
-            sequence.add(InstructionMatcher.SKIP_ONE);
-        return this;
+        return skipCountedWithCondition(count, node -> true);
     }
 
-    public InstructionFinder whenMatch(Consumer<AbstractInsnNode> fn) {
-        record.callback = fn;
+    public InstructionFinder skipCountedWithCondition(int count, Function<AbstractInsnNode, Boolean> counted) {
+        flush();
+        sequence.add((it, cbs) -> {
+            for (int i = 0; i < count; ) {
+                if (!it.hasNext())
+                    return false;
+                if (counted.apply(it.next()))
+                    i++;
+            }
+            return true;
+        });
         return this;
     }
 
@@ -188,34 +233,81 @@ public class InstructionFinder implements InstructionMatcher {
     public InstructionFinder not(Function<InstructionFinder, InstructionMatcher> lambda) {
         return group(finder -> {
             InstructionMatcher matcher = lambda.apply(finder);
-            return it -> !matcher.match(it);
+            return (it, cbs) -> !matcher.matchAndComputeCallback(it, Collections.emptyList());
         });
     }
 
-    public boolean findFirst(InsnList list) {
-        flush();
-
-        for (int i = 0; i < list.size(); i++) {
-            ListIterator<AbstractInsnNode> it = list.iterator(i);
-            if (match(it)) {
-                runCallback(list.iterator(i));
-                return true;
-            }
-        }
-        return false;
+    public InstructionFinder whenMatch(Consumer<AbstractInsnNode> fn) {
+        record.addCallback(fn);
+        return this;
     }
 
-    private void runCallback(ListIterator<AbstractInsnNode> it) {
-        for (InstructionMatcher matcher : sequence)
-            if (matcher instanceof InstructionFinderRecord)
-                ((InstructionFinderRecord) matcher).runCallback(it.next());
+    public InstructionFinder whenMatchOnce(Consumer<AbstractInsnNode> fn) {
+        Cell<Boolean> allowToCall = new Cell<>(true);
+        return whenMatch(node -> {
+            if (allowToCall.get()) {
+                fn.accept(node);
+                allowToCall.set(false);
+            }
+        });
+    }
+
+    private boolean find(InsnList list, AbstractInsnNode start, boolean once) {
+        ArrayList<Runnable> callbacks = new ArrayList<>();
+
+        IntFunction<Boolean> matchFn = i -> matchAndComputeCallback(list.iterator(i), callbacks);
+
+        boolean matchSome = false;
+        int i = list.indexOf(start);
+        if (reversed) {
+            for (; i >= 0; i--)
+                if (matchFn.apply(i)) {
+                    matchSome = true;
+                    if (once)
+                        break;
+                }
+        } else {
+            for (; i < list.size(); i++)
+                if (matchFn.apply(i)) {
+                    matchSome = true;
+                    if (once)
+                        break;
+                }
+        }
+
+        callbacks.forEach(Runnable::run);
+
+        return matchSome;
+    }
+
+    public boolean findFirstStartFrom(InsnList list, AbstractInsnNode start) {
+        return find(list, start, true);
+    }
+
+    public boolean findFirst(InsnList list) {
+        return findFirstStartFrom(list, list.getFirst());
+    }
+
+    public boolean find(InsnList list, AbstractInsnNode start) {
+        return find(list, start, false);
+    }
+
+    public boolean find(InsnList list) {
+        return find(list, list.getFirst(), false);
     }
 
     @Override
-    public boolean match(ListIterator<AbstractInsnNode> it) {
+    public boolean matchAndComputeCallback(ListIterator<AbstractInsnNode> it, List<Runnable> returnCallbacks) {
+        flush();
+
+        ArrayList<Runnable> callbacks = new ArrayList<>();
+
         for (InstructionMatcher matcher : sequence)
-            if (!it.hasNext() || !matcher.match(it))
+            if (!matcher.matchAndComputeCallback(it, callbacks))
                 return false;
+
+        returnCallbacks.addAll(callbacks);
+
         return true;
     }
 }
