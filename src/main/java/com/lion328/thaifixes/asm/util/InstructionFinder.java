@@ -51,22 +51,20 @@ public class InstructionFinder<T> implements InstructionMatcher {
     private final boolean reversed;
     private final ClassMap classMap;
     private final ClassDetail currentClassDetail;
-
-    private InstructionFinder() {
-        sequence = Collections.emptyList();
-        record = null;
-        reversed = false;
-        classMap = IdentityClassMap.INSTANCE;
-        currentClassDetail = null;
-    }
+    private final String selfInternalName;
 
     private InstructionFinder(List<InstructionMatcher> sequence, InstructionFinderRecord record, boolean reversed,
-                              ClassMap classMap, ClassDetail currentClassDetail) {
+                              ClassMap classMap, ClassDetail currentClassDetail, String selfInternalName) {
         this.sequence = sequence;
         this.record = record;
         this.reversed = reversed;
         this.classMap = classMap;
         this.currentClassDetail = currentClassDetail;
+        this.selfInternalName = selfInternalName;
+    }
+
+    private InstructionFinder() {
+        this(Collections.emptyList(), null, false, IdentityClassMap.INSTANCE, null, null);
     }
 
     public static InstructionFinder<Void> create() {
@@ -88,19 +86,23 @@ public class InstructionFinder<T> implements InstructionMatcher {
         sequence.add(matcher);
 
         return new InstructionFinder<>(Collections.unmodifiableList(sequence), o.record, o.reversed, o.classMap,
-                o.currentClassDetail);
+                o.currentClassDetail, o.selfInternalName);
     }
 
     private <U> InstructionFinder<U> withRecord(InstructionFinderRecord record) {
-        return new InstructionFinder<>(sequence, record, reversed, classMap, currentClassDetail);
+        return new InstructionFinder<>(sequence, record, reversed, classMap, currentClassDetail, selfInternalName);
     }
 
     public InstructionFinder<T> reversed() {
-        return new InstructionFinder<>(sequence, record, !reversed, classMap, currentClassDetail);
+        return new InstructionFinder<>(sequence, record, !reversed, classMap, currentClassDetail, selfInternalName);
     }
 
     public InstructionFinder<T> withClassMap(ClassMap classMap) {
-        return new InstructionFinder<>(sequence, record, reversed, classMap, currentClassDetail);
+        return new InstructionFinder<>(sequence, record, reversed, classMap, currentClassDetail, selfInternalName);
+    }
+
+    public InstructionFinder<T> withSelfInternalName(String selfInternalName) {
+        return new InstructionFinder<>(sequence, record, reversed, classMap, currentClassDetail, selfInternalName);
     }
 
     private InstructionFinder<T> obfuscate() {
@@ -222,7 +224,12 @@ public class InstructionFinder<T> implements InstructionMatcher {
                 record.type != AbstractInsnNode.METHOD_INSN)
             throw new IllegalArgumentException();
 
-        return new InstructionFinder<>(sequence, record.withOwner(owner), reversed, classMap, classMap.getClass(owner));
+        return new InstructionFinder<>(sequence, record.withOwner(owner), reversed, classMap, classMap.getClass(owner),
+                selfInternalName);
+    }
+
+    public InstructionFinder<T> ownerSelf() {
+        return owner(selfInternalName);
     }
 
     public InstructionFinder<T> name(String name) {
@@ -278,7 +285,7 @@ public class InstructionFinder<T> implements InstructionMatcher {
 
     public InstructionFinder<Void> group(Function<InstructionFinder<Void>, InstructionMatcher> lambda) {
         InstructionFinder<Void> child = new InstructionFinder<>(Collections.emptyList(), null, reversed,
-                classMap, null);
+                classMap, null, selfInternalName);
 
         return addMatcher(lambda.apply(child));
     }
