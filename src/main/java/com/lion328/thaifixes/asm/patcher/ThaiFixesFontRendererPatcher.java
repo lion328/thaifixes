@@ -24,14 +24,10 @@ package com.lion328.thaifixes.asm.patcher;
 
 import com.lion328.thaifixes.asm.ClassMapManager;
 import com.lion328.thaifixes.asm.mapper.ClassMap;
+import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 public class ThaiFixesFontRendererPatcher extends SingleClassPatcher {
 
@@ -57,23 +53,15 @@ public class ThaiFixesFontRendererPatcher extends SingleClassPatcher {
 
         n.superName = replace;
 
-        for (MethodNode mn : n.methods) {
-            InsnList insns = mn.instructions;
-            for (int i = 0; i < insns.size(); i++) {
-                AbstractInsnNode abstractInsn = insns.get(i);
-                if (abstractInsn instanceof MethodInsnNode) {
-                    MethodInsnNode insn = (MethodInsnNode) abstractInsn;
-                    if (target.equals(insn.owner)) {
-                        insn.owner = replace;
-                    }
-                } else if (abstractInsn instanceof FieldInsnNode) {
-                    FieldInsnNode insn = (FieldInsnNode) abstractInsn;
-                    if (target.equals(insn.owner)) {
-                        insn.owner = replace;
-                    }
-                }
-            }
-        }
+        n.methods.forEach(method -> {
+            InstructionFinder.create()
+                    .method().owner(target).whenMatch(node -> node.owner = replace)
+                    .find(method.instructions);
+
+            InstructionFinder.create()
+                    .field().owner(target).whenMatch(node -> node.owner = replace)
+                    .find(method.instructions);
+        });
 
         ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         n.accept(w);

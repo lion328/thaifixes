@@ -71,6 +71,11 @@ public class InstructionFinder<T> implements InstructionMatcher {
         return new InstructionFinder<>();
     }
 
+    private InstructionFinder<Void> inheritAttributes() {
+        return new InstructionFinder<>(Collections.emptyList(), null, reversed, classMap, null,
+                selfInternalName);
+    }
+
     private InstructionFinder<T> flush() {
         if (record != null) {
             InstructionFinder<T> o = obfuscate();
@@ -283,17 +288,19 @@ public class InstructionFinder<T> implements InstructionMatcher {
         });
     }
 
-    public InstructionFinder<Void> group(Function<InstructionFinder<Void>, InstructionMatcher> lambda) {
-        InstructionFinder<Void> child = new InstructionFinder<>(Collections.emptyList(), null, reversed,
-                classMap, null, selfInternalName);
-
-        return addMatcher(lambda.apply(child));
+    public InstructionFinder<Void> not(Function<InstructionFinder<Void>, InstructionMatcher> lambda) {
+        InstructionMatcher matcher = lambda.apply(inheritAttributes());
+        return addMatcher((it, cbs) -> !matcher.matchAndComputeCallback(it, Collections.emptyList()));
     }
 
-    public InstructionFinder<Void> not(Function<InstructionFinder<Void>, InstructionMatcher> lambda) {
-        return group(finder -> {
-            InstructionMatcher matcher = lambda.apply(finder);
-            return (it, cbs) -> !matcher.matchAndComputeCallback(it, Collections.emptyList());
+    public InstructionFinder<Void> or(Function<InstructionFinder<Void>, InstructionMatcher> left,
+                                      Function<InstructionFinder<Void>, InstructionMatcher> right) {
+        InstructionMatcher leftMatcher = left.apply(inheritAttributes());
+        InstructionMatcher rightMatcher = right.apply(inheritAttributes());
+        return addMatcher((it, returnCallback) -> {
+            if (leftMatcher.matchAndComputeCallback(it, returnCallback))
+                return true;
+            return rightMatcher.matchAndComputeCallback(it, returnCallback);
         });
     }
 

@@ -23,6 +23,7 @@
 package com.lion328.thaifixes.asm.patcher;
 
 import com.lion328.thaifixes.asm.mapper.ClassMap;
+import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -74,6 +75,20 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
                 replaceTextYOffset(insns, insn);
             }
         }
+
+        n.methods.forEach(method -> {
+            InsnList list = method.instructions;
+            InstructionFinder<Void> finder = InstructionFinder.create().withClassMap(classMap);
+
+            finder
+                    .var(Opcodes.ALOAD).number(0).whenMatch(list::remove)
+                    .field(Opcodes.GETFIELD).whenMatch(list::remove)
+                    .field(Opcodes.GETFIELD).whenMatch(list::remove)
+                    .field(Opcodes.GETFIELD).owner("net/minecraft/client/gui/FontRenderer").desc("I")
+                    .whenMatch(node -> list.insert(getConfigFontHeightMethod()))
+                    .whenMatch(list::remove)
+                    .find(list);
+        });
 
         ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         n.accept(w);
