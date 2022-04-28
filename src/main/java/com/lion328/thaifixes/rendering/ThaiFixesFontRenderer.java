@@ -24,12 +24,10 @@ package com.lion328.thaifixes.rendering;
 
 import com.lion328.thaifixes.rendering.font.Font;
 import com.lion328.thaifixes.rendering.font.StubFont;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,13 +39,7 @@ public class ThaiFixesFontRenderer extends FakeFontRenderer {
     private Font font = new StubFont();
     private TextureManager renderEngine;
     private char lastChar = 0;
-    private float lastPosX = Float.NaN;
-    private float lastPosY = Float.NaN;
     private float lastCharShift = Float.NaN;
-
-    public static File getMinecraftDirectory() {
-        return Minecraft.getMinecraft().mcDataDir;
-    }
 
     public ThaiFixesFontRenderer(GameSettings settings, ResourceLocation asciiTex, TextureManager texMan, boolean unicode) {
         super(settings, asciiTex, texMan, unicode);
@@ -82,10 +74,6 @@ public class ThaiFixesFontRenderer extends FakeFontRenderer {
         if (!resourceLocationPool.containsKey(location))
             resourceLocationPool.put(location, new ResourceLocation(location));
         renderEngine.bindTexture(resourceLocationPool.get(location));
-    }
-
-    public int getDefaultCharacterWidth(char c) {
-        return super.getCharWidth(c);
     }
 
     public float getX() {
