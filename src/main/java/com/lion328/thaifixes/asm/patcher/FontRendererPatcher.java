@@ -294,8 +294,32 @@ public class FontRendererPatcher extends SingleClassPatcher {
     }
 
     private void patchRenderStringAtPos(MethodNode mn) {
+        int charVar = findRenderStringAtPosCharVar(mn);
+        int shiftVar = findRenderStringAtPosShiftVar(mn);
+
         patchRenderStringAtPosPrePostString(mn);
-        patchRenderStringAtPosShift(mn);
+        patchRenderStringAtPosPostChar(mn, charVar);
+        patchRenderStringAtPosShift(mn, charVar, shiftVar);
+    }
+
+    private int findRenderStringAtPosCharVar(MethodNode mn) {
+        // Find the character variable inside the loop.
+        Cell<Integer> charVarCell = new Cell<>();
+        finder
+                .method().owner("java/lang/String").name("charAt")
+                .var(Opcodes.ISTORE).whenMatch(node -> charVarCell.set(node.var))
+                .findFirst(mn.instructions);
+        return charVarCell.get();
+    }
+
+    private int findRenderStringAtPosShiftVar(MethodNode mn) {
+        Cell<Integer> shiftVarCell = new Cell<>();
+        finder
+                .field(Opcodes.GETFIELD).ownerSelf().name("posY")
+                .var(Opcodes.FLOAD).whenMatch(node -> shiftVarCell.set(node.var))
+                .insn(Opcodes.FSUB)
+                .findFirst(mn.instructions);
+        return shiftVarCell.get();
     }
 
     private void patchRenderStringAtPosPrePostString(MethodNode mn) {
@@ -323,29 +347,43 @@ public class FontRendererPatcher extends SingleClassPatcher {
         }).find(instructions);
     }
 
-    private void patchRenderStringAtPosShift(MethodNode mn) {
+    private void patchRenderStringAtPosPostChar(MethodNode mn, int charVar) {
+        InsnList insns = mn.instructions;
+
+        // Find index where the loop condition belong.
+        Cell<JumpInsnNode> conditionInsnCell = new Cell<>();
+        finder
+                .method().owner("java/lang/String").name("length")
+                .jump().whenMatch(conditionInsnCell::set)
+                .findFirst(insns);
+
+        // Find jump destination point back from the end of the loop.
+        Cell<LabelNode> labelCell = new Cell<>();
+        finder
+                .reversed()
+                .label().whenMatch(labelCell::set)
+                .findFirstStartFrom(insns, conditionInsnCell.get());
+
+        // Find a jump where its destination = firstLabelNode and insert instructions.
+        finder.jump().label(labelCell.get()).whenMatch(insn -> {
+            InsnList patch = new InsnList();
+            patch.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            patch.add(new VarInsnNode(Opcodes.ILOAD, charVar));
+            patch.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassName, "lastCharThaiFixes", "C"));
+
+            callFontMethod(patch, "postCharacterRendered", "(C)V",
+                    i -> i.add(new VarInsnNode(Opcodes.ILOAD, charVar)));
+
+            insns.insertBefore(insn, patch);
+        }).findFirst(insns);
+    }
+
+    private void patchRenderStringAtPosShift(MethodNode mn, int charVar, int shiftVar) {
         InsnList insns = mn.instructions;
 
         // A new variable storing the original content of the shift variable.
         int originalShiftVar = mn.maxLocals;
         int boldShiftVar = originalShiftVar + 1;
-
-        // Find the character variable inside the loop.
-        Cell<Integer> charVarCell = new Cell<>();
-        finder
-                .method().owner("java/lang/String").name("charAt")
-                .var(Opcodes.ISTORE).whenMatch(node -> charVarCell.set(node.var))
-                .findFirst(insns);
-        int charVar = charVarCell.get();
-
-        // Find shiftVar.
-        Cell<Integer> shiftVarCell = new Cell<>();
-        finder
-                .field(Opcodes.GETFIELD).ownerSelf().name("posY")
-                .var(Opcodes.FLOAD).whenMatch(node -> shiftVarCell.set(node.var))
-                .insn(Opcodes.FSUB)
-                .findFirst(insns);
-        int shiftVar = shiftVarCell.get();
 
         // Find the instruction that set the variable and add instructions.
         finder.var(Opcodes.FSTORE).number(shiftVar).whenMatch(node -> {
