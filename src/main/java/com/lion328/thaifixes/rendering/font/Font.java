@@ -22,23 +22,23 @@
 
 package com.lion328.thaifixes.rendering.font;
 
-import com.lion328.thaifixes.rendering.ThaiFixesFontRenderer;
+import com.lion328.thaifixes.rendering.FontManager;
 
 public interface Font {
 
     /**
-     * Set ThaiFixesFontRenderer object.
+     * Set FontManager object.
      *
-     * @param wrapper ThaiFixesFontRenderer object.
+     * @param wrapper FontManager object.
      */
-    void setFontRenderer(ThaiFixesFontRenderer wrapper);
+    void setManager(FontManager manager);
 
     /**
-     * Get ThaiFixesFontRenderer object.
+     * Get FontManager object.
      *
-     * @return Return the current ThaiFixesFontRenderer object.
+     * @return Return the current FontManager object.
      */
-    ThaiFixesFontRenderer getRenderer();
+    FontManager getManager();
 
     /**
      * Check for supported character.

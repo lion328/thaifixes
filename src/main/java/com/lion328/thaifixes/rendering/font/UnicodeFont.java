@@ -23,8 +23,8 @@
 package com.lion328.thaifixes.rendering.font;
 
 import com.lion328.thaifixes.ThaiUtil;
+import com.lion328.thaifixes.rendering.FontManager;
 import com.lion328.thaifixes.rendering.GLFunctions;
-import com.lion328.thaifixes.rendering.ThaiFixesFontRenderer;
 import org.lwjgl.opengl.GL11;
 
 public class UnicodeFont extends ThaiFont {
@@ -33,12 +33,12 @@ public class UnicodeFont extends ThaiFont {
     private float saraAmDisplayShift = Float.NaN;
 
     @Override
-    public void onFontRendererChanged() {
-        if (getRenderer() == null)
+    public void onManagerChanged() {
+        if (getManager() == null)
             return;
 
-        int aaWidth = (getRenderer().getRawUnicodeWidth(ThaiUtil.SARA_AA) & 15) + 1;
-        int amWIdth = (getRenderer().getRawUnicodeWidth(ThaiUtil.SARA_AM) & 15) + 1;
+        int aaWidth = (getManager().getRawUnicodeWidth(ThaiUtil.SARA_AA) & 15) + 1;
+        int amWIdth = (getManager().getRawUnicodeWidth(ThaiUtil.SARA_AM) & 15) + 1;
         saraAmDisplayShift = -(amWIdth - aaWidth);
         saraAmDisplayWidth = (aaWidth + saraAmDisplayShift) / 2.0F + 1.0F;
     }
@@ -50,7 +50,7 @@ public class UnicodeFont extends ThaiFont {
 
     @Override
     public float renderCharacter(char c, boolean italic) {
-        ThaiFixesFontRenderer renderer = getRenderer();
+        FontManager renderer = getManager();
 
         int rawWidth = renderer.getRawUnicodeWidth(c) & 0xFF;
         float startTexcoordX = (float) (rawWidth >>> 4);

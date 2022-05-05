@@ -28,7 +28,6 @@ import com.lion328.thaifixes.asm.patcher.FontRendererPatcher;
 import com.lion328.thaifixes.asm.patcher.GuiChatPatcher;
 import com.lion328.thaifixes.asm.patcher.GuiNewChatPatcher;
 import com.lion328.thaifixes.asm.patcher.MinecraftPatcher;
-import com.lion328.thaifixes.asm.patcher.ThaiFixesFontRendererPatcher;
 import com.lion328.thaifixes.coremod.ThaiFixesCoremod;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -50,7 +49,6 @@ public class ThaiFixesTransformer implements IClassTransformer {
             patchers.add(new FontRendererPatcher(classMap));
             patchers.add(new GuiNewChatPatcher(classMap));
             patchers.add(new GuiChatPatcher(classMap));
-            patchers.add(new ThaiFixesFontRendererPatcher(classMap));
         } catch (Exception e) {
             ThaiFixesCoremod.LOGGER.catching(e);
         }

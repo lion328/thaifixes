@@ -26,10 +26,8 @@ import com.lion328.thaifixes.asm.mapper.ClassMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -54,51 +52,12 @@ public class MinecraftPatcher extends SingleClassPatcher {
         r.accept(n, 0);
 
         for (MethodNode mn : n.methods)
-            if (patchFontRendererField(mn))
-                break;
-        for (MethodNode mn : n.methods)
             if (patchLanguageManagerField(mn))
                 break;
 
         ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         n.accept(w);
         return w.toByteArray();
-    }
-
-    private boolean patchFontRendererField(MethodNode node) {
-        InsnList insns = node.instructions;
-        for (int i = 0; i < insns.size(); i++) {
-            AbstractInsnNode insn = insns.get(i);
-            if (insn.getOpcode() != Opcodes.LDC) {
-                continue;
-            }
-            LdcInsnNode ldc = (LdcInsnNode) insn;
-            if (!ldc.cst.equals("textures/font/ascii.png")) {
-                continue;
-            }
-            for (; i >= 0; i--) {
-                if (insns.get(i).getOpcode() != Opcodes.NEW) {
-                    continue;
-                }
-                TypeInsnNode type = (TypeInsnNode) insns.get(i);
-                if (type.desc.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
-                    type.desc = "com/lion328/thaifixes/rendering/ThaiFixesFontRenderer";
-                    break;
-                }
-            }
-            for (; i < insns.size(); i++) {
-                if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL) {
-                    continue;
-                }
-                if (((MethodInsnNode) insns.get(i)).owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
-                    MethodInsnNode method = (MethodInsnNode) insns.get(i);
-                    method.owner = "com/lion328/thaifixes/rendering/ThaiFixesFontRenderer";
-                    break;
-                }
-            }
-            return true;
-        }
-        return false;
     }
 
     private boolean patchLanguageManagerField(MethodNode node) {

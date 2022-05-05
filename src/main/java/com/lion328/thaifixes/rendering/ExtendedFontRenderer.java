@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Waritnan Sookbuntherng
+ * Copyright (c) 2022 Waritnan Sookbuntherng
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,31 @@
  * SOFTWARE.
  */
 
-package com.lion328.thaifixes.asm.mapper;
+package com.lion328.thaifixes.rendering;
 
-import org.objectweb.asm.Type;
+import com.lion328.thaifixes.rendering.font.Font;
+import net.minecraft.client.renderer.texture.TextureManager;
 
-public interface ClassDetail {
+public interface ExtendedFontRenderer {
+    TextureManager getTextureManagerThaiFixes();
 
-    String getName();
+    byte[] getGlyphWidthThaiFixes();
 
-    String getObfuscatedName();
+    void loadGlyphTextureThaiFixes(int texture);
 
-    default Type getType() {
-        return Type.getType("L" + getObfuscatedName().replace('.', '/') + ";");
-    }
+    void setUnicodeFlagThaiFixes(boolean flag);
 
-    String getField(String name);
+    float getXThaiFixes();
 
-    String getMethod(String name, String desc);
+    float getYThaiFixes();
 
-    void addField(String name, String obfuscatedName);
+    void setXThaiFixes(float x);
 
-    void addMethod(String name, String obfuscatedName, String desc);
+    Font getFontThaiFixes();
 
-    ClassDetail getSuperclassMap();
+    void setFontThaiFixes(Font font);
+
+    char getLastCharacterRenderedThaiFixes();
+
+    float getLastCharacterShiftOriginalThaiFixes();
 }

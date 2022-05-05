@@ -25,8 +25,8 @@ package com.lion328.thaifixes.rendering.font;
 import com.lion328.thaifixes.ThaiFixes;
 import com.lion328.thaifixes.ThaiUtil;
 import com.lion328.thaifixes.config.ThaiFixesConfiguration;
+import com.lion328.thaifixes.rendering.FontManager;
 import com.lion328.thaifixes.rendering.GLFunctions;
-import com.lion328.thaifixes.rendering.ThaiFixesFontRenderer;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
@@ -104,15 +104,15 @@ public class MCPXFont extends ThaiFont {
 
     @Override
     public float renderCharacter(char c, boolean italic) {
-        ThaiFixesFontRenderer renderer = getRenderer();
-        char lastChar = renderer.getLastCharacterRendered();
+        FontManager manager = getManager();
+        char lastChar = manager.getLastCharacterRendered();
 
         int offset = c - ThaiUtil.THAI_RANGE_MIN + 1;
 
-        float posX = renderer.getX();
+        float posX = manager.getX();
 
         float cPosX = posX;
-        float cPosY = renderer.getY();
+        float cPosY = manager.getY();
 
         if (ThaiUtil.isFloating(c)) {
             cPosX -= thaiCharWidth[offset];
@@ -139,7 +139,7 @@ public class MCPXFont extends ThaiFont {
         float italicSize = italic ? 1.0F : 0.0F;
         float f3 = (float) thaiCharWidth[offset] - 0.01F;
 
-        renderer.bindTexture(MCPX_TEXTURE_LOCATION_RESOURCE);
+        manager.bindTexture(MCPX_TEXTURE_LOCATION_RESOURCE);
 
         GLFunctions.begin(GL11.GL_TRIANGLE_STRIP);
         GLFunctions.texCoord(texcoordX / 128.0F, texcoordY / 128.0F);

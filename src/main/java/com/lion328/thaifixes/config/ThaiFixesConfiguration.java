@@ -22,6 +22,7 @@
 
 package com.lion328.thaifixes.config;
 
+import com.lion328.thaifixes.ThaiFixes;
 import com.lion328.thaifixes.rendering.font.FontStyle;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.Configuration;
@@ -58,15 +59,15 @@ public class ThaiFixesConfiguration {
     }
 
     public static boolean isMCPXChatResizeEnable() {
-        return fontStyle == FontStyle.MCPX && enableMCPXChatResize;
+        return ThaiFixes.isFontRendererPatched() && fontStyle == FontStyle.MCPX && enableMCPXChatResize;
     }
 
     public static boolean isLargeMCPXShadowEanbled() {
-        return fontStyle == FontStyle.MCPX && largeMCPXShadow;
+        return ThaiFixes.isFontRendererPatched() && fontStyle == FontStyle.MCPX && largeMCPXShadow;
     }
 
     public static boolean isASCIIFontWithMCPXEnabled() {
-        return fontStyle == FontStyle.MCPX && asciiFontWithMCPX;
+        return ThaiFixes.isFontRendererPatched() && fontStyle == FontStyle.MCPX && asciiFontWithMCPX;
     }
 
     public static void syncConfig() {

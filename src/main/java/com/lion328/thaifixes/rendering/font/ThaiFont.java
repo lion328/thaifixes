@@ -31,9 +31,9 @@ public abstract class ThaiFont extends AbstractFont {
     public void preCharacterRendered(char c) {
         // Reset position when bold style is used.
         if (ThaiUtil.isFloating(c))
-            getRenderer().setX(lastPosX + getRenderer().getLastCharacterShiftOriginal());
+            getManager().setX(lastPosX + getManager().getLastCharacterShiftOriginal());
 
-        lastPosX = getRenderer().getX();
+        lastPosX = getManager().getX();
     }
 
     @Override

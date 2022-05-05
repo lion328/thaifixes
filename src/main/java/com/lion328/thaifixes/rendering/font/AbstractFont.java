@@ -22,23 +22,23 @@
 
 package com.lion328.thaifixes.rendering.font;
 
-import com.lion328.thaifixes.rendering.ThaiFixesFontRenderer;
+import com.lion328.thaifixes.rendering.FontManager;
 
 public abstract class AbstractFont implements Font {
-    private ThaiFixesFontRenderer renderer;
+    private FontManager manager;
 
     @Override
-    public final void setFontRenderer(ThaiFixesFontRenderer renderer) {
-        this.renderer = renderer;
-        onFontRendererChanged();
+    public final void setManager(FontManager renderer) {
+        this.manager = renderer;
+        onManagerChanged();
     }
 
     @Override
-    public final ThaiFixesFontRenderer getRenderer() {
-        return renderer;
+    public final FontManager getManager() {
+        return manager;
     }
 
-    public void onFontRendererChanged() {
+    public void onManagerChanged() {
     }
 
     @Override
