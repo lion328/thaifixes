@@ -30,8 +30,12 @@ public interface ClassDetail {
 
     String getObfuscatedName();
 
+    default String getObfuscatedInternalName() {
+        return getObfuscatedName().replace('.', '/');
+    }
+
     default Type getType() {
-        return Type.getType("L" + getObfuscatedName().replace('.', '/') + ";");
+        return Type.getType("L" + getObfuscatedInternalName() + ";");
     }
 
     String getField(String name);
