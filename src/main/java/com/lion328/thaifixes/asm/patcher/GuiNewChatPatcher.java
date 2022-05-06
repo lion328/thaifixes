@@ -41,10 +41,6 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
         this.classMap = classMap;
     }
 
-    public static MethodInsnNode getInjectedIntMethod(String methodName) {
-        return new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lion328/thaifixes/InjectedConstants", methodName, "()I", false);
-    }
-
     @Override
     public String getClassName() {
         return classMap.getClass("net.minecraft.client.gui.GuiNewChat").getObfuscatedName();
@@ -88,7 +84,7 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
     }
 
     private MethodInsnNode getConfigFontHeightMethod() {
-        return getInjectedIntMethod("getFontHeight");
+        return PatcherUtil.invokeInjectedConstantsMethodInt("getFontHeight");
     }
 
     private boolean replaceFontHeight(InsnList insns, AbstractInsnNode insn) {
@@ -147,7 +143,7 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
             return false;
         }
 
-        insns.insert(insn, getInjectedIntMethod("getChatLineTextYOffset"));
+        insns.insert(insn, PatcherUtil.invokeInjectedConstantsMethodInt("getChatLineTextYOffset"));
         insns.remove(insn); // BIPUSH 8
 
         return true;

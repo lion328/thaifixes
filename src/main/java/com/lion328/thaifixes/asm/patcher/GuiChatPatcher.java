@@ -56,7 +56,7 @@ public class GuiChatPatcher extends SingleClassPatcher {
 
     private void replaceBipushWithConfig(InsnList insns, int b, String methodName) {
         InstructionFinder.create().integer(Opcodes.BIPUSH).value(b)
-                .whenMatch(insn -> insns.insert(insn, GuiNewChatPatcher.getInjectedIntMethod(methodName)))
+                .whenMatch(insn -> insns.insert(insn, PatcherUtil.invokeInjectedConstantsMethodInt(methodName)))
                 .whenMatch(insns::remove)
                 .find(insns);
     }

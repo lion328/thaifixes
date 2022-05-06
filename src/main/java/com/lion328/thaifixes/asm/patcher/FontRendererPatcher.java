@@ -27,7 +27,6 @@ import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.util.Cell;
 import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -93,9 +92,9 @@ public class FontRendererPatcher extends SingleClassPatcher {
         }
 
         // Add new fields.
-        addPrivateField(n, "fontThaiFixes", fontClassDescriptor);
-        addPrivateField(n, "lastCharThaiFixes", "C");
-        addPrivateField(n, "lastCharShiftThaiFixes", "F");
+        PatcherUtil.addPrivateField(n, "fontThaiFixes", fontClassDescriptor);
+        PatcherUtil.addPrivateField(n, "lastCharThaiFixes", "C");
+        PatcherUtil.addPrivateField(n, "lastCharShiftThaiFixes", "F");
 
         // Implement getters.
         implGetterObfuscated(n, "glyphWidth", "[B", "getGlyphWidthThaiFixes");
@@ -120,20 +119,12 @@ public class FontRendererPatcher extends SingleClassPatcher {
         return true;
     }
 
-    private void addPrivateField(ClassVisitor visitor, String name, String desc) {
-        visitor.visitField(Opcodes.ACC_PRIVATE, name, desc, null, null).visitEnd();
-    }
-
     private void implGetterObfuscated(ClassVisitor visitor, String field, String desc, String methodName) {
         implGetter(visitor, fontRendererClass.getField(field), desc, methodName);
     }
 
     private void implGetter(ClassVisitor visitor, String field, String desc, String methodName) {
-        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PUBLIC, methodName, "()" + desc, null, null);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, fontRendererClassInternalNameObfuscated, field, desc);
-        mv.visitInsn(Type.getType(desc).getOpcode(Opcodes.IRETURN));
-        mv.visitEnd();
+        PatcherUtil.implGetterSelf(visitor, fontRendererClassInternalNameObfuscated, field, desc, methodName);
     }
 
     private void implSetterObfuscated(ClassVisitor visitor, String field, String desc, String methodName) {
@@ -141,35 +132,12 @@ public class FontRendererPatcher extends SingleClassPatcher {
     }
 
     private void implSetter(ClassVisitor visitor, String field, String desc, String methodName) {
-        String methodDesc = "(" + desc + ")V";
-
-        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PUBLIC, methodName, methodDesc, null, null);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitVarInsn(Type.getType(desc).getOpcode(Opcodes.ILOAD), 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, fontRendererClassInternalNameObfuscated, field, desc);
-        mv.visitInsn(Opcodes.RETURN);
-        mv.visitEnd();
+        PatcherUtil.implSetterSelf(visitor, fontRendererClassInternalNameObfuscated, field, desc, methodName);
     }
 
     private void proxyMethodObfuscated(ClassVisitor visitor, String originalName, String newName, String desc) {
-        String obfuscatedName = fontRendererClass.getMethod(originalName, desc);
-
-        MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PUBLIC, newName, desc, null, null);
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-
-        Type type = Type.getType(desc);
-        Type[] argTypes = type.getArgumentTypes();
-        for (int i = 0; i < argTypes.length; i++)
-            mv.visitVarInsn(argTypes[i].getOpcode(Opcodes.ILOAD), i + 1);
-
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, fontRendererClassInternalNameObfuscated, obfuscatedName, desc, false);
-
-        if (type.getReturnType() == Type.VOID_TYPE)
-            mv.visitInsn(Opcodes.RETURN);
-        else
-            mv.visitInsn(type.getOpcode(Opcodes.IRETURN));
-
-        mv.visitEnd();
+        PatcherUtil.proxyMethodSelf(visitor, fontRendererClassInternalNameObfuscated,
+                fontRendererClass.getMethod(originalName, desc), newName, desc);
     }
 
     private void callFontMethod(InsnList i, String name, String desc) {
@@ -207,10 +175,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
     }
 
     private InsnList putField(InsnList insns, String name, String desc, Consumer<InsnList> lambda) {
-        insns.add(new VarInsnNode(Opcodes.ALOAD, 0));
-        lambda.accept(insns);
-        insns.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassInternalNameObfuscated, name, desc));
-        return insns;
+        return PatcherUtil.putFieldSelf(insns, fontRendererClassInternalNameObfuscated, name, desc, lambda);
     }
 
     private void patchInit(MethodNode mn) {
