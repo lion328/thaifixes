@@ -125,7 +125,7 @@ public class InstructionFinder<T> implements InstructionMatcher {
             record = obfuscateType();
 
         if (record.owner != null)
-            record = record.withOwner(classMap.getClassFromInternalName(record.owner).getObfuscatedName());
+            record = record.withOwner(classMap.getClassFromInternalName(record.owner).getObfuscatedInternalName());
 
         return withRecord(record);
     }
@@ -179,7 +179,7 @@ public class InstructionFinder<T> implements InstructionMatcher {
         if (record.desc == null)
             return record;
 
-        String newDesc = classMap.getClassFromInternalName(record.desc).getObfuscatedName();
+        String newDesc = classMap.getClassFromInternalName(record.desc).getObfuscatedInternalName();
         return record.withDescriptor(newDesc);
     }
 
