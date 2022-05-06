@@ -26,9 +26,7 @@ import com.lion328.thaifixes.asm.mapper.ClassDetail;
 import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.util.Cell;
 import com.lion328.thaifixes.asm.util.InstructionFinder;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -76,12 +74,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
     }
 
     @Override
-    public byte[] patch(byte[] original) throws Exception {
-        // Parse the class.
-        ClassReader r = new ClassReader(original);
-        ClassNode n = new ClassNode();
-        r.accept(n, 0);
-
+    public boolean tryPatch(ClassNode n) throws Exception {
         // Set ExtendedFontRenderer as a parent.
         n.interfaces.add(renderingPackagePath + "/ExtendedFontRenderer");
 
@@ -99,36 +92,32 @@ public class FontRendererPatcher extends SingleClassPatcher {
                 patchGetCharWidthFloat(mn);
         }
 
-        // Setup a ClassWriter
-        ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-        n.accept(w);
-
         // Add new fields.
-        addPrivateField(w, "fontThaiFixes", fontClassDescriptor);
-        addPrivateField(w, "lastCharThaiFixes", "C");
-        addPrivateField(w, "lastCharShiftThaiFixes", "F");
+        addPrivateField(n, "fontThaiFixes", fontClassDescriptor);
+        addPrivateField(n, "lastCharThaiFixes", "C");
+        addPrivateField(n, "lastCharShiftThaiFixes", "F");
 
         // Implement getters.
-        implGetterObfuscated(w, "glyphWidth", "[B", "getGlyphWidthThaiFixes");
-        implGetterObfuscated(w, "posX", "F", "getXThaiFixes");
-        implGetterObfuscated(w, "posY", "F", "getYThaiFixes");
-        implGetterObfuscated(w, "renderEngine",
+        implGetterObfuscated(n, "glyphWidth", "[B", "getGlyphWidthThaiFixes");
+        implGetterObfuscated(n, "posX", "F", "getXThaiFixes");
+        implGetterObfuscated(n, "posY", "F", "getYThaiFixes");
+        implGetterObfuscated(n, "renderEngine",
                 classMap.getClass("net.minecraft.client.renderer.texture.TextureManager")
                         .getType().getDescriptor(),
                 "getTextureManagerThaiFixes");
-        implGetter(w, "fontThaiFixes", fontClassDescriptor, "getFontThaiFixes");
-        implGetter(w, "lastCharThaiFixes", "C", "getLastCharacterRenderedThaiFixes");
-        implGetter(w, "lastCharShiftThaiFixes", "F", "getLastCharacterShiftOriginalThaiFixes");
+        implGetter(n, "fontThaiFixes", fontClassDescriptor, "getFontThaiFixes");
+        implGetter(n, "lastCharThaiFixes", "C", "getLastCharacterRenderedThaiFixes");
+        implGetter(n, "lastCharShiftThaiFixes", "F", "getLastCharacterShiftOriginalThaiFixes");
 
         // Implement setters.
-        implSetterObfuscated(w, "posX", "F", "setXThaiFixes");
-        implSetter(w, "fontThaiFixes", fontClassDescriptor, "setFontThaiFixes");
+        implSetterObfuscated(n, "posX", "F", "setXThaiFixes");
+        implSetter(n, "fontThaiFixes", fontClassDescriptor, "setFontThaiFixes");
 
         // Implement proxy methods.
-        proxyMethodObfuscated(w, "loadGlyphTexture", "loadGlyphTextureThaiFixes", "(I)V");
-        proxyMethodObfuscated(w, "setUnicodeFlag", "setUnicodeFlagThaiFixes", "(Z)V");
+        proxyMethodObfuscated(n, "loadGlyphTexture", "loadGlyphTextureThaiFixes", "(I)V");
+        proxyMethodObfuscated(n, "setUnicodeFlag", "setUnicodeFlagThaiFixes", "(Z)V");
 
-        return w.toByteArray();
+        return true;
     }
 
     private void addPrivateField(ClassVisitor visitor, String name, String desc) {

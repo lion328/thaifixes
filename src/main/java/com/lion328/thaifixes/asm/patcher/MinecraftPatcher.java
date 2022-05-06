@@ -24,11 +24,8 @@ package com.lion328.thaifixes.asm.patcher;
 
 import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.util.InstructionFinder;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class MinecraftPatcher extends SingleClassPatcher {
@@ -45,15 +42,11 @@ public class MinecraftPatcher extends SingleClassPatcher {
     }
 
     @Override
-    public byte[] patch(byte[] original) throws Exception {
-        ClassReader r = new ClassReader(original);
-        ClassNode n = new ClassNode();
-        r.accept(n, 0);
-
+    public boolean tryPatch(ClassNode n) throws Exception {
         String orig = "net/minecraft/client/resources/LanguageManager";
         String ours = "com/lion328/thaifixes/ThaiFixesLanguageManager";
 
-        InstructionFinder<MethodInsnNode> finder = InstructionFinder.create()
+        InstructionFinder<?> finder = InstructionFinder.create()
                 .withClassMap(classMap)
                 .type(Opcodes.NEW).desc(orig).whenMatch(insn -> insn.desc = ours)
                 .skip(6)
@@ -63,8 +56,6 @@ public class MinecraftPatcher extends SingleClassPatcher {
             if (finder.findFirst(mn.instructions))
                 break;
 
-        ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-        n.accept(w);
-        return w.toByteArray();
+        return true;
     }
 }

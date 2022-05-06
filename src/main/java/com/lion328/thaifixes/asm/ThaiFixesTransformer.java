@@ -30,6 +30,9 @@ import com.lion328.thaifixes.asm.patcher.GuiNewChatPatcher;
 import com.lion328.thaifixes.asm.patcher.MinecraftPatcher;
 import com.lion328.thaifixes.coremod.ThaiFixesCoremod;
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.ClassNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,20 +59,33 @@ public class ThaiFixesTransformer implements IClassTransformer {
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] original) {
-        byte[] result = original;
-
+        List<ClassPatcher> supportedPatchers = new ArrayList<>();
         for (ClassPatcher patcher : patchers) {
-            if (patcher.isSupported(name)) {
-                ThaiFixesCoremod.LOGGER.info("Patching {}", transformedName);
+            if (patcher.isSupported(name))
+                supportedPatchers.add(patcher);
+        }
 
-                try {
-                    result = patcher.patch(result);
-                } catch (Exception e) {
-                    ThaiFixesCoremod.LOGGER.catching(e);
-                }
+        if (supportedPatchers.isEmpty())
+            return original;
+
+        ClassReader classReader = new ClassReader(original);
+        ClassNode classNode = new ClassNode();
+        classReader.accept(classNode, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+
+        for (ClassPatcher patcher : supportedPatchers) {
+            try {
+                if (patcher.tryPatch(classNode))
+                    ThaiFixesCoremod.LOGGER.info("{} is patched by {}", transformedName,
+                            patcher.getClass().getSimpleName());
+            } catch (Exception e) {
+                ThaiFixesCoremod.LOGGER.error("Error during patching", e);
             }
         }
 
-        return result;
+        ClassWriter classWriter = new ClassWriter(classReader,
+                ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        classNode.accept(classWriter);
+
+        return classWriter.toByteArray();
     }
 }

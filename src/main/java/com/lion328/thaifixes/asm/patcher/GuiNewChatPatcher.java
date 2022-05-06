@@ -24,8 +24,6 @@ package com.lion328.thaifixes.asm.patcher;
 
 import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.util.InstructionFinder;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -53,11 +51,7 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
     }
 
     @Override
-    public byte[] patch(byte[] original) {
-        ClassReader r = new ClassReader(original);
-        ClassNode n = new ClassNode();
-        r.accept(n, 0);
-
+    public boolean tryPatch(ClassNode n) throws Exception {
         for (MethodNode mn : n.methods) {
             InsnList insns = mn.instructions;
 
@@ -90,10 +84,7 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
                     .find(list);
         });
 
-        ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-        n.accept(w);
-
-        return w.toByteArray();
+        return true;
     }
 
     private MethodInsnNode getConfigFontHeightMethod() {

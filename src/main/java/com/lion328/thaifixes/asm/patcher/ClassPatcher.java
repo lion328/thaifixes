@@ -22,9 +22,11 @@
 
 package com.lion328.thaifixes.asm.patcher;
 
+import org.objectweb.asm.tree.ClassNode;
+
 public interface ClassPatcher {
 
-    boolean isSupported(String name);
+    boolean isSupported(String className);
 
-    byte[] patch(byte[] original) throws Exception;
+    boolean tryPatch(ClassNode classNode) throws Exception;
 }
