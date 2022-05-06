@@ -23,14 +23,13 @@
 package com.lion328.thaifixes.asm.patcher;
 
 import com.lion328.thaifixes.asm.mapper.ClassMap;
+import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TypeInsnNode;
 
 public class MinecraftPatcher extends SingleClassPatcher {
 
@@ -51,41 +50,21 @@ public class MinecraftPatcher extends SingleClassPatcher {
         ClassNode n = new ClassNode();
         r.accept(n, 0);
 
+        String orig = "net/minecraft/client/resources/LanguageManager";
+        String ours = "com/lion328/thaifixes/ThaiFixesLanguageManager";
+
+        InstructionFinder<MethodInsnNode> finder = InstructionFinder.create()
+                .withClassMap(classMap)
+                .type(Opcodes.NEW).desc(orig).whenMatch(insn -> insn.desc = ours)
+                .skip(6)
+                .method(Opcodes.INVOKESPECIAL).owner(orig).name("<init>").whenMatch(insn -> insn.owner = ours);
+
         for (MethodNode mn : n.methods)
-            if (patchLanguageManagerField(mn))
+            if (finder.findFirst(mn.instructions))
                 break;
 
         ClassWriter w = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         n.accept(w);
         return w.toByteArray();
-    }
-
-    private boolean patchLanguageManagerField(MethodNode node) {
-        String orig = classMap.getClass("net/minecraft/client/resources/LanguageManager").getObfuscatedName();
-        String ours = "com/lion328/thaifixes/ThaiFixesLanguageManager";
-
-        InsnList insns = node.instructions;
-        for (int i = 0; i < insns.size(); i++) {
-            if (insns.get(i).getOpcode() != Opcodes.NEW)
-                continue;
-
-            TypeInsnNode type = (TypeInsnNode) insns.get(i);
-            if (!orig.equals(type.desc))
-                continue;
-            type.desc = ours;
-
-            for (; i < insns.size(); i++) {
-                if (insns.get(i).getOpcode() != Opcodes.INVOKESPECIAL)
-                    continue;
-
-                if (orig.equals(((MethodInsnNode) insns.get(i)).owner)) {
-                    MethodInsnNode method = (MethodInsnNode) insns.get(i);
-                    method.owner = ours;
-                    break;
-                }
-            }
-            return true;
-        }
-        return false;
     }
 }
