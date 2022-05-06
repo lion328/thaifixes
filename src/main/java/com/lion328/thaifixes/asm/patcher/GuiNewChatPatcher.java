@@ -25,13 +25,11 @@ package com.lion328.thaifixes.asm.patcher;
 import com.lion328.thaifixes.asm.mapper.ClassMap;
 import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+
+import java.util.function.Supplier;
 
 public class GuiNewChatPatcher extends SingleClassPatcher {
 
@@ -48,103 +46,40 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
 
     @Override
     public boolean tryPatch(ClassNode n) throws Exception {
-        for (MethodNode mn : n.methods) {
-            InsnList insns = mn.instructions;
+        Supplier<MethodInsnNode> getFontHeightNode =
+                () -> PatcherUtil.invokeInjectedConstantsMethodInt("getFontHeight");
 
-            for (int i = 0; i < insns.size(); i++) {
-                AbstractInsnNode insn = insns.get(i);
-
-                if (replaceFontHeight(insns, insn)) {
-                    continue;
-                }
-
-                if (replaceChatLineHeight(insns, insn)) {
-                    continue;
-                }
-
-                replaceTextYOffset(insns, insn);
-            }
-        }
-
-        n.methods.forEach(method -> {
-            InsnList list = method.instructions;
+        n.methods.forEach(mn -> {
+            InsnList list = mn.instructions;
             InstructionFinder<Void> finder = InstructionFinder.create().withClassMap(classMap);
 
+            // Replace font height.
             finder
                     .var(Opcodes.ALOAD).number(0).whenMatch(list::remove)
                     .field(Opcodes.GETFIELD).whenMatch(list::remove)
                     .field(Opcodes.GETFIELD).whenMatch(list::remove)
                     .field(Opcodes.GETFIELD).owner("net/minecraft/client/gui/FontRenderer").desc("I")
-                    .whenMatch(node -> list.insert(getConfigFontHeightMethod()))
+                    .whenMatch(node -> list.insert(node, getFontHeightNode.get()))
+                    .whenMatch(list::remove)
+                    .find(list);
+
+            // Replace chat line height.
+            finder
+                    .integer(Opcodes.BIPUSH)
+                    .value(9)
+                    .whenMatch(node -> list.insert(node, getFontHeightNode.get()))
+                    .whenMatch(list::remove)
+                    .find(list);
+
+            // Replace text vertical offset.
+            finder
+                    .integer(Opcodes.BIPUSH)
+                    .value(8)
+                    .whenMatch(node -> list.insert(node,
+                            PatcherUtil.invokeInjectedConstantsMethodInt("getChatLineTextYOffset")))
                     .whenMatch(list::remove)
                     .find(list);
         });
-
-        return true;
-    }
-
-    private MethodInsnNode getConfigFontHeightMethod() {
-        return PatcherUtil.invokeInjectedConstantsMethodInt("getFontHeight");
-    }
-
-    private boolean replaceFontHeight(InsnList insns, AbstractInsnNode insn) {
-        if (insn.getOpcode() != Opcodes.GETFIELD) {
-            return false;
-        }
-
-        FieldInsnNode fieldInsn = (FieldInsnNode) insn;
-
-        if (!fieldInsn.owner.equals(classMap.getClass("net.minecraft.client.gui.FontRenderer")
-                .getObfuscatedInternalName())) {
-            return false;
-        }
-
-        if (!fieldInsn.desc.equals("I")) {
-            return false;
-        }
-
-        insns.insert(insn, getConfigFontHeightMethod());
-
-        int i = insns.indexOf(insn) - 3;
-
-        insns.remove(insns.get(i)); // ALOAD 0
-        insns.remove(insns.get(i)); // GETFIELD GuiNewChat.mc
-        insns.remove(insns.get(i)); // GETFIELD Minecraft.fontRendererObj
-        insns.remove(insns.get(i)); // GETFIELD FontRenderer.FONT_HEIGHT
-
-        return true;
-    }
-
-    private boolean replaceChatLineHeight(InsnList insns, AbstractInsnNode insn) {
-        if (insn.getOpcode() != Opcodes.BIPUSH) {
-            return false;
-        }
-
-        IntInsnNode intInsn = (IntInsnNode) insn;
-
-        if (intInsn.operand != 9) {
-            return false;
-        }
-
-        insns.insert(insn, getConfigFontHeightMethod());
-        insns.remove(insn); // BIPUSH 9
-
-        return true;
-    }
-
-    private boolean replaceTextYOffset(InsnList insns, AbstractInsnNode insn) {
-        if (insn.getOpcode() != Opcodes.BIPUSH) {
-            return false;
-        }
-
-        IntInsnNode intInsn = (IntInsnNode) insn;
-
-        if (intInsn.operand != 8) {
-            return false;
-        }
-
-        insns.insert(insn, PatcherUtil.invokeInjectedConstantsMethodInt("getChatLineTextYOffset"));
-        insns.remove(insn); // BIPUSH 8
 
         return true;
     }

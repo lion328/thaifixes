@@ -27,7 +27,7 @@ import com.lion328.thaifixes.asm.util.InstructionFinder;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.IntInsnNode;
 
 public class GuiChatPatcher extends SingleClassPatcher {
 
@@ -44,20 +44,23 @@ public class GuiChatPatcher extends SingleClassPatcher {
 
     @Override
     public boolean tryPatch(ClassNode n) throws Exception {
-        for (MethodNode mn : n.methods) {
+        n.methods.forEach(mn -> {
             InsnList insns = mn.instructions;
+            InstructionFinder<IntInsnNode> finder = InstructionFinder.create().integer(Opcodes.BIPUSH);
 
-            replaceBipushWithConfig(insns, 12, "getChatTextFieldHeight");
-            replaceBipushWithConfig(insns, 14, "getChatTextFieldBoxHeight");
-        }
+            finder.value(12)
+                    .whenMatch(insn -> insns.insert(insn,
+                            PatcherUtil.invokeInjectedConstantsMethodInt("getChatTextFieldHeight")))
+                    .whenMatch(insns::remove)
+                    .find(insns);
+
+            finder.value(14)
+                    .whenMatch(insn -> insns.insert(insn,
+                            PatcherUtil.invokeInjectedConstantsMethodInt("getChatTextFieldBoxHeight")))
+                    .whenMatch(insns::remove)
+                    .find(insns);
+        });
 
         return true;
-    }
-
-    private void replaceBipushWithConfig(InsnList insns, int b, String methodName) {
-        InstructionFinder.create().integer(Opcodes.BIPUSH).value(b)
-                .whenMatch(insn -> insns.insert(insn, PatcherUtil.invokeInjectedConstantsMethodInt(methodName)))
-                .whenMatch(insns::remove)
-                .find(insns);
     }
 }
