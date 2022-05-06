@@ -79,6 +79,8 @@ public class ThaiFixesTransformer implements IClassTransformer {
                             patcher.getClass().getSimpleName());
             } catch (Exception e) {
                 ThaiFixesCoremod.LOGGER.error("Error during patching", e);
+                ThaiFixesCoremod.LOGGER.info("Rolling back {} to the original state", transformedName);
+                return original;
             }
         }
 
