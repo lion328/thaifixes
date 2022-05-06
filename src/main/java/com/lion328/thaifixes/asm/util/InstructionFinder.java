@@ -30,10 +30,12 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import java.util.ArrayList;
@@ -115,13 +117,15 @@ public class InstructionFinder<T> implements InstructionMatcher {
             throw new IllegalArgumentException();
 
         InstructionFinderRecord record = this.record;
-        if (record.type == AbstractInsnNode.FIELD_INSN)
+        if (record.insnType == AbstractInsnNode.FIELD_INSN)
             record = obfuscateField();
-        else if (record.type == AbstractInsnNode.METHOD_INSN)
+        else if (record.insnType == AbstractInsnNode.METHOD_INSN)
             record = obfuscateMethod();
+        else if (record.insnType == AbstractInsnNode.TYPE_INSN)
+            record = obfuscateType();
 
         if (record.owner != null)
-            record = record.withOwner(currentClassDetail.getObfuscatedName());
+            record = record.withOwner(classMap.getClassFromInternalName(record.owner).getObfuscatedName());
 
         return withRecord(record);
     }
@@ -171,6 +175,14 @@ public class InstructionFinder<T> implements InstructionMatcher {
         return record;
     }
 
+    private InstructionFinderRecord obfuscateType() {
+        if (record.desc == null)
+            return record;
+
+        String newDesc = classMap.getClassFromInternalName(record.desc).getObfuscatedName();
+        return record.withDescriptor(newDesc);
+    }
+
     private <U> InstructionFinder<U> newRecord(int type) {
         return flush().withRecord(new InstructionFinderRecord(type));
     }
@@ -202,9 +214,8 @@ public class InstructionFinder<T> implements InstructionMatcher {
         return newFinder.withRecord(newFinder.record.withOpcode(opcode));
     }
 
-    public InstructionFinder<LdcInsnNode> ldc(Object obj) {
-        InstructionFinder<VarInsnNode> newFinder = newRecord(AbstractInsnNode.LDC_INSN);
-        return newFinder.withRecord(newFinder.record.withConstant(obj));
+    public InstructionFinder<LdcInsnNode> ldc() {
+        return newRecord(AbstractInsnNode.LDC_INSN);
     }
 
     public InstructionFinder<JumpInsnNode> jump() {
@@ -213,6 +224,24 @@ public class InstructionFinder<T> implements InstructionMatcher {
 
     public InstructionFinder<LabelNode> label() {
         return newRecord(AbstractInsnNode.LABEL);
+    }
+
+    public InstructionFinder<IntInsnNode> integer() {
+        return newRecord(AbstractInsnNode.INT_INSN);
+    }
+
+    public InstructionFinder<IntInsnNode> integer(int opcode) {
+        InstructionFinder<IntInsnNode> newFinder = integer();
+        return newFinder.withRecord(newFinder.record.withOpcode(opcode));
+    }
+
+    public InstructionFinder<TypeInsnNode> type() {
+        return newRecord(AbstractInsnNode.TYPE_INSN);
+    }
+
+    public InstructionFinder<TypeInsnNode> type(int opcode) {
+        InstructionFinder<TypeInsnNode> newFinder = type();
+        return newFinder.withRecord(newFinder.record.withOpcode(opcode));
     }
 
     public InstructionFinder<InsnNode> insn() {
@@ -225,8 +254,8 @@ public class InstructionFinder<T> implements InstructionMatcher {
     }
 
     public InstructionFinder<T> owner(String owner) {
-        if (record == null || record.owner != null || record.type != AbstractInsnNode.FIELD_INSN &&
-                record.type != AbstractInsnNode.METHOD_INSN)
+        if (record == null || record.owner != null || record.insnType != AbstractInsnNode.FIELD_INSN &&
+                record.insnType != AbstractInsnNode.METHOD_INSN)
             throw new IllegalArgumentException();
 
         return new InstructionFinder<>(sequence, record.withOwner(owner), reversed, classMap, classMap.getClass(owner),
@@ -238,8 +267,8 @@ public class InstructionFinder<T> implements InstructionMatcher {
     }
 
     public InstructionFinder<T> name(String name) {
-        if (record == null || record.name != null || record.type != AbstractInsnNode.FIELD_INSN &&
-                record.type != AbstractInsnNode.METHOD_INSN)
+        if (record == null || record.name != null || record.insnType != AbstractInsnNode.FIELD_INSN &&
+                record.insnType != AbstractInsnNode.METHOD_INSN)
             throw new IllegalArgumentException();
 
         return withRecord(record.withName(name));
@@ -248,24 +277,32 @@ public class InstructionFinder<T> implements InstructionMatcher {
     public InstructionFinder<T> desc(String desc) {
         if (record == null || record.desc != null)
             throw new IllegalArgumentException();
-        if (record.type == AbstractInsnNode.METHOD_INSN && !desc.startsWith("("))
+        if (record.insnType == AbstractInsnNode.METHOD_INSN && !desc.startsWith("("))
             throw new IllegalArgumentException();
 
         return withRecord(record.withDescriptor(desc));
     }
 
     public InstructionFinder<T> number(int i) {
-        if (record == null || record.type != AbstractInsnNode.VAR_INSN)
+        if (record == null || record.insnType != AbstractInsnNode.VAR_INSN)
             throw new IllegalArgumentException();
 
         return withRecord(record.withVariableNumber(i));
     }
 
     public InstructionFinder<T> label(LabelNode node) {
-        if (record == null || record.type != AbstractInsnNode.JUMP_INSN)
+        if (record == null || record.insnType != AbstractInsnNode.JUMP_INSN)
             throw new IllegalArgumentException();
 
         return withRecord(record.withLabel(node));
+    }
+
+    public InstructionFinder<T> value(Object v) {
+        if (record == null || record.insnType != AbstractInsnNode.LDC_INSN &&
+                record.insnType != AbstractInsnNode.INT_INSN)
+            throw new IllegalArgumentException();
+
+        return withRecord(record.withConstant(v));
     }
 
     public InstructionFinder<Void> skip() {
