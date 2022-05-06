@@ -27,4 +27,8 @@ public interface ClassMap {
     ClassDetail getClass(String name);
 
     ClassDetail addClass(ClassDetail classDetail);
+
+    default ClassDetail getClassFromInternalName(String internalName) {
+        return getClass(internalName.replace('/', '.'));
+    }
 }
