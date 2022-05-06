@@ -56,13 +56,11 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
     private final ClassMap classMap;
     private final ClassDetail fontRendererClass;
-    private final String fontRendererClassName;
     private final InstructionFinder<Void> finder;
 
     public FontRendererPatcher(ClassMap classMap) {
         this.classMap = classMap;
-        fontRendererClass = classMap.getClass(fontRendererClassInternalName);
-        fontRendererClassName = fontRendererClass.getObfuscatedName();
+        fontRendererClass = classMap.getClassFromInternalName(fontRendererClassInternalName);
         finder = InstructionFinder.create()
                 .withClassMap(classMap)
                 .withSelfInternalName(fontRendererClassInternalName);
@@ -70,7 +68,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
     @Override
     public String getClassName() {
-        return fontRendererClass.getObfuscatedName().replace('/', '.');
+        return fontRendererClass.getObfuscatedName();
     }
 
     @Override
@@ -102,8 +100,8 @@ public class FontRendererPatcher extends SingleClassPatcher {
         implGetterObfuscated(n, "posX", "F", "getXThaiFixes");
         implGetterObfuscated(n, "posY", "F", "getYThaiFixes");
         implGetterObfuscated(n, "renderEngine",
-                classMap.getClass("net.minecraft.client.renderer.texture.TextureManager")
-                        .getType().getDescriptor(),
+                classMap.getClass("net.minecraft.client.renderer.texture.TextureManager").getObfuscatedType()
+                        .getDescriptor(),
                 "getTextureManagerThaiFixes");
         implGetter(n, "fontThaiFixes", fontClassDescriptor, "getFontThaiFixes");
         implGetter(n, "lastCharThaiFixes", "C", "getLastCharacterRenderedThaiFixes");
@@ -131,7 +129,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
     private void implGetter(ClassVisitor visitor, String field, String desc, String methodName) {
         MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PUBLIC, methodName, "()" + desc, null, null);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, fontRendererClassName, field, desc);
+        mv.visitFieldInsn(Opcodes.GETFIELD, fontRendererClassInternalName, field, desc);
         mv.visitInsn(Type.getType(desc).getOpcode(Opcodes.IRETURN));
         mv.visitEnd();
     }
@@ -146,7 +144,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
         MethodVisitor mv = visitor.visitMethod(Opcodes.ACC_PUBLIC, methodName, methodDesc, null, null);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitVarInsn(Type.getType(desc).getOpcode(Opcodes.ILOAD), 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, fontRendererClassName, field, desc);
+        mv.visitFieldInsn(Opcodes.PUTFIELD, fontRendererClassInternalName, field, desc);
         mv.visitInsn(Opcodes.RETURN);
         mv.visitEnd();
     }
@@ -162,7 +160,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
         for (int i = 0; i < argTypes.length; i++)
             mv.visitVarInsn(argTypes[i].getOpcode(Opcodes.ILOAD), i + 1);
 
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, fontRendererClassName, obfuscatedName, desc, false);
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, fontRendererClassInternalName, obfuscatedName, desc, false);
 
         if (type.getReturnType() == Type.VOID_TYPE)
             mv.visitInsn(Opcodes.RETURN);
@@ -179,7 +177,8 @@ public class FontRendererPatcher extends SingleClassPatcher {
 
     private void callFontMethod(InsnList i, String name, String desc, Consumer<InsnList> lambda) {
         i.add(new VarInsnNode(Opcodes.ALOAD, 0));
-        i.add(new FieldInsnNode(Opcodes.GETFIELD, fontRendererClassName, "fontThaiFixes", fontClassDescriptor));
+        i.add(new FieldInsnNode(Opcodes.GETFIELD, fontRendererClassInternalName, "fontThaiFixes",
+                fontClassDescriptor));
         lambda.accept(i);
         i.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, fontClassInternalName, name, desc, true));
     }
@@ -208,7 +207,7 @@ public class FontRendererPatcher extends SingleClassPatcher {
     private InsnList putField(InsnList insns, String name, String desc, Consumer<InsnList> lambda) {
         insns.add(new VarInsnNode(Opcodes.ALOAD, 0));
         lambda.accept(insns);
-        insns.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassName, name, desc));
+        insns.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassInternalName, name, desc));
         return insns;
     }
 
@@ -250,7 +249,8 @@ public class FontRendererPatcher extends SingleClassPatcher {
             lastCharShift.add(new InsnNode(Opcodes.DUP));
             lastCharShift.add(new VarInsnNode(Opcodes.ALOAD, 0));
             lastCharShift.add(new InsnNode(Opcodes.SWAP));
-            lastCharShift.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassName, "lastCharShiftThaiFixes", "F"));
+            lastCharShift.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassInternalName,
+                    "lastCharShiftThaiFixes", "F"));
             instructions.insertBefore(node, lastCharShift);
         }).find(instructions);
     }
@@ -317,7 +317,8 @@ public class FontRendererPatcher extends SingleClassPatcher {
         InsnList lastCharReset = new InsnList();
         lastCharReset.add(new VarInsnNode(Opcodes.ALOAD, 0));
         lastCharReset.add(new InsnNode(Opcodes.ICONST_0));
-        lastCharReset.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassName, "lastCharThaiFixes", "C"));
+        lastCharReset.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassInternalName,
+                "lastCharThaiFixes", "C"));
 
         InsnList patchStart = new InsnList();
         patchStart.add(lastCharReset);
@@ -358,7 +359,8 @@ public class FontRendererPatcher extends SingleClassPatcher {
             InsnList patch = new InsnList();
             patch.add(new VarInsnNode(Opcodes.ALOAD, 0));
             patch.add(new VarInsnNode(Opcodes.ILOAD, charVar));
-            patch.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassName, "lastCharThaiFixes", "C"));
+            patch.add(new FieldInsnNode(Opcodes.PUTFIELD, fontRendererClassInternalName,
+                    "lastCharThaiFixes", "C"));
 
             callFontMethod(patch, "postCharacterRendered", "(C)V",
                     i -> i.add(new VarInsnNode(Opcodes.ILOAD, charVar)));

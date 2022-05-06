@@ -28,14 +28,14 @@ public interface ClassDetail {
 
     String getName();
 
-    String getObfuscatedName();
+    String getObfuscatedInternalName();
 
-    default String getObfuscatedInternalName() {
-        return getObfuscatedName().replace('.', '/');
+    default String getObfuscatedName() {
+        return getObfuscatedInternalName().replace('/', '.');
     }
 
-    default Type getType() {
-        return Type.getType("L" + getObfuscatedInternalName() + ";");
+    default Type getObfuscatedType() {
+        return Type.getObjectType(getObfuscatedInternalName());
     }
 
     String getField(String name);

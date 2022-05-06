@@ -38,7 +38,7 @@ public class MinecraftPatcher extends SingleClassPatcher {
 
     @Override
     public String getClassName() {
-        return classMap.getClass("net/minecraft/client/Minecraft").getObfuscatedName().replace('/', '.');
+        return classMap.getClass("net.minecraft.client.Minecraft").getObfuscatedName();
     }
 
     @Override

@@ -26,8 +26,8 @@ public final class IdentityClassMap implements ClassMap {
     public static final IdentityClassMap INSTANCE = new IdentityClassMap();
 
     @Override
-    public ClassDetail getClass(String name) {
-        return new IdentityClassDetail(name);
+    public ClassDetail getClassFromInternalName(String internalName) {
+        return new IdentityClassDetail(internalName);
     }
 
     @Override
@@ -48,7 +48,7 @@ public final class IdentityClassMap implements ClassMap {
         }
 
         @Override
-        public String getObfuscatedName() {
+        public String getObfuscatedInternalName() {
             return className;
         }
 

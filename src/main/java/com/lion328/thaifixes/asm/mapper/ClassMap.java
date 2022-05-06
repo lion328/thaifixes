@@ -24,11 +24,11 @@ package com.lion328.thaifixes.asm.mapper;
 
 public interface ClassMap {
 
-    ClassDetail getClass(String name);
+    ClassDetail getClassFromInternalName(String internalName);
 
     ClassDetail addClass(ClassDetail classDetail);
 
-    default ClassDetail getClassFromInternalName(String internalName) {
-        return getClass(internalName.replace('/', '.'));
+    default ClassDetail getClass(String name) {
+        return getClassFromInternalName(name.replace('.', '/'));
     }
 }

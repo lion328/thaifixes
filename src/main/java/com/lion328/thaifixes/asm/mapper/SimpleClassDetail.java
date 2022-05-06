@@ -50,7 +50,7 @@ public class SimpleClassDetail implements ClassDetail {
     }
 
     @Override
-    public String getObfuscatedName() {
+    public String getObfuscatedInternalName() {
         return obfuscatedName;
     }
 

@@ -39,7 +39,7 @@ public class GuiChatPatcher extends SingleClassPatcher {
 
     @Override
     public String getClassName() {
-        return classMap.getClass("net/minecraft/client/gui/GuiChat").getObfuscatedName().replace('/', '.');
+        return classMap.getClass("net.minecraft.client.gui.GuiChat").getObfuscatedName();
     }
 
     @Override

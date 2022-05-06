@@ -27,15 +27,15 @@ import java.util.Map;
 
 public class SimpleClassMap implements ClassMap {
 
-    private Map<String, ClassDetail> classesDetail;
+    private final Map<String, ClassDetail> classesDetail;
 
     public SimpleClassMap() {
-        classesDetail = new HashMap<String, ClassDetail>();
+        classesDetail = new HashMap<>();
     }
 
     @Override
-    public ClassDetail getClass(String name) {
-        return classesDetail.getOrDefault(name, IdentityClassMap.INSTANCE.getClass(name));
+    public ClassDetail getClassFromInternalName(String internalName) {
+        return classesDetail.getOrDefault(internalName, IdentityClassMap.INSTANCE.getClassFromInternalName(internalName));
     }
 
     @Override

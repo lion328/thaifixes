@@ -458,9 +458,9 @@ public class V1_6_2ClassMapper implements ClassMapper {
             if ((index = key.indexOf(':')) != -1) {
                 className = key.substring(0, (tmp = key.substring(0, index).lastIndexOf('/')));
                 if (key.charAt(index + 1) == '(') {
-                    classMap.getClass(className).addMethod(key.substring(tmp + 1, index), entry.getValue(), key.substring(index + 1));
+                    classMap.getClassFromInternalName(className).addMethod(key.substring(tmp + 1, index), entry.getValue(), key.substring(index + 1));
                 } else {
-                    classMap.getClass(className).addField(key.substring(tmp + 1, index), entry.getValue());
+                    classMap.getClassFromInternalName(className).addField(key.substring(tmp + 1, index), entry.getValue());
                 }
             } else {
                 classMap.addClass(new SimpleClassDetail(key, entry.getValue()));

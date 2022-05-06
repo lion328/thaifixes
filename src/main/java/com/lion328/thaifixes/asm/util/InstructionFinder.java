@@ -141,7 +141,7 @@ public class InstructionFinder<T> implements InstructionMatcher {
         Type type = Type.getType(record.desc);
 
         if (type.getSort() == Type.OBJECT)
-            type = Type.getObjectType(classMap.getClass(type.getClassName()).getObfuscatedName());
+            type = classMap.getClassFromInternalName(type.getClassName()).getObfuscatedType();
 
         record = record.withDescriptor(type.getDescriptor());
         return record;
@@ -160,14 +160,11 @@ public class InstructionFinder<T> implements InstructionMatcher {
         Type returnType = type.getReturnType();
 
         if (returnType.getSort() == Type.OBJECT)
-            returnType = Type.getObjectType(classMap.getClass(returnType.getClassName()).getObfuscatedName());
+            returnType = classMap.getClassFromInternalName(returnType.getClassName()).getObfuscatedType();
 
-        for (int i = 0; i < argTypes.length; i++) {
-            if (argTypes[i].getSort() == Type.OBJECT) {
-                String obfuscated = classMap.getClass(argTypes[i].getClassName()).getObfuscatedName();
-                argTypes[i] = Type.getObjectType(obfuscated);
-            }
-        }
+        for (int i = 0; i < argTypes.length; i++)
+            if (argTypes[i].getSort() == Type.OBJECT)
+                argTypes[i] = classMap.getClassFromInternalName(argTypes[i].getClassName()).getObfuscatedType();
 
         type = Type.getMethodType(returnType, argTypes);
         record = record.withDescriptor(type.getDescriptor());
@@ -258,8 +255,8 @@ public class InstructionFinder<T> implements InstructionMatcher {
                 record.insnType != AbstractInsnNode.METHOD_INSN)
             throw new IllegalArgumentException();
 
-        return new InstructionFinder<>(sequence, record.withOwner(owner), reversed, classMap, classMap.getClass(owner),
-                selfInternalName);
+        return new InstructionFinder<>(sequence, record.withOwner(owner), reversed, classMap,
+                classMap.getClassFromInternalName(owner), selfInternalName);
     }
 
     public InstructionFinder<T> ownerSelf() {

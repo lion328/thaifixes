@@ -47,7 +47,7 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
 
     @Override
     public String getClassName() {
-        return classMap.getClass("net/minecraft/client/gui/GuiNewChat").getObfuscatedName().replace('/', '.');
+        return classMap.getClass("net.minecraft.client.gui.GuiNewChat").getObfuscatedName();
     }
 
     @Override
@@ -98,7 +98,8 @@ public class GuiNewChatPatcher extends SingleClassPatcher {
 
         FieldInsnNode fieldInsn = (FieldInsnNode) insn;
 
-        if (!fieldInsn.owner.equals(classMap.getClass("net/minecraft/client/gui/FontRenderer").getObfuscatedName())) {
+        if (!fieldInsn.owner.equals(classMap.getClass("net.minecraft.client.gui.FontRenderer")
+                .getObfuscatedInternalName())) {
             return false;
         }
 
